@@ -55,13 +55,19 @@ services:
     build: ./frontend
     container_name: alkauf-frontend
     restart: unless-stopped
-    # Wird vom NPM bedient; nach außen geht NPM auf 8081 (siehe npm-Service).
-    # Das Frontend-Nginx liefert die PWA und proxyt /api -> backend:5000.
+    # Liefert die PWA und proxyt /api -> backend:5000.
+    # Direkt auf Host-Port 8081 (eigener/externer Reverse Proxy zeigt hierher).
+    # Wer den gebündelten NPM nutzen will: dort Proxy-Host auf frontend:80 + Profil 'bundled-proxy'.
+    ports:
+      - "8081:80"
     expose: ["80"]
     depends_on: [backend]
     networks: [alkauf_net]
 
   npm:
+    # Optionaler gebündelter Reverse Proxy. Standardmäßig NICHT gestartet (eigener Proxy vorhanden).
+    # Aktivieren mit:  docker compose --profile bundled-proxy up -d
+    profiles: ["bundled-proxy"]
     image: jc21/nginx-proxy-manager:latest
     container_name: alkauf-npm
     restart: unless-stopped

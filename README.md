@@ -55,21 +55,22 @@ docker compose exec backend node src/prisma/seed.js
 
 ---
 
-## 3. Nginx Proxy Manager → Port 8081
+## 3. Reverse Proxy → Port 8081
 
-Nach außen wird die App über den **Nginx Proxy Manager (NPM)** ausgeliefert.
+Das **Frontend** (Nginx, liefert die PWA und proxyt `/api` → Backend) liegt direkt auf **Host-Port 8081**.
 
-1. NPM-Admin öffnen: `http://<host>:81` — **Default-Login sofort ändern**
-   (Standard: `admin@example.com` / `changeme`).
-2. **Proxy Host** anlegen:
-   - Domain: eure Domain (oder Host-IP)
-   - **Forward Hostname/IP:** `frontend`   **Forward Port:** `80`
-   - *Websockets support* an (schadet nicht), *Block Common Exploits* an
-3. **SSL**-Tab: Let's-Encrypt-Zertifikat anfordern (Domain muss auf den Host zeigen) → *Force SSL*.
-4. **Access List** (Basic Auth) als zusätzliche Schutzschicht **vor** der App anlegen und im Proxy Host zuweisen.
-5. WebUI erreichen: **`http://<host>:8081`** bzw. `https://eure-domain` → es erscheint der Login der App.
+**Variante A — eigener/externer Reverse Proxy (Standard dieses Compose):**
+Im vorhandenen Proxy einen Host anlegen, der auf **`http://<host>:8081`** weiterleitet, dort SSL
+(Let's Encrypt) terminieren und optional eine Access-List (Basic Auth) davorschalten.
+Damit das **Secure-Cookie** greift, muss der Proxy `X-Forwarded-Proto: https` setzen (Standard bei NPM/Traefik) —
+das Frontend-Nginx reicht den Wert durch. Sonst nichts weiter zu tun.
 
-> Die App-eigene **JWT-Anmeldung** kommt zusätzlich **hinter** der NPM-Basic-Auth.
+**Variante B — gebündelter Nginx Proxy Manager (ohne eigenen Proxy):**
+Beim `frontend`-Service das `ports: ["8081:80"]` entfernen und stattdessen den NPM starten:
+`docker compose --profile bundled-proxy up -d`. Dann im NPM-Admin (`http://<host>:81`, Default-Login
+ändern!) einen **Proxy Host → `frontend:80`** anlegen, SSL + Access-List aktivieren; WebUI dann auf `:8081`.
+
+> Die App-eigene **JWT-Anmeldung** (httpOnly-Cookie) kommt zusätzlich hinter einer evtl. Basic-Auth.
 
 ### fail2ban (Host)
 
