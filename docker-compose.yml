@@ -37,7 +37,7 @@ services:
       REMINDER_LOOKAHEAD_DAYS: 7          # konfigurierbar
       TZ: Europe/Berlin
       # --- Ergänzungen über Abschnitt 3 hinaus (für eine lauffähige App nötig) ---
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       APP_URL: ${APP_URL:-http://localhost:8081}
       CORS_ORIGIN: ${CORS_ORIGIN:-}
       ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}

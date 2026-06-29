@@ -1,16 +1,7 @@
 import axios from 'axios';
-import { getToken, clearToken } from './auth';
 
-export const api = axios.create({ baseURL: '/api' });
-
-api.interceptors.request.use((cfg) => {
-  const t = getToken();
-  if (t) {
-    cfg.headers = cfg.headers ?? {};
-    cfg.headers.Authorization = `Bearer ${t}`;
-  }
-  return cfg;
-});
+// withCredentials: sendet das httpOnly-Auth-Cookie automatisch mit (same-origin)
+export const api = axios.create({ baseURL: '/api', withCredentials: true });
 
 let onUnauthorized: (() => void) | null = null;
 export function setUnauthorizedHandler(fn: () => void): void {
@@ -21,9 +12,9 @@ api.interceptors.response.use(
   (r) => r,
   (err) => {
     const url = (err.config && err.config.url) || '';
-    // 401 vom Login (Falschpasswort) NICHT als Session-Ablauf behandeln
-    if (axios.isAxiosError(err) && err.response?.status === 401 && !url.endsWith('/auth/login')) {
-      clearToken();
+    // 401 von Login (Falschpasswort) bzw. /auth/me (noch nicht eingeloggt) ist KEIN Session-Ablauf
+    const isAuthProbe = url.endsWith('/auth/login') || url.endsWith('/auth/me');
+    if (axios.isAxiosError(err) && err.response?.status === 401 && !isAuthProbe) {
       onUnauthorized?.();
     }
     return Promise.reject(err);

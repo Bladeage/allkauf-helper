@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
@@ -15,7 +15,7 @@ export default defineConfig({
         short_name: 'Haus-Helfer',
         description: 'Bau-Begleiter für das allkauf Ausbauhaus (Home 12)',
         theme_color: '#ea580c',
-        background_color: '#0f172a',
+        background_color: '#f1f5f9',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',

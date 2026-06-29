@@ -5,6 +5,8 @@ import { api, apiError } from '../lib/api';
 import type { Reminder, Milestone } from '../types';
 import { Spinner, Card, Badge, Button, Input, PageHeader, EmptyState, ErrorBox } from '../components/ui';
 import { fmtDate, toInputDate } from '../lib/format';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 function Section({ title, color, items }: { title: string; color: string; items: Reminder[] }) {
   if (items.length === 0) return null;
@@ -14,7 +16,7 @@ function Section({ title, color, items }: { title: string; color: string; items:
         {items.map((r) => (
           <li key={r.id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-2">
             <div className="min-w-0">
-              <Link to={`/phases/${r.phaseId}`} className="block truncate font-medium text-slate-800 hover:text-brand">
+              <Link to={`/phases/${r.phaseId}`} className="block truncate font-medium text-slate-800 hover:text-brand-700">
                 {r.title}
               </Link>
               <div className="truncate text-xs text-slate-500">
@@ -38,6 +40,8 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   async function addM() {
     if (!title.trim()) return;
@@ -45,6 +49,7 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
     setErr(null);
     try {
       await api.post('/milestones', { title: title.trim() });
+      toast.success('Meilenstein angelegt');
       setTitle('');
       reload();
     } catch (e) {
@@ -56,15 +61,17 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
   async function setDate(id: number, dateStr: string) {
     try {
       await api.patch(`/milestones/${id}`, { actualDate: dateStr || null });
+      toast.success('Datum gespeichert');
       reload();
     } catch (e) {
       setErr(apiError(e));
     }
   }
   async function del(id: number) {
-    if (!confirm('Meilenstein löschen?')) return;
+    if (!(await confirm({ message: 'Meilenstein löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
     try {
       await api.delete(`/milestones/${id}`);
+      toast.success('Meilenstein gelöscht');
       reload();
     } catch (e) {
       setErr(apiError(e));

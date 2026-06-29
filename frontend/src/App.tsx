@@ -12,6 +12,8 @@ import Costs from './pages/Costs';
 import Reminders from './pages/Reminders';
 import HouseAreas from './pages/HouseAreas';
 import Settings from './pages/Settings';
+import NotFound from './pages/NotFound';
+import { ReloadPrompt } from './components/ReloadPrompt';
 
 // Remount bei Phasenwechsel, damit keine alten Daten unter neuer URL aufblitzen
 function PhaseDetailRoute() {
@@ -51,18 +53,21 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/timeline" element={<Timeline />} />
-        <Route path="/phases" element={<Phases />} />
-        <Route path="/phases/:id" element={<PhaseDetailRoute />} />
-        <Route path="/costs" element={<Costs />} />
-        <Route path="/reminders" element={<Reminders />} />
-        <Route path="/house" element={<HouseRoute />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/phases" element={<Phases />} />
+          <Route path="/phases/:id" element={<PhaseDetailRoute />} />
+          <Route path="/costs" element={<Costs />} />
+          <Route path="/reminders" element={<Reminders />} />
+          <Route path="/house" element={<HouseRoute />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+      <ReloadPrompt />
+    </>
   );
 }

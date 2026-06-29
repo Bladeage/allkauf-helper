@@ -8,7 +8,7 @@ import { HttpError } from '../middleware/errorHandler.js';
 // auch bei „User existiert nicht" echte Arbeit leistet -> konstante Zeit gegen User-Enumeration.
 const DUMMY_HASH = bcrypt.hashSync('timing-mitigation-dummy', 10);
 
-export async function login(email, password) {
+export async function login(email, password, remember = false) {
   const normEmail = String(email || '').toLowerCase().trim();
   const user = await prisma.user.findUnique({ where: { email: normEmail } });
   const hash = user ? user.passwordHash : DUMMY_HASH;
@@ -19,10 +19,11 @@ export async function login(email, password) {
   const token = jwt.sign(
     { sub: String(user.id), email: user.email, name: user.name, role: user.role },
     config.jwtSecret,
-    { expiresIn: config.jwtExpiresIn },
+    { expiresIn: remember ? config.jwtRememberExpiresIn : config.jwtExpiresIn },
   );
   return {
     token,
+    remember: Boolean(remember),
     user: { id: user.id, name: user.name, email: user.email, role: user.role },
   };
 }

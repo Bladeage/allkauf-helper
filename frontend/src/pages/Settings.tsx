@@ -5,6 +5,7 @@ import { useData } from '../context/DataContext';
 import type { ProjectSettings } from '../types';
 import { Spinner, Card, Button, Input, Field, ErrorBox, PageHeader, Badge } from '../components/ui';
 import { toInputDate } from '../lib/format';
+import { useToast } from '../context/ToastContext';
 
 export default function Settings() {
   const { data, loading, error } = useFetch<ProjectSettings>('/settings');
@@ -21,6 +22,7 @@ export default function Settings() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     if (!data) return;
@@ -54,6 +56,7 @@ export default function Settings() {
         hourlyRateEigenleistung: num(form.hourlyRateEigenleistung),
       });
       setSaved(true);
+      toast.success('Einstellungen gespeichert');
     } catch (e) {
       setErr(apiError(e));
     } finally {

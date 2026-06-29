@@ -9,6 +9,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [remember, setRemember] = useState(false);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -16,7 +17,7 @@ export default function Login() {
     setBusy(true);
     setErr(null);
     try {
-      await login(email.trim(), password);
+      await login(email.trim(), password, remember);
     } catch (e2) {
       setErr(apiError(e2, 'Login fehlgeschlagen'));
     } finally {
@@ -45,6 +46,15 @@ export default function Login() {
               required
             />
           </Field>
+          <label className="flex items-center gap-2 text-sm text-slate-600">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand"
+            />
+            Eingeloggt bleiben
+          </label>
           {sessionExpired && !err && (
             <div className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800" role="status">
               Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.

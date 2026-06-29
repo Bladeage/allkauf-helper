@@ -1,11 +1,19 @@
-export const TOKEN_KEY = 'alkauf_token';
+// Das Auth-Token liegt im httpOnly-Cookie (per JS NICHT lesbar).
+// Hier nur ein NICHT-sensibler Flag für die Multi-Tab-Synchronisation (Login/Logout über Tabs).
+export const AUTH_FLAG = 'alkauf_auth';
 
-export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+export function markLoggedIn(): void {
+  try {
+    localStorage.setItem(AUTH_FLAG, String(Date.now()));
+  } catch {
+    /* ignore */
+  }
 }
-export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-export function clearToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
+
+export function markLoggedOut(): void {
+  try {
+    localStorage.removeItem(AUTH_FLAG);
+  } catch {
+    /* ignore */
+  }
 }

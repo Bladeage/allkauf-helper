@@ -7,6 +7,8 @@ import { Spinner, ProgressBar, Badge, Card, Button, Input, Textarea, Select, Fie
 import { STATUS_BADGE, STATUS_LABEL, CATEGORY_LABEL, fmtDate, toInputDate, euro } from '../lib/format';
 import TaskItem from '../components/TaskItem';
 import NoteEditor from '../components/NoteEditor';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 const CATS: CostCategory[] = ['allkauf_paket', 'bemusterung_extra', 'eigenleistung_material', 'sonstiges'];
 
@@ -26,7 +28,7 @@ export default function PhaseDetail() {
 
   return (
     <div className="space-y-4">
-      <Link to="/phases" className="text-sm text-slate-500 hover:text-brand">
+      <Link to="/phases" className="text-sm text-slate-500 hover:text-brand-700">
         ← Alle Phasen
       </Link>
 
@@ -48,7 +50,7 @@ export default function PhaseDetail() {
           <span>Start: {fmtDate(phase.startDate)}</span>
           <span>Ende: {fmtDate(phase.endDate)}</span>
           {phase.budget != null && <span>Budget: {euro(phase.budget)}</span>}
-          <button onClick={() => setShowEdit(true)} className="text-brand hover:underline">
+          <button onClick={() => setShowEdit(true)} className="text-brand-700 hover:underline">
             bearbeiten
           </button>
         </div>
@@ -87,6 +89,8 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
   const [amount, setAmount] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   async function add() {
     if (!label.trim() || amount.trim() === '') return;
@@ -94,6 +98,7 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
     setErr(null);
     try {
       await api.post('/lump-sums', { phaseId: phase.id, label: label.trim(), amount: Number(amount) });
+      toast.success('Pauschale hinzugefügt');
       setLabel('');
       setAmount('');
       onChanged();
@@ -104,11 +109,12 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
     }
   }
   async function del(lid: number) {
-    if (!confirm('Pauschale wirklich löschen?')) return;
+    if (!(await confirm({ message: 'Pauschale wirklich löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
     setBusy(true);
     setErr(null);
     try {
       await api.delete(`/lump-sums/${lid}`);
+      toast.success('Pauschale gelöscht');
       onChanged();
     } catch (e) {
       setErr(apiError(e));
@@ -157,6 +163,7 @@ function AddTaskModal({ phaseId, onClose, onDone }: { phaseId: number; onClose: 
   const [dueDate, setDueDate] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
 
   async function submit() {
     if (!title.trim()) {
@@ -174,6 +181,7 @@ function AddTaskModal({ phaseId, onClose, onDone }: { phaseId: number; onClose: 
         costAmount: costAmount.trim() === '' ? null : Number(costAmount),
         dueDate: dueDate || null,
       });
+      toast.success('Aufgabe hinzugefügt');
       onDone();
       onClose();
     } catch (e) {
@@ -231,6 +239,7 @@ function EditPhaseModal({ phase, onClose, onDone }: { phase: PD; onClose: () => 
   const [budget, setBudget] = useState(phase.budget != null ? String(phase.budget) : '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
 
   async function submit() {
     setBusy(true);
@@ -242,6 +251,7 @@ function EditPhaseModal({ phase, onClose, onDone }: { phase: PD; onClose: () => 
         endDate: endDate || null,
         budget: budget.trim() === '' ? null : Number(budget),
       });
+      toast.success('Phase gespeichert');
       onDone();
       onClose();
     } catch (e) {

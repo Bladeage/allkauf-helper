@@ -96,11 +96,15 @@ npm run dev                    # http://localhost:5173  (proxyt /api -> :5000)
 
 ---
 
-## 5. Sicherheit (Abschnitt 8)
+## 5. Sicherheit (Abschnitt 8 + Review-Härtung)
 
-- **JWT-Login** (`POST /api/auth/login`), Passwörter mit **bcrypt** gehasht, Token mit Ablaufzeit (`JWT_EXPIRES_IN`).
-- **Rate-Limiting** am Login (10 Versuche / 15 min / IP) + sanftes Limit auf der übrigen API.
-- **Helmet**-Security-Header, CORS nur für `CORS_ORIGIN` (im Prod-Betrieb same-origin).
+- **JWT-Login** (`POST /api/auth/login`), Passwörter mit **bcrypt** gehasht. Das Token liegt im
+  **httpOnly-Cookie** (per JS nicht lesbar; `Secure` bei HTTPS, `SameSite=Lax`). „Eingeloggt bleiben"
+  → 30 Tage, sonst `JWT_EXPIRES_IN` (Default 7 Tage). API-/CLI-Clients können alternativ den
+  `Authorization: Bearer <token>`-Header nutzen (Token kommt zusätzlich im Login-Body).
+- **Rate-Limiting** am Login (10 / 15 min / IP), enges Limit auf der Erinnerungs-Mail + sanftes API-Limit.
+- **Security-Header** am ausliefernden Nginx: Content-Security-Policy, X-Frame-Options, X-Content-Type-Options,
+  Referrer-Policy, Permissions-Policy; Helmet am Backend. CORS standardmäßig nur same-origin (sonst `CORS_ORIGIN`).
 - **HTTPS** über NPM (Let's Encrypt), **NPM Access-List** (Basic Auth) davor, **fail2ban** am Host.
 
 Passwort eines Accounts zurücksetzen:

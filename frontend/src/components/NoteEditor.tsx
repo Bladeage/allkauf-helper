@@ -4,6 +4,8 @@ import { api, apiError } from '../lib/api';
 import type { Note } from '../types';
 import { Button, Textarea, ErrorBox } from './ui';
 import { fmtDateTime } from '../lib/format';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; taskId?: number }) {
   const q = phaseId ? `/notes?phaseId=${phaseId}` : `/notes?taskId=${taskId}`;
@@ -11,6 +13,8 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
   const [text, setText] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   async function add() {
     if (!text.trim()) return;
@@ -18,6 +22,7 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
     setErr(null);
     try {
       await api.post('/notes', { phaseId: phaseId ?? null, taskId: taskId ?? null, content: text.trim() });
+      toast.success('Notiz gespeichert');
       setText('');
       reload();
     } catch (e) {
@@ -28,8 +33,10 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
   }
 
   async function del(id: number) {
+    if (!(await confirm({ message: 'Notiz löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
     try {
       await api.delete(`/notes/${id}`);
+      toast.success('Notiz gelöscht');
       reload();
     } catch (e) {
       setErr(apiError(e));

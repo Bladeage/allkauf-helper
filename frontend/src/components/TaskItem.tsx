@@ -4,6 +4,8 @@ import type { CostCategory, Milestone, Priority, Task } from '../types';
 import { Badge, Button, Input, Select, Textarea, Field, ErrorBox } from './ui';
 import { CATEGORY_BADGE, CATEGORY_LABEL, PRIORITY_LABEL, euro, fmtDate, toInputDate } from '../lib/format';
 import NoteEditor from './NoteEditor';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 const CATS: CostCategory[] = ['allkauf_paket', 'bemusterung_extra', 'eigenleistung_material', 'sonstiges'];
 const PRIOS: Priority[] = ['low', 'normal', 'high', 'urgent'];
@@ -20,6 +22,8 @@ export default function TaskItem({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   const link = task.milestoneLinks?.[0];
   const [form, setForm] = useState({
@@ -81,6 +85,7 @@ export default function TaskItem({
     }
     try {
       await api.patch(`/tasks/${task.id}`, data);
+      toast.success('Aufgabe gespeichert');
       onChanged();
       setOpen(false);
     } catch (e) {
@@ -91,11 +96,12 @@ export default function TaskItem({
   }
 
   async function remove() {
-    if (!confirm('Diese Aufgabe wirklich löschen?')) return;
+    if (!(await confirm({ message: 'Diese Aufgabe wirklich löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
     setBusy(true);
     setErr(null);
     try {
       await api.delete(`/tasks/${task.id}`);
+      toast.success('Aufgabe gelöscht');
       await onChanged();
     } catch (e) {
       setErr(apiError(e));
@@ -127,7 +133,7 @@ export default function TaskItem({
           checked={task.isDone}
           onChange={toggleDone}
           disabled={busy}
-          className="h-5 w-5 shrink-0 rounded border-slate-300 text-brand focus:ring-brand"
+          className="h-5 w-5 shrink-0 rounded border-slate-300 text-brand-700 focus:ring-brand"
           aria-label={`Erledigt: ${task.title}`}
         />
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
@@ -217,7 +223,7 @@ export default function TaskItem({
               type="checkbox"
               checked={form.isPaid}
               onChange={(e) => up('isPaid', e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-brand focus:ring-brand"
+              className="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand"
             />
             als bezahlt markiert
           </label>

@@ -1,6 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { config } from './config/env.js';
 import apiRoutes from './routes/index.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
@@ -26,9 +27,11 @@ export function createApp() {
         if (allowed.has(origin)) return cb(null, true);
         return cb(null, false);
       },
+      credentials: true, // Cookies (httpOnly-Auth) erlauben
     }),
   );
 
+  app.use(cookieParser());
   app.use(express.json({ limit: '1mb' }));
 
   app.use('/api', apiLimiter, apiRoutes);

@@ -19,7 +19,10 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL,
 
   jwtSecret: process.env.JWT_SECRET || 'dev-insecure-secret-change-me',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '12h',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  jwtRememberExpiresIn: process.env.JWT_REMEMBER_EXPIRES_IN || '30d',
+  cookieName: 'alkauf_token',
+  rememberMaxAgeMs: 30 * 24 * 60 * 60 * 1000, // 30 Tage (persistentes „eingeloggt bleiben")
 
   smtp: {
     user: process.env.PROTON_SMTP_USER,

@@ -79,7 +79,7 @@ export default function Dashboard() {
             {over && <Badge className="bg-red-100 text-red-700">über Budget</Badge>}
           </div>
           <ProgressBar value={budgetPct} className={`mt-3 ${over ? '[&>div]:bg-red-500' : ''}`} />
-          <Link to="/costs" className="mt-2 inline-block text-xs text-brand hover:underline">
+          <Link to="/costs" className="mt-2 inline-block text-xs text-brand-700 hover:underline">
             → Kostenübersicht
           </Link>
         </Card>
@@ -109,7 +109,7 @@ export default function Dashboard() {
               ))}
             </ul>
           )}
-          <Link to="/reminders" className="mt-3 inline-block text-xs text-brand hover:underline">
+          <Link to="/reminders" className="mt-3 inline-block text-xs text-brand-700 hover:underline">
             → Alle Wiedervorlagen
           </Link>
         </Card>

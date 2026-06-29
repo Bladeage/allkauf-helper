@@ -3,6 +3,8 @@ import { useFetch } from '../hooks/useFetch';
 import { api, apiError } from '../lib/api';
 import type { HouseArea } from '../types';
 import { Spinner, Button, Input, Textarea, Field, Modal, PageHeader, EmptyState, ErrorBox } from '../components/ui';
+import { useToast } from '../context/ToastContext';
+import { useConfirm } from '../context/ConfirmContext';
 
 function AreaModal({
   area,
@@ -21,6 +23,8 @@ function AreaModal({
   const [planningNotes, setPlanningNotes] = useState(area?.planningNotes ?? '');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const toast = useToast();
+  const confirm = useConfirm();
 
   async function save() {
     if (!name.trim()) {
@@ -38,6 +42,7 @@ function AreaModal({
     try {
       if (area) await api.patch(`/house-areas/${area.id}`, body);
       else await api.post('/house-areas', body);
+      toast.success('Gespeichert');
       onDone();
     } catch (e) {
       setErr(apiError(e));
@@ -48,11 +53,12 @@ function AreaModal({
 
   async function del() {
     if (!area || !onDeleted) return;
-    if (!confirm('Bereich löschen?')) return;
+    if (!(await confirm({ message: 'Bereich löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
     setBusy(true);
     setErr(null);
     try {
       await api.delete(`/house-areas/${area.id}`);
+      toast.success('Bereich gelöscht');
       onDeleted();
     } catch (e) {
       setErr(apiError(e));
