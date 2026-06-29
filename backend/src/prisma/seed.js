@@ -269,18 +269,26 @@ const MILESTONES = [
 ];
 
 const HOUSE_AREAS = [
-  { name: 'Familienbad', icon: '🛁', description: 'Wanne, Dusche, Doppelwaschtisch, Fliesen.' },
-  { name: 'Gäste-WC', icon: '🚻', description: 'Kompakt, pflegeleicht.' },
+  // Außen
+  { name: 'Garten', icon: '🌳', description: 'Rasen, Beete, Bepflanzung, Zaun.' },
+  { name: 'Vorgarten', icon: '🌷', description: 'Eingangsbereich, Bepflanzung, Wege.' },
+  { name: 'Einfahrt', icon: '🚗', description: 'Zufahrt, Stellplatz, Pflasterung (Wallbox-Leerrohr?).' },
+  { name: 'Terrasse', icon: '⛱️', description: 'Belag, Übergang zum Wohnzimmer, Möblierung.' },
+  // Erdgeschoss
+  { name: 'Hauswirtschaftsraum', icon: '🧺', description: 'Waschen, Trockner, Stauraum, Technik.' },
+  { name: 'Flur', icon: '🚪', description: 'Garderobe, Beleuchtung, Bodenübergänge (EG).' },
   { name: 'Küche', icon: '🍳', description: 'Grundriss, Anschlüsse, Geräte, Bemusterung.' },
-  { name: 'Wohn-/Esszimmer', icon: '🛋️', description: 'Bodenbelag, Licht, Steckdosen, Heizung.' },
-  { name: 'Schlafzimmer', icon: '🛏️', description: 'Ankleide, Steckdosen, Licht.' },
-  { name: 'Kinderzimmer', icon: '🧸', description: 'Flexible Nutzung, Netzwerk/Leerrohre.' },
-  { name: 'Hauswirtschaftsraum (HWR)', icon: '🧺', description: 'Waschen, Trockner, Stauraum, Technik.' },
-  { name: 'Technikraum', icon: '⚙️', description: 'Wärmepumpe, Verteiler, KWL, Wasser.' },
-  { name: 'Flur / Diele', icon: '🚪', description: 'Garderobe, Beleuchtung, Bodenübergänge.' },
-  { name: 'Garage / Carport', icon: '🚗', description: 'Stellplatz, Strom (Wallbox-Leerrohr!), Stauraum.' },
-  { name: 'Garten / Außenanlage', icon: '🌳', description: 'Terrasse, Wege, Bepflanzung, Zaun.' },
-  { name: 'Dachboden / Spitzboden', icon: '📦', description: 'Dämmung, Stauraum, evtl. späterer Ausbau.' },
+  { name: 'Treppe', icon: '🪜', description: 'Material, Geländer, Beleuchtung.' },
+  { name: 'Arbeitszimmer', icon: '💼', description: 'Homeoffice, Steckdosen, Netzwerk/LAN.' },
+  { name: 'Wohnzimmer', icon: '🛋️', description: 'Bodenbelag, Licht, Steckdosen, Terrassenzugang.' },
+  // Obergeschoss
+  { name: 'Elternschlafzimmer', icon: '🛏️', description: 'Ankleide, Steckdosen, Licht.' },
+  { name: 'Gästebad', icon: '🚻', description: 'WC/Dusche, Fliesen, Armaturen.' },
+  { name: 'Hauptbadezimmer', icon: '🛁', description: 'Wanne, Dusche, Doppelwaschtisch, Fliesen.' },
+  { name: 'Kinderzimmer eins', icon: '🧸', description: 'Flexible Nutzung, Netzwerk/Leerrohre.' },
+  { name: 'Kinderzimmer zwei', icon: '🧒', description: 'Flexible Nutzung, Netzwerk/Leerrohre.' },
+  { name: 'Flur oben', icon: '🔝', description: 'Galerie/Flur OG, Beleuchtung, Steckdosen.' },
+  { name: 'Dachboden', icon: '📦', description: 'Dämmung, Stauraum, evtl. späterer Ausbau.' },
 ];
 
 async function ensureUser(u, idx) {
