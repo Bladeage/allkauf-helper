@@ -16,3 +16,12 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Enges Limit für das manuelle Auslösen der Erinnerungs-Mail (gegen Mail-Bomb / Kontingent)
+export const sendMailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 Stunde
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Zu viele Mail-Auslösungen. Bitte später erneut versuchen.' },
+});

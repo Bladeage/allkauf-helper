@@ -23,7 +23,7 @@ export default function Costs() {
       {/* Summen */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <div className="text-xs text-slate-400">Ausgegeben (Ist)</div>
+          <div className="text-xs text-slate-400">Ist-Kosten (inkl. Pauschalen)</div>
           <div className="text-2xl font-bold text-slate-800">{euro(totals.grandTotal)}</div>
           <div className="mt-1 text-xs text-slate-400">davon bezahlt: {euro(totals.paidTotal)}</div>
         </Card>

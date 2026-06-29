@@ -102,7 +102,7 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
 }
 
 export default function Reminders() {
-  const { data: reminders, loading, reload } = useFetch<Reminder[]>('/reminders');
+  const { data: reminders, loading, error, reload } = useFetch<Reminder[]>('/reminders');
   const { data: milestones, reload: reloadM } = useFetch<Milestone[]>('/milestones');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -143,7 +143,8 @@ export default function Reminders() {
       <Section title="Überfällig" color="text-red-600" items={overdue} />
       <Section title="Diese Woche" color="text-amber-600" items={thisWeek} />
       <Section title="Später" color="text-slate-600" items={later} />
-      {list.length === 0 && (
+      {error && <ErrorBox>{error}</ErrorBox>}
+      {!error && list.length === 0 && (
         <EmptyState>
           Keine offenen Wiedervorlagen. Lege an einer Aufgabe ein Fälligkeitsdatum oder eine Meilenstein-Verknüpfung an.
         </EmptyState>

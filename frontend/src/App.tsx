@@ -14,7 +14,14 @@ import HouseAreas from './pages/HouseAreas';
 import Settings from './pages/Settings';
 
 function HouseRoute() {
-  const { enableHouseModule } = useData();
+  const { enableHouseModule, ready } = useData();
+  if (!ready) {
+    return (
+      <div className="grid h-full place-items-center">
+        <Spinner />
+      </div>
+    );
+  }
   return enableHouseModule ? <HouseAreas /> : <Navigate to="/" replace />;
 }
 

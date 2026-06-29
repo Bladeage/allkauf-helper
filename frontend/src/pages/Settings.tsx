@@ -7,7 +7,7 @@ import { Spinner, Card, Button, Input, Field, ErrorBox, PageHeader, Badge } from
 import { toInputDate } from '../lib/format';
 
 export default function Settings() {
-  const { data, loading } = useFetch<ProjectSettings>('/settings');
+  const { data, loading, error } = useFetch<ProjectSettings>('/settings');
   const { config } = useData();
   const [form, setForm] = useState({
     projectName: '',
@@ -69,6 +69,7 @@ export default function Settings() {
   return (
     <div className="space-y-4">
       <PageHeader title="Einstellungen" subtitle="Projektdaten, Budget und Eigenleistungs-Stundensatz" />
+      {error && <ErrorBox>{error}</ErrorBox>}
 
       <Card title="Projekt">
         <div className="space-y-3">

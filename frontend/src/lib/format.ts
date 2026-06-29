@@ -15,9 +15,12 @@ export const fmtDate = (iso: string | null | undefined): string =>
 export const fmtDateShort = (iso: string | null | undefined): string =>
   iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }) : '–';
 
-// Für <input type="date">
-export const toInputDate = (iso: string | null | undefined): string =>
-  iso ? new Date(iso).toISOString().slice(0, 10) : '';
+// Für <input type="date"> — robust gegen ungültige Werte (sonst RangeError im Render)
+export const toInputDate = (iso: string | null | undefined): string => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+};
 
 export const fmtHours = (n: number | null | undefined): string => (n == null ? '–' : `${n} h`);
 

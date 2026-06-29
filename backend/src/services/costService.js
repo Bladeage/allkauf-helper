@@ -34,12 +34,9 @@ export async function getCostSummary() {
     for (const t of p.tasks) {
       const amt = num(t.costAmount);
       const planned = t.plannedAmount != null ? num(t.plannedAmount) : amt;
-      const c = COST_CATEGORIES.includes(t.costCategory)
-        ? t.costCategory
-        : t.costCategory
-          ? 'sonstiges'
-          : null;
-      if (c) cat[c] += amt;
+      // Unbekannte/leere Kategorie -> 'sonstiges', damit Σ byCategory == Gesamtsumme bleibt
+      const c = COST_CATEGORIES.includes(t.costCategory) ? t.costCategory : 'sonstiges';
+      cat[c] += amt;
       pTaskCost += amt;
       pPlanned += planned;
       pHours += num(t.estimatedHours);

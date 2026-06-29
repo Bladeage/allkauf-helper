@@ -49,11 +49,14 @@ function AreaModal({
   async function del() {
     if (!area || !onDeleted) return;
     if (!confirm('Bereich löschen?')) return;
+    setBusy(true);
+    setErr(null);
     try {
       await api.delete(`/house-areas/${area.id}`);
       onDeleted();
     } catch (e) {
       setErr(apiError(e));
+      setBusy(false);
     }
   }
 
@@ -77,7 +80,7 @@ function AreaModal({
         {err && <ErrorBox>{err}</ErrorBox>}
         <div className="flex items-center justify-between">
           {area && onDeleted ? (
-            <Button variant="danger" onClick={del}>
+            <Button variant="danger" onClick={del} disabled={busy}>
               Löschen
             </Button>
           ) : (
@@ -98,7 +101,7 @@ function AreaModal({
 }
 
 export default function HouseAreas() {
-  const { data, loading, reload } = useFetch<HouseArea[]>('/house-areas');
+  const { data, loading, error, reload } = useFetch<HouseArea[]>('/house-areas');
   const [active, setActive] = useState<HouseArea | null>(null);
   const [adding, setAdding] = useState(false);
 
@@ -115,6 +118,7 @@ export default function HouseAreas() {
           </Button>
         }
       />
+      {error && <ErrorBox>{error}</ErrorBox>}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {data?.map((a) => (
           <button
@@ -128,7 +132,7 @@ export default function HouseAreas() {
           </button>
         ))}
       </div>
-      {data && data.length === 0 && <EmptyState>Noch keine Bereiche.</EmptyState>}
+      {data && !error && data.length === 0 && <EmptyState>Noch keine Bereiche.</EmptyState>}
 
       {active && (
         <AreaModal

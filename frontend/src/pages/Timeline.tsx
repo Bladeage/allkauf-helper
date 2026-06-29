@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import type { Phase, Milestone, ProjectSettings } from '../types';
-import { Spinner, PageHeader, EmptyState } from '../components/ui';
+import { Spinner, PageHeader, EmptyState, ErrorBox } from '../components/ui';
 
 const DAY = 86400000;
 const PX_PER_DAY = 6;
@@ -22,11 +22,13 @@ function shortTitle(t: string): string {
 
 export default function Timeline() {
   const navigate = useNavigate();
-  const { data: phases } = useFetch<Phase[]>('/phases');
+  const { data: phases, loading, error } = useFetch<Phase[]>('/phases');
   const { data: milestones } = useFetch<Milestone[]>('/milestones');
   const { data: settings } = useFetch<ProjectSettings>('/settings');
 
-  if (!phases) return <Spinner />;
+  if (loading) return <Spinner />;
+  if (error) return <ErrorBox>{error}</ErrorBox>;
+  if (!phases) return null;
 
   const bars = phases
     .filter((p) => p.startDate && p.endDate)

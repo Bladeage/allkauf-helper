@@ -10,9 +10,8 @@ const router = Router();
 router.use(requireAuth);
 
 async function getOrCreate() {
-  let s = await prisma.projectSettings.findFirst();
-  if (!s) s = await prisma.projectSettings.create({ data: {} });
-  return s;
+  // Singleton (id=1) per upsert — vermeidet Mehrfachzeilen bei gleichzeitigem Erstzugriff
+  return prisma.projectSettings.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } });
 }
 
 const dateField = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD').nullable().optional();

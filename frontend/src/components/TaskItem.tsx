@@ -54,6 +54,7 @@ export default function TaskItem({
       onChanged();
     } catch (e) {
       setErr(apiError(e));
+    } finally {
       setBusy(false);
     }
   }
@@ -106,8 +107,9 @@ export default function TaskItem({
     setBusy(true);
     setErr(null);
     try {
-      if (link) await api.delete(`/tasks/${task.id}/milestone-link/${link.id}`);
+      // Erst neuen Link anlegen, dann alten löschen — schlägt der POST fehl, bleibt die bestehende Verknüpfung erhalten
       if (mid) await api.post(`/tasks/${task.id}/milestone-link`, { milestoneId: Number(mid), daysBefore: Number(daysBefore) || 0 });
+      if (link) await api.delete(`/tasks/${task.id}/milestone-link/${link.id}`);
       onChanged();
     } catch (e) {
       setErr(apiError(e));

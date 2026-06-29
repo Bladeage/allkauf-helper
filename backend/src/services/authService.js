@@ -4,8 +4,9 @@ import { prisma } from '../config/db.js';
 import { config } from '../config/env.js';
 import { HttpError } from '../middleware/errorHandler.js';
 
-// Dummy-Hash, damit Login-Zeit für „User existiert nicht" ähnlich bleibt (gegen User-Enumeration)
-const DUMMY_HASH = '$2a$10$CwTycUXWue0Thq9StjUM0uJ8Dvz0u8b1m1Qe1Yd1Xx2nO3oQ1q2K';
+// Gültiger 60-Zeichen-bcrypt-Hash (einmalig zur Laufzeit erzeugt), damit bcrypt.compare
+// auch bei „User existiert nicht" echte Arbeit leistet -> konstante Zeit gegen User-Enumeration.
+const DUMMY_HASH = bcrypt.hashSync('timing-mitigation-dummy', 10);
 
 export async function login(email, password) {
   const normEmail = String(email || '').toLowerCase().trim();

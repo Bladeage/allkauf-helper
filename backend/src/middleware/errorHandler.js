@@ -21,6 +21,15 @@ export function errorHandler(err, req, res, next) {
   if (err.code === 'P2025') {
     return res.status(404).json({ error: 'Datensatz nicht gefunden' });
   }
+  // Prisma Fremdschlüssel-Verletzung -> 400
+  if (err.code === 'P2003') {
+    return res.status(400).json({ error: 'Ungültige Referenz (z. B. unbekannte ID)' });
+  }
+  // Ungültige Query-Eingaben (z. B. nicht-numerische :id -> NaN) -> 400 statt 500
+  if (err.name === 'PrismaClientValidationError') {
+    console.warn('[warn] PrismaClientValidationError:', String(err.message).split('\n').pop());
+    return res.status(400).json({ error: 'Ungültige Anfrage-Parameter' });
+  }
   const message =
     status >= 500
       ? config.nodeEnv === 'production'

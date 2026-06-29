@@ -55,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     clearToken();
     setUser(null);
+    // gecachte API-Antworten des SW verwerfen, damit kein Vor-Nutzer-Datenrest bleibt
+    if ('caches' in window) caches.delete('api-cache').catch(() => {});
     navigate('/');
   };
 

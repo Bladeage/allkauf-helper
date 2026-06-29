@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import type { Phase, CostSummary, Reminder, ProjectSettings } from '../types';
-import { Spinner, Card, ProgressBar, Badge, EmptyState } from '../components/ui';
+import { Spinner, Card, ProgressBar, Badge, EmptyState, ErrorBox } from '../components/ui';
 import { euro, fmtDate, STATUS_BADGE, STATUS_LABEL } from '../lib/format';
 
 export default function Dashboard() {
-  const { data: phases } = useFetch<Phase[]>('/phases');
-  const { data: costs } = useFetch<CostSummary>('/costs/summary');
+  const { data: phases, loading: lp, error: ep } = useFetch<Phase[]>('/phases');
+  const { data: costs, loading: lc, error: ec } = useFetch<CostSummary>('/costs/summary');
   const { data: reminders } = useFetch<Reminder[]>('/reminders');
   const { data: settings } = useFetch<ProjectSettings>('/settings');
 
-  if (!phases || !costs) return <Spinner />;
+  if (lp || lc) return <Spinner />;
+  if (ep || ec) return <ErrorBox>{ep || ec}</ErrorBox>;
+  if (!phases || !costs) return <ErrorBox>Keine Daten verfügbar.</ErrorBox>;
 
   const current = phases.find((p) => p.status === 'in_progress') ?? phases.find((p) => p.status !== 'done') ?? phases[0];
   const totalTasks = phases.reduce((s, p) => s + p.taskCount, 0);

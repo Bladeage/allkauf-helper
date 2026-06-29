@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
+import { sendMailLimiter } from '../middleware/rateLimit.js';
 import { getReminders } from '../services/reminderService.js';
 import { runReminderJob } from '../services/emailService.js';
 
@@ -15,9 +16,10 @@ router.get(
   }),
 );
 
-// Manuell die Erinnerungs-Mail auslösen (zum Testen des SMTP-Setups)
+// Manuell die Erinnerungs-Mail auslösen (zum Testen des SMTP-Setups) — eng limitiert
 router.post(
   '/send-now',
+  sendMailLimiter,
   asyncHandler(async (req, res) => {
     res.json(await runReminderJob());
   }),
