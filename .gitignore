@@ -24,3 +24,6 @@ logs/
 Thumbs.db
 .idea/
 .vscode/
+
+# Referenz-Dokumente (Handover/Baubeschreibung) nicht hochladen
+*.pdf

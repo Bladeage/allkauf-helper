@@ -154,14 +154,21 @@ CSV-/PDF-Export der Kosten, MaBV-Zahlungsplan-Ansicht.
 
 ---
 
-## 8. Platzhalter (liefert Fabian später)
+## 8. Datenbasis & Platzhalter
 
-- Konkrete **Bemusterungs-Positionen** mit Beträgen → je Aufgabe unter „Kosten" eintragen.
-- **allkauf-Grundpreis-Aufteilung** → je Phase unter „Pauschalen".
-- **Projektstart/-ende** und **Meilenstein-Datümer** (z. B. „Estrich fertig") → Einstellungen bzw. Wiedervorlagen.
-- Die **allkauf-spezifische Checkliste** aus dem Bauherrenleitfaden → eigene Aufgaben ergänzen.
+Phasen, Checklisten und Meilensteine sind mit der **offiziellen allkauf-Baubeschreibung (Stand 06/2025)**
+und der **allkauf-FAQ** abgeglichen: Ausbaupakete AP 1a/1b/2, Bemusterung im Bemusterungszentrum Heinsberg,
+Bauherrenleistungen (SiGeKo, Zufahrt/Kran/Baustrom, Bodenplatte/Keller in Eigenleistung, Untermörteln …),
+Versicherungspaket über allkauf, der offizielle Bauzeitenplan (Stelltermin 14 Wochen) und die Innenausbau-
+Reihenfolge (Elektro → Trockenbau → HLS → Estrich → Trocknung → Spachteln → Außenputz).
 
-Die Phasen tragen Beispiel-Termine, damit die Zeitleiste sofort etwas zeigt — einfach überschreiben.
+Bewusst **leer** (vom Bauherrn zu füllen):
+- **Beträge** (allkauf-Grundpreis-Pauschale, Bemusterungs-Aufpreise, Material) → je Aufgabe „Kosten" bzw. Phase „Pauschalen".
+- **Termine** (Projektstart/-ende, Meilenstein-Datümer wie „Estrich fertig"/„Stelltermin") → Einstellungen bzw. Wiedervorlagen.
+- **Projektname, Wohnfläche, Eigenleistungs-Stundensatz, Gesamtbudget** → Einstellungen.
+
+> Die Referenz-PDFs (Handover, Baubeschreibung) liegen lokal im Projektordner und sind per `.gitignore`
+> vom GitHub-Upload ausgeschlossen.
 
 ---
 
