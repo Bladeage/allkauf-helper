@@ -1,26 +1,38 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { api, setUnauthorizedHandler } from '../lib/api';
-import { getToken, setToken, clearToken } from '../lib/auth';
+import { getToken, setToken, clearToken, TOKEN_KEY } from '../lib/auth';
 import type { User } from '../types';
 
 interface AuthState {
   user: User | null;
   ready: boolean;
+  sessionExpired: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
+function clearApiCache() {
+  if ('caches' in window) caches.delete('api-cache').catch(() => {});
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // 401 (abgelaufen/ungültig): ausloggen, SW-Cache leeren, Hinweis merken (nur wenn vorher eingeloggt)
     setUnauthorizedHandler(() => {
-      setUser(null);
+      setUser((prev) => {
+        if (prev) setSessionExpired(true);
+        return null;
+      });
+      clearApiCache();
     });
   }, []);
 
@@ -34,8 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const r = await api.get<User>('/auth/me');
         if (active) setUser(r.data);
-      } catch {
-        clearToken();
+      } catch (e) {
+        // Nur bei echtem 401 das Token verwerfen; bei 5xx/Offline-Start (PWA) Token behalten
+        if (axios.isAxiosError(e) && e.response?.status === 401) clearToken();
       } finally {
         if (active) setReady(true);
       }
@@ -45,22 +58,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Multi-Tab-Sync: Logout/Login in einem anderen Tab übernehmen
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== TOKEN_KEY) return;
+      if (!e.newValue) setUser(null);
+      else if (!user) window.location.reload();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [user]);
+
   const login = async (email: string, password: string) => {
     const r = await api.post<{ token: string; user: User }>('/auth/login', { email, password });
     setToken(r.data.token);
     setUser(r.data.user);
-    navigate('/');
+    setSessionExpired(false);
+    // Bewusst kein navigate('/') — die aktuelle URL (Deep-Link) wird nach Login einfach gerendert.
   };
 
   const logout = () => {
     clearToken();
     setUser(null);
-    // gecachte API-Antworten des SW verwerfen, damit kein Vor-Nutzer-Datenrest bleibt
-    if ('caches' in window) caches.delete('api-cache').catch(() => {});
+    setSessionExpired(false);
+    clearApiCache();
     navigate('/');
   };
 
-  return <AuthContext.Provider value={{ user, ready, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, ready, sessionExpired, login, logout }}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth(): AuthState {

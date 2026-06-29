@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
 export function Spinner({ className = '' }: { className?: string }) {
@@ -38,11 +38,14 @@ export function Card({
 export function ProgressBar({ value, className = '' }: { value: number; className?: string }) {
   const pct = Math.max(0, Math.min(100, Math.round(value * 100)));
   return (
-    <div className={`h-2 w-full overflow-hidden rounded-full bg-slate-200 ${className}`}>
-      <div
-        className="h-full rounded-full bg-brand transition-all"
-        style={{ width: `${pct}%` }}
-      />
+    <div
+      role="progressbar"
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      className={`h-2 w-full overflow-hidden rounded-full bg-slate-200 ${className}`}
+    >
+      <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -61,7 +64,7 @@ export function Button({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' }) {
   const base =
-    'inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-1';
   const variants: Record<string, string> = {
     primary: 'bg-brand text-white hover:bg-brand-600',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
@@ -105,7 +108,7 @@ export function Field({ label, children, hint }: { label: string; children: Reac
     <label className="block">
       <span className="mb-1 block text-xs font-medium text-slate-500">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-slate-500">{hint}</span>}
     </label>
   );
 }
@@ -114,54 +117,95 @@ export function Modal({
   open,
   onClose,
   title,
+  busy = false,
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title?: ReactNode;
+  busy?: boolean;
   children: ReactNode;
 }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+
   useEffect(() => {
     if (!open) return;
+    const prevFocus = document.activeElement as HTMLElement | null;
+    const sel =
+      'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && !busy) {
+        onClose();
+        return;
+      }
+      if (e.key === 'Tab' && panelRef.current) {
+        const items = Array.from(panelRef.current.querySelectorAll<HTMLElement>(sel));
+        if (items.length === 0) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const t = window.setTimeout(() => {
+      const items = panelRef.current?.querySelectorAll<HTMLElement>(sel);
+      if (items && items[0]) items[0].focus();
+    }, 0);
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prevOverflow;
+      window.clearTimeout(t);
+      prevFocus?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open, onClose, busy]);
 
   if (!open) return null;
+  const close = () => {
+    if (!busy) onClose();
+  };
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" onClick={close}>
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white shadow-xl sm:rounded-2xl"
+        aria-labelledby={titleId}
+        className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-          <h3 className="font-semibold text-slate-800">{title}</h3>
-          <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100" aria-label="Schließen">
+          <h2 id={titleId} className="font-semibold text-slate-800">
+            {title}
+          </h2>
+          <button onClick={close} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Schließen">
             ✕
           </button>
         </div>
-        <div className="p-4">{children}</div>
+        <div className="overflow-y-auto p-4 safe-bottom">{children}</div>
       </div>
     </div>
   );
 }
 
 export function EmptyState({ children }: { children: ReactNode }) {
-  return <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">{children}</div>;
+  return <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">{children}</div>;
 }
 
 export function ErrorBox({ children }: { children: ReactNode }) {
-  return <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{children}</div>;
+  return (
+    <div role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+      {children}
+    </div>
+  );
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: ReactNode }) {

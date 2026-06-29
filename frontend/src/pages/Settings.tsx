@@ -78,10 +78,10 @@ export default function Settings() {
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Wohnfläche (m²)">
-              <Input type="number" inputMode="decimal" value={form.livingAreaSqm} onChange={(e) => up('livingAreaSqm', e.target.value)} />
+              <Input type="number" min="0" inputMode="decimal" value={form.livingAreaSqm} onChange={(e) => up('livingAreaSqm', e.target.value)} />
             </Field>
             <Field label="Gesamtbudget (€)">
-              <Input type="number" inputMode="decimal" value={form.totalBudget} onChange={(e) => up('totalBudget', e.target.value)} />
+              <Input type="number" min="0" inputMode="decimal" value={form.totalBudget} onChange={(e) => up('totalBudget', e.target.value)} />
             </Field>
             <Field label="Projektstart (Gantt)">
               <Input type="date" value={form.projectStart} onChange={(e) => up('projectStart', e.target.value)} />
@@ -93,7 +93,7 @@ export default function Settings() {
               <Input type="date" value={form.handoverDate} onChange={(e) => up('handoverDate', e.target.value)} />
             </Field>
             <Field label="Stundensatz Eigenleistung (€/h)">
-              <Input type="number" inputMode="decimal" value={form.hourlyRateEigenleistung} onChange={(e) => up('hourlyRateEigenleistung', e.target.value)} />
+              <Input type="number" min="0" inputMode="decimal" value={form.hourlyRateEigenleistung} onChange={(e) => up('hourlyRateEigenleistung', e.target.value)} />
             </Field>
           </div>
           {err && <ErrorBox>{err}</ErrorBox>}
@@ -113,7 +113,7 @@ export default function Settings() {
             {config?.enableHouseModule ? 'aktiv' : 'deaktiviert'}
           </Badge>
         </div>
-        <p className="mt-2 text-xs text-slate-400">
+        <p className="mt-2 text-xs text-slate-500">
           Umschaltbar über die Umgebungsvariable <code className="rounded bg-slate-100 px-1">ENABLE_HOUSE_MODULE</code> (true/false) in der
           <code className="rounded bg-slate-100 px-1">.env</code> und Neustart des Backends.
         </p>

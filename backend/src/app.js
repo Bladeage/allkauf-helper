@@ -16,13 +16,14 @@ export function createApp() {
 
   app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));
 
-  // CORS (Abschnitt 8): leere Liste => erlaubt (Prod ist same-origin); gesetzt => nur diese Origins
+  // CORS (Abschnitt 8): Default = nur same-origin/serverseitig. Cross-Origin nur, wenn
+  // explizit in CORS_ORIGIN erlaubt (leere Liste blockt fremde Origins statt sie zu reflektieren).
   const allowed = new Set(config.corsOrigin);
   app.use(
     cors({
       origin: (origin, cb) => {
-        if (!origin) return cb(null, true); // same-origin / serverseitig
-        if (allowed.size === 0 || allowed.has(origin)) return cb(null, true);
+        if (!origin) return cb(null, true); // same-origin / serverseitig (kein Origin-Header)
+        if (allowed.has(origin)) return cb(null, true);
         return cb(null, false);
       },
     }),

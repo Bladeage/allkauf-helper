@@ -15,7 +15,7 @@ export default function TaskItem({
 }: {
   task: Task;
   milestones: Milestone[];
-  onChanged: () => void;
+  onChanged: () => void | Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -51,7 +51,7 @@ export default function TaskItem({
     setErr(null);
     try {
       await api.patch(`/tasks/${task.id}`, { isDone: !task.isDone });
-      onChanged();
+      await onChanged(); // bis zum Reload „busy" halten -> kein kurzer Stale-Zustand
     } catch (e) {
       setErr(apiError(e));
     } finally {
@@ -96,9 +96,10 @@ export default function TaskItem({
     setErr(null);
     try {
       await api.delete(`/tasks/${task.id}`);
-      onChanged();
+      await onChanged();
     } catch (e) {
       setErr(apiError(e));
+    } finally {
       setBusy(false);
     }
   }
@@ -108,7 +109,7 @@ export default function TaskItem({
     setErr(null);
     try {
       // Erst neuen Link anlegen, dann alten löschen — schlägt der POST fehl, bleibt die bestehende Verknüpfung erhalten
-      if (mid) await api.post(`/tasks/${task.id}/milestone-link`, { milestoneId: Number(mid), daysBefore: Number(daysBefore) || 0 });
+      if (mid) await api.post(`/tasks/${task.id}/milestone-link`, { milestoneId: Number(mid), daysBefore: Math.round(Number(daysBefore)) || 0 });
       if (link) await api.delete(`/tasks/${task.id}/milestone-link/${link.id}`);
       onChanged();
     } catch (e) {
@@ -127,10 +128,10 @@ export default function TaskItem({
           onChange={toggleDone}
           disabled={busy}
           className="h-5 w-5 shrink-0 rounded border-slate-300 text-brand focus:ring-brand"
-          aria-label="Erledigt"
+          aria-label={`Erledigt: ${task.title}`}
         />
-        <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)}>
-          <div className={`font-medium ${task.isDone ? 'text-slate-400 line-through' : 'text-slate-800'}`}>{task.title}</div>
+        <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+          <div className={`font-medium ${task.isDone ? 'text-slate-500 line-through' : 'text-slate-800'}`}>{task.title}</div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {task.costCategory && (
               <Badge className={CATEGORY_BADGE[task.costCategory]}>
@@ -144,7 +145,8 @@ export default function TaskItem({
             )}
             {task.effectiveDueDate && (
               <Badge className={overdue ? 'bg-red-100 text-red-700' : 'bg-sky-100 text-sky-700'}>
-                📅 {fmtDate(task.effectiveDueDate)}
+                📅 {overdue ? 'Überfällig: ' : ''}
+                {fmtDate(task.effectiveDueDate)}
               </Badge>
             )}
             {task.isPaid && <Badge className="bg-emerald-100 text-emerald-700">bezahlt</Badge>}
@@ -152,7 +154,7 @@ export default function TaskItem({
             {task._count && task._count.notes > 0 && <Badge className="bg-slate-100 text-slate-500">📝 {task._count.notes}</Badge>}
           </div>
         </button>
-        <span className="select-none text-xs text-slate-300">{open ? '▲' : '▼'}</span>
+        <span className="select-none text-xs text-slate-500" aria-hidden="true">{open ? '▲' : '▼'}</span>
       </div>
 
       {open && (
@@ -191,13 +193,13 @@ export default function TaskItem({
               </Select>
             </Field>
             <Field label="Ist-Betrag (€)">
-              <Input type="number" inputMode="decimal" value={form.costAmount} onChange={(e) => up('costAmount', e.target.value)} />
+              <Input type="number" min="0" inputMode="decimal" value={form.costAmount} onChange={(e) => up('costAmount', e.target.value)} />
             </Field>
             <Field label="Soll-Betrag (€)">
-              <Input type="number" inputMode="decimal" value={form.plannedAmount} onChange={(e) => up('plannedAmount', e.target.value)} />
+              <Input type="number" min="0" inputMode="decimal" value={form.plannedAmount} onChange={(e) => up('plannedAmount', e.target.value)} />
             </Field>
             <Field label="Eigenleistung (Std.)">
-              <Input type="number" inputMode="numeric" value={form.estimatedHours} onChange={(e) => up('estimatedHours', e.target.value)} />
+              <Input type="number" min="0" inputMode="numeric" value={form.estimatedHours} onChange={(e) => up('estimatedHours', e.target.value)} />
             </Field>
             <Field label="Anbieter / Firma">
               <Input value={form.vendor} onChange={(e) => up('vendor', e.target.value)} />
@@ -268,7 +270,7 @@ export default function TaskItem({
                 Löschen
               </Button>
             ) : (
-              <span className="text-xs text-slate-400">Offizieller Checklisten-Punkt</span>
+              <span className="text-xs text-slate-500">Offizieller Checklisten-Punkt</span>
             )}
             <Button onClick={save} disabled={busy}>
               {busy ? 'Speichern…' : 'Speichern'}

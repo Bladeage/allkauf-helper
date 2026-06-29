@@ -14,6 +14,7 @@ export default function Dashboard() {
   if (ep || ec) return <ErrorBox>{ep || ec}</ErrorBox>;
   if (!phases || !costs) return <ErrorBox>Keine Daten verfügbar.</ErrorBox>;
 
+  const allDone = phases.length > 0 && phases.every((p) => p.status === 'done');
   const current = phases.find((p) => p.status === 'in_progress') ?? phases.find((p) => p.status !== 'done') ?? phases[0];
   const totalTasks = phases.reduce((s, p) => s + p.taskCount, 0);
   const doneTasks = phases.reduce((s, p) => s + p.doneCount, 0);
@@ -41,7 +42,13 @@ export default function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Aktuelle Phase */}
         <Card title="Aktuelle Phase">
-          {current ? (
+          {allDone ? (
+            <div className="py-2 text-center">
+              <div className="text-2xl">🎉</div>
+              <div className="font-semibold text-emerald-700">Projekt abgeschlossen</div>
+              <div className="text-xs text-slate-500">Alle Aufgaben erledigt.</div>
+            </div>
+          ) : current ? (
             <Link to={`/phases/${current.id}`} className="block">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-slate-800">{current.title}</span>
@@ -53,7 +60,7 @@ export default function Dashboard() {
                   {current.doneCount}/{current.taskCount}
                 </span>
               </div>
-              <div className="mt-2 text-xs text-slate-400">
+              <div className="mt-2 text-xs text-slate-500">
                 {fmtDate(current.startDate)} – {fmtDate(current.endDate)}
               </div>
             </Link>
@@ -67,7 +74,7 @@ export default function Dashboard() {
           <div className="flex items-end justify-between">
             <div>
               <div className="text-2xl font-bold text-slate-800">{euro(spent)}</div>
-              <div className="text-xs text-slate-400">von {budget > 0 ? euro(budget) : '–'} geplant</div>
+              <div className="text-xs text-slate-500">von {budget > 0 ? euro(budget) : '–'} geplant</div>
             </div>
             {over && <Badge className="bg-red-100 text-red-700">über Budget</Badge>}
           </div>
@@ -80,7 +87,7 @@ export default function Dashboard() {
         {/* Ausgaben aktuelle Phase */}
         <Card title="Ausgaben aktuelle Phase">
           <div className="text-2xl font-bold text-slate-800">{euro(currentCost?.total ?? 0)}</div>
-          <div className="mt-1 text-xs text-slate-400">
+          <div className="mt-1 text-xs text-slate-500">
             geplant: {euro(currentCost?.planned ?? 0)} · {currentCost?.estimatedHours ?? 0} h Eigenleistung
           </div>
         </Card>
@@ -94,7 +101,10 @@ export default function Dashboard() {
               {upcoming.map((r) => (
                 <li key={r.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="min-w-0 truncate text-slate-700">{r.title}</span>
-                  <Badge className={r.overdue ? 'bg-red-100 text-red-700' : 'bg-sky-100 text-sky-700'}>{fmtDate(r.effectiveDueDate)}</Badge>
+                  <Badge className={r.overdue ? 'bg-red-100 text-red-700' : 'bg-sky-100 text-sky-700'}>
+                    {r.overdue ? '⚠ ' : ''}
+                    {fmtDate(r.effectiveDueDate)}
+                  </Badge>
                 </li>
               ))}
             </ul>

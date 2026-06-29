@@ -10,6 +10,7 @@ export default defineConfig({
       injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
+        id: '/',
         name: 'allkauf Haus-Helfer',
         short_name: 'Haus-Helfer',
         description: 'Bau-Begleiter für das allkauf Ausbauhaus (Home 12)',

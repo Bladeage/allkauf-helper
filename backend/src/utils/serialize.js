@@ -12,7 +12,11 @@ export function serialize(value) {
   if (Array.isArray(value)) return value.map(serialize);
   if (typeof value === 'object') {
     const out = {};
-    for (const [k, v] of Object.entries(value)) out[k] = serialize(v);
+    for (const [k, v] of Object.entries(value)) {
+      // Defensive: sensible Felder niemals an den Client serialisieren
+      if (k === 'passwordHash' || k === 'password') continue;
+      out[k] = serialize(v);
+    }
     return out;
   }
   return value;

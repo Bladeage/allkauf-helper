@@ -1,6 +1,6 @@
 import { useAuth } from '../../context/AuthContext';
 
-export default function TopBar({ onMenu }: { onMenu: () => void }) {
+export default function TopBar({ open, onMenu }: { open: boolean; onMenu: () => void }) {
   const { user, logout } = useAuth();
   return (
     <header className="flex items-center justify-between gap-2 border-b border-slate-200 bg-white px-4 py-3 safe-top">
@@ -8,6 +8,8 @@ export default function TopBar({ onMenu }: { onMenu: () => void }) {
         onClick={onMenu}
         className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden"
         aria-label="Menü öffnen"
+        aria-expanded={open}
+        aria-controls="mobile-nav"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round" />

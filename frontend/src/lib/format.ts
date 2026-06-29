@@ -15,6 +15,19 @@ export const fmtDate = (iso: string | null | undefined): string =>
 export const fmtDateShort = (iso: string | null | undefined): string =>
   iso ? new Date(iso).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }) : '–';
 
+// Für ECHTE Zeitstempel (createdAt/updatedAt) — lokale Zeitzone (Europe/Berlin), nicht UTC
+export const fmtDateTime = (iso: string | null | undefined): string =>
+  iso
+    ? new Date(iso).toLocaleString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Europe/Berlin',
+      })
+    : '–';
+
 // Für <input type="date"> — robust gegen ungültige Werte (sonst RangeError im Render)
 export const toInputDate = (iso: string | null | undefined): string => {
   if (!iso) return '';

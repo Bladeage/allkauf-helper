@@ -61,7 +61,7 @@ function AreaModal({
   }
 
   return (
-    <Modal open onClose={onClose} title={area ? 'Bereich bearbeiten' : 'Bereich hinzufügen'}>
+    <Modal open onClose={onClose} title={area ? 'Bereich bearbeiten' : 'Bereich hinzufügen'} busy={busy}>
       <div className="space-y-3">
         <div className="grid grid-cols-[4rem_1fr] gap-3">
           <Field label="Icon">
@@ -127,8 +127,8 @@ export default function HouseAreas() {
             className="flex flex-col items-center gap-1 rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200 transition hover:ring-brand-200"
           >
             <span className="text-3xl">{a.icon || '🏠'}</span>
-            <span className="text-sm font-medium text-slate-700">{a.name}</span>
-            {a.planningNotes && <span className="text-[10px] text-slate-400">notiert</span>}
+            <span className="w-full break-words text-sm font-medium text-slate-700">{a.name}</span>
+            {a.planningNotes && <span className="text-[10px] text-slate-500">notiert</span>}
           </button>
         ))}
       </div>

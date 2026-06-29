@@ -17,7 +17,7 @@ function Section({ title, color, items }: { title: string; color: string; items:
               <Link to={`/phases/${r.phaseId}`} className="block truncate font-medium text-slate-800 hover:text-brand">
                 {r.title}
               </Link>
-              <div className="truncate text-xs text-slate-400">
+              <div className="truncate text-xs text-slate-500">
                 {r.phaseTitle}
                 {r.hasMilestone && r.milestoneTitle ? ` · ${r.daysBefore} Tage vor „${r.milestoneTitle}"` : ''}
               </div>
@@ -79,11 +79,17 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
           <div key={m.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 p-2">
             <div className="min-w-0">
               <div className="truncate font-medium text-slate-800">{m.title}</div>
-              {m._count && <div className="text-xs text-slate-400">{m._count.taskLinks} verknüpfte Aufgabe(n)</div>}
+              {m._count && <div className="text-xs text-slate-500">{m._count.taskLinks} verknüpfte Aufgabe(n)</div>}
             </div>
             <div className="flex items-center gap-2">
-              <Input type="date" value={toInputDate(m.actualDate)} onChange={(e) => setDate(m.id, e.target.value)} className="w-40" />
-              <button onClick={() => del(m.id)} className="text-xs text-slate-400 hover:text-red-600">
+              <Input
+                type="date"
+                aria-label={`Ist-Datum ${m.title}`}
+                value={toInputDate(m.actualDate)}
+                onChange={(e) => setDate(m.id, e.target.value)}
+                className="w-40"
+              />
+              <button onClick={() => del(m.id)} className="text-xs text-slate-500 hover:text-red-600">
                 löschen
               </button>
             </div>
@@ -91,7 +97,7 @@ function MilestonesCard({ milestones, reload }: { milestones: Milestone[]; reloa
         ))}
       </div>
       <div className="mt-3 flex items-end gap-2">
-        <Input placeholder="Neuer Meilenstein (z. B. Estrich fertig)" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <Input aria-label="Neuer Meilenstein" placeholder="Neuer Meilenstein (z. B. Estrich fertig)" value={title} onChange={(e) => setTitle(e.target.value)} />
         <Button variant="secondary" onClick={addM} disabled={busy}>
           Anlegen
         </Button>
@@ -106,6 +112,7 @@ export default function Reminders() {
   const { data: milestones, reload: reloadM } = useFetch<Milestone[]>('/milestones');
   const [sending, setSending] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [msgOk, setMsgOk] = useState(false);
 
   async function sendNow() {
     setSending(true);
@@ -113,8 +120,10 @@ export default function Reminders() {
     try {
       const r = await api.post('/reminders/send-now');
       const d = r.data as { sent: boolean; count: number; reason?: string; error?: string };
+      setMsgOk(d.sent);
       setMsg(d.sent ? `Mail gesendet (${d.count} Aufgaben).` : `Nicht gesendet: ${d.reason || d.error || '—'}`);
     } catch (e) {
+      setMsgOk(false);
       setMsg(apiError(e));
     } finally {
       setSending(false);
@@ -138,7 +147,15 @@ export default function Reminders() {
           </Button>
         }
       />
-      {msg && <div className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">{msg}</div>}
+      {msg && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`rounded-lg px-3 py-2 text-sm ${msgOk ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}
+        >
+          {msg}
+        </div>
+      )}
 
       <Section title="Überfällig" color="text-red-600" items={overdue} />
       <Section title="Diese Woche" color="text-amber-600" items={thisWeek} />

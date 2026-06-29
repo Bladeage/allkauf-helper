@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { useData } from './context/DataContext';
 import { Spinner } from './components/ui';
@@ -12,6 +12,12 @@ import Costs from './pages/Costs';
 import Reminders from './pages/Reminders';
 import HouseAreas from './pages/HouseAreas';
 import Settings from './pages/Settings';
+
+// Remount bei Phasenwechsel, damit keine alten Daten unter neuer URL aufblitzen
+function PhaseDetailRoute() {
+  const { id } = useParams();
+  return <PhaseDetail key={id} />;
+}
 
 function HouseRoute() {
   const { enableHouseModule, ready } = useData();
@@ -50,7 +56,7 @@ export default function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/timeline" element={<Timeline />} />
         <Route path="/phases" element={<Phases />} />
-        <Route path="/phases/:id" element={<PhaseDetail />} />
+        <Route path="/phases/:id" element={<PhaseDetailRoute />} />
         <Route path="/costs" element={<Costs />} />
         <Route path="/reminders" element={<Reminders />} />
         <Route path="/house" element={<HouseRoute />} />

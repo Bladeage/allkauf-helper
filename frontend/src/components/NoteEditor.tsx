@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch';
 import { api, apiError } from '../lib/api';
 import type { Note } from '../types';
 import { Button, Textarea, ErrorBox } from './ui';
-import { fmtDate } from '../lib/format';
+import { fmtDateTime } from '../lib/format';
 
 export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; taskId?: number }) {
   const q = phaseId ? `/notes?phaseId=${phaseId}` : `/notes?taskId=${taskId}`;
@@ -41,9 +41,12 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
       {data?.map((n) => (
         <div key={n.id} className="group rounded-lg bg-slate-50 p-2 text-sm">
           <div className="whitespace-pre-wrap text-slate-700">{n.content}</div>
-          <div className="mt-1 flex items-center justify-between text-xs text-slate-400">
-            <span>{fmtDate(n.createdAt)}</span>
-            <button onClick={() => del(n.id)} className="hover:text-red-600 sm:opacity-0 sm:group-hover:opacity-100">
+          <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+            <span>{fmtDateTime(n.createdAt)}</span>
+            <button
+              onClick={() => del(n.id)}
+              className="rounded px-1 py-0.5 hover:text-red-600 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+            >
               löschen
             </button>
           </div>
@@ -51,7 +54,7 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
       ))}
       <div className="flex items-end gap-2">
         <Textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Notiz hinzufügen…" />
-        <Button variant="secondary" onClick={add} disabled={busy}>
+        <Button variant="secondary" onClick={add} disabled={busy} aria-label="Notiz hinzufügen">
           +
         </Button>
       </div>

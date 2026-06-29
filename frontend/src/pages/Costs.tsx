@@ -23,28 +23,28 @@ export default function Costs() {
       {/* Summen */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <div className="text-xs text-slate-400">Ist-Kosten (inkl. Pauschalen)</div>
+          <div className="text-xs text-slate-500">Ist-Kosten (inkl. Pauschalen)</div>
           <div className="text-2xl font-bold text-slate-800">{euro(totals.grandTotal)}</div>
-          <div className="mt-1 text-xs text-slate-400">davon bezahlt: {euro(totals.paidTotal)}</div>
+          <div className="mt-1 text-xs text-slate-500">davon bezahlt: {euro(totals.paidTotal)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-400">Geplant (Soll)</div>
+          <div className="text-xs text-slate-500">Geplant (Soll)</div>
           <div className="text-2xl font-bold text-slate-800">{euro(totals.plannedTotal)}</div>
-          {data.totalBudget != null && <div className="mt-1 text-xs text-slate-400">Gesamtbudget: {euro(data.totalBudget)}</div>}
+          {data.totalBudget != null && <div className="mt-1 text-xs text-slate-500">Gesamtbudget: {euro(data.totalBudget)}</div>}
         </Card>
         <Card>
-          <div className="text-xs text-slate-400">Eigenleistung (Stunden)</div>
+          <div className="text-xs text-slate-500">Eigenleistung (Stunden)</div>
           <div className="text-2xl font-bold text-slate-800">{fmtHours(totals.estimatedHoursTotal)}</div>
           {totals.eigenleistungValue != null && (
-            <div className="mt-1 text-xs text-slate-400">≈ {euro(totals.eigenleistungValue)} Wert (à {euro(data.hourlyRate)})</div>
+            <div className="mt-1 text-xs text-slate-500">≈ {euro(totals.eigenleistungValue)} Wert (à {euro(data.hourlyRate)})</div>
           )}
         </Card>
         <Card>
-          <div className="text-xs text-slate-400">Budget-Status</div>
+          <div className="text-xs text-slate-500">Budget-Status</div>
           <div className={`text-2xl font-bold ${over ? 'text-red-600' : 'text-emerald-600'}`}>
             {budget > 0 ? `${Math.round((totals.grandTotal / budget) * 100)} %` : '–'}
           </div>
-          {over ? <Badge className="mt-1 bg-red-100 text-red-700">über Budget</Badge> : <div className="mt-1 text-xs text-slate-400">im Rahmen</div>}
+          {over ? <Badge className="mt-1 bg-red-100 text-red-700">über Budget</Badge> : <div className="mt-1 text-xs text-slate-500">im Rahmen</div>}
         </Card>
       </div>
 
@@ -73,10 +73,10 @@ export default function Costs() {
           {data.byPhase.map((p) => (
             <div key={p.phaseId} className="rounded-xl ring-1 ring-slate-200">
               <div className="flex items-center justify-between gap-2 border-b border-slate-100 p-3">
-                <span className="font-medium text-slate-800">{p.title}</span>
-                <span className="text-right">
+                <span className="min-w-0 truncate font-medium text-slate-800">{p.title}</span>
+                <span className="shrink-0 text-right">
                   <span className="font-semibold text-slate-800">{euro(p.total)}</span>
-                  <span className="ml-2 text-xs text-slate-400">Soll {euro(p.planned)}</span>
+                  <span className="ml-2 text-xs text-slate-500">Soll {euro(p.planned)}</span>
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 p-3 text-sm sm:grid-cols-4">
@@ -98,7 +98,7 @@ export default function Costs() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-slate-400">
+        <p className="mt-3 text-xs text-slate-500">
           Beträge sind teils Platzhalter. Die konkrete allkauf-Grundpreis-Aufteilung und Bemusterungs-Positionen kannst du je
           Aufgabe bzw. unter „Pauschalen" in der Phase eintragen.
         </p>

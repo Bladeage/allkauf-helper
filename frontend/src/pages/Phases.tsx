@@ -31,7 +31,7 @@ export default function Phases() {
               </span>
             </div>
             {(p.startDate || p.endDate) && (
-              <div className="mt-2 text-xs text-slate-400">
+              <div className="mt-2 text-xs text-slate-500">
                 {fmtDate(p.startDate)} – {fmtDate(p.endDate)}
               </div>
             )}

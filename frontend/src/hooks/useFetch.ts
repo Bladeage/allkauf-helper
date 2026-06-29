@@ -28,8 +28,9 @@ export function useFetch<T>(url: string | null, deps: unknown[] = []) {
 
   useEffect(() => {
     reload();
+    // url immer mit beobachten (sonst refetcht ein url-Wechsel ohne passendes deps nicht)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  }, [url, ...deps]);
 
   return { data, loading, error, reload, setData };
 }

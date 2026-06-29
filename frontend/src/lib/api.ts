@@ -20,7 +20,9 @@ export function setUnauthorizedHandler(fn: () => void): void {
 api.interceptors.response.use(
   (r) => r,
   (err) => {
-    if (axios.isAxiosError(err) && err.response?.status === 401) {
+    const url = (err.config && err.config.url) || '';
+    // 401 vom Login (Falschpasswort) NICHT als Session-Ablauf behandeln
+    if (axios.isAxiosError(err) && err.response?.status === 401 && !url.endsWith('/auth/login')) {
       clearToken();
       onUnauthorized?.();
     }

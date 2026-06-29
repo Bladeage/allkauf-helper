@@ -1,4 +1,4 @@
-const TOKEN_KEY = 'alkauf_token';
+export const TOKEN_KEY = 'alkauf_token';
 
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);

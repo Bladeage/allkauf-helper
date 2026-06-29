@@ -104,8 +104,17 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
     }
   }
   async function del(lid: number) {
-    await api.delete(`/lump-sums/${lid}`);
-    onChanged();
+    if (!confirm('Pauschale wirklich löschen?')) return;
+    setBusy(true);
+    setErr(null);
+    try {
+      await api.delete(`/lump-sums/${lid}`);
+      onChanged();
+    } catch (e) {
+      setErr(apiError(e));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -117,7 +126,7 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
             <span className="text-slate-700">{l.label}</span>
             <span className="flex items-center gap-3">
               <b className="text-slate-800">{euro(l.amount)}</b>
-              <button onClick={() => del(l.id)} className="text-xs text-slate-400 hover:text-red-600">
+              <button onClick={() => del(l.id)} className="text-xs text-slate-500 hover:text-red-600">
                 löschen
               </button>
             </span>
@@ -126,10 +135,10 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
       </div>
       <div className="mt-3 flex flex-wrap items-end gap-2">
         <div className="min-w-[12rem] flex-1">
-          <Input placeholder="Bezeichnung (z. B. Rohbau-Anteil)" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <Input aria-label="Bezeichnung der Pauschale" placeholder="Bezeichnung (z. B. Rohbau-Anteil)" value={label} onChange={(e) => setLabel(e.target.value)} />
         </div>
         <div className="w-32">
-          <Input type="number" inputMode="decimal" placeholder="€" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          <Input aria-label="Betrag in Euro" type="number" min="0" inputMode="decimal" placeholder="€" value={amount} onChange={(e) => setAmount(e.target.value)} />
         </div>
         <Button variant="secondary" onClick={add} disabled={busy}>
           Hinzufügen
@@ -175,7 +184,7 @@ function AddTaskModal({ phaseId, onClose, onDone }: { phaseId: number; onClose: 
   }
 
   return (
-    <Modal open onClose={onClose} title="Eigene Aufgabe hinzufügen">
+    <Modal open onClose={onClose} title="Eigene Aufgabe hinzufügen" busy={busy}>
       <div className="space-y-3">
         <Field label="Titel">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
@@ -195,7 +204,7 @@ function AddTaskModal({ phaseId, onClose, onDone }: { phaseId: number; onClose: 
             </Select>
           </Field>
           <Field label="Betrag (€)">
-            <Input type="number" inputMode="decimal" value={costAmount} onChange={(e) => setCostAmount(e.target.value)} />
+            <Input type="number" min="0" inputMode="decimal" value={costAmount} onChange={(e) => setCostAmount(e.target.value)} />
           </Field>
         </div>
         <Field label="Fälligkeit (optional)">
@@ -243,7 +252,7 @@ function EditPhaseModal({ phase, onClose, onDone }: { phase: PD; onClose: () => 
   }
 
   return (
-    <Modal open onClose={onClose} title="Phase bearbeiten">
+    <Modal open onClose={onClose} title="Phase bearbeiten" busy={busy}>
       <div className="space-y-3">
         <Field label="Beschreibung">
           <Textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
@@ -257,7 +266,7 @@ function EditPhaseModal({ phase, onClose, onDone }: { phase: PD; onClose: () => 
           </Field>
         </div>
         <Field label="Phasen-Budget (€, optional)">
-          <Input type="number" inputMode="decimal" value={budget} onChange={(e) => setBudget(e.target.value)} />
+          <Input type="number" min="0" inputMode="decimal" value={budget} onChange={(e) => setBudget(e.target.value)} />
         </Field>
         {err && <ErrorBox>{err}</ErrorBox>}
         <div className="flex justify-end gap-2">
