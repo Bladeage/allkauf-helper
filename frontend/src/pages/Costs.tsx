@@ -23,10 +23,10 @@ export default function Costs() {
         subtitle="allkauf-Grundpreis · Bemusterung · Eigenleistung · Sonstiges"
         actions={
           <div className="flex gap-2">
-            <a href="/api/exports/costs.csv" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+            <a href="/api/exports/costs.csv" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600">
               ⬇ CSV
             </a>
-            <a href="/api/exports/costs.pdf" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+            <a href="/api/exports/costs.pdf" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600">
               ⬇ PDF
             </a>
           </div>
@@ -51,34 +51,34 @@ export default function Costs() {
       {/* Summen */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <div className="text-xs text-slate-500">Ist-Kosten (inkl. Pauschalen)</div>
-          <div className="text-2xl font-bold text-slate-800">{euro(totals.grandTotal)}</div>
-          <div className="mt-1 text-xs text-slate-500">davon bezahlt: {euro(totals.paidTotal)}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Ist-Kosten (inkl. Pauschalen)</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(totals.grandTotal)}</div>
+          <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">davon bezahlt: {euro(totals.paidTotal)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-500">Geplant (Soll)</div>
-          <div className="text-2xl font-bold text-slate-800">{euro(totals.plannedTotal)}</div>
-          {data.totalBudget != null && <div className="mt-1 text-xs text-slate-500">Gesamtbudget: {euro(data.totalBudget)}</div>}
+          <div className="text-xs text-slate-500 dark:text-slate-400">Geplant (Soll)</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(totals.plannedTotal)}</div>
+          {data.totalBudget != null && <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">Gesamtbudget: {euro(data.totalBudget)}</div>}
         </Card>
         <Card>
-          <div className="text-xs text-slate-500">Eigenleistung (Stunden)</div>
-          <div className="text-2xl font-bold text-slate-800">{fmtHours(totals.estimatedHoursTotal)}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Eigenleistung (Stunden)</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{fmtHours(totals.estimatedHoursTotal)}</div>
           {totals.eigenleistungValue != null && (
-            <div className="mt-1 text-xs text-slate-500">≈ {euro(totals.eigenleistungValue)} Wert (à {euro(data.hourlyRate)})</div>
+            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">≈ {euro(totals.eigenleistungValue)} Wert (à {euro(data.hourlyRate)})</div>
           )}
         </Card>
         <Card>
-          <div className="text-xs text-slate-500">Budget-Status</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Budget-Status</div>
           <div className={`text-2xl font-bold ${over ? 'text-red-600' : 'text-emerald-600'}`}>
             {budget > 0 ? `${Math.round((totals.grandTotal / budget) * 100)} %` : '–'}
           </div>
-          {over ? <Badge className="mt-1 bg-red-100 text-red-700">über Budget</Badge> : <div className="mt-1 text-xs text-slate-500">im Rahmen</div>}
+          {over ? <Badge className="mt-1 bg-red-100 text-red-700">über Budget</Badge> : <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">im Rahmen</div>}
         </Card>
       </div>
 
       {/* Kategorien */}
       <Card title="Nach Kategorie">
-        <div className="mb-3 flex h-3 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mb-3 flex h-3 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
           {CATS.map((c) => {
             const v = totals.byCategory[c];
             const pct = (v / grand) * 100;
@@ -87,9 +87,9 @@ export default function Costs() {
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {CATS.map((c) => (
-            <div key={c} className="rounded-lg bg-slate-50 p-2">
+            <div key={c} className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2">
               <Badge className={CATEGORY_BADGE[c]}>{CATEGORY_LABEL[c]}</Badge>
-              <div className="mt-1 font-semibold text-slate-800">{euro(totals.byCategory[c])}</div>
+              <div className="mt-1 font-semibold text-slate-800 dark:text-slate-100">{euro(totals.byCategory[c])}</div>
             </div>
           ))}
         </div>
@@ -99,34 +99,34 @@ export default function Costs() {
       <Card title="Nach Phase">
         <div className="space-y-3">
           {data.byPhase.map((p) => (
-            <div key={p.phaseId} className="rounded-xl ring-1 ring-slate-200">
-              <div className="flex items-center justify-between gap-2 border-b border-slate-100 p-3">
-                <span className="min-w-0 truncate font-medium text-slate-800">{p.title}</span>
+            <div key={p.phaseId} className="rounded-xl ring-1 ring-slate-200 dark:ring-slate-700">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700 p-3">
+                <span className="min-w-0 truncate font-medium text-slate-800 dark:text-slate-100">{p.title}</span>
                 <span className="shrink-0 text-right">
-                  <span className="font-semibold text-slate-800">{euro(p.total)}</span>
-                  <span className="ml-2 text-xs text-slate-500">Soll {euro(p.planned)}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-100">{euro(p.total)}</span>
+                  <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">Soll {euro(p.planned)}</span>
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 p-3 text-sm sm:grid-cols-4">
                 {CATS.map((c) =>
                   p.byCategory[c] > 0 ? (
                     <div key={c} className="flex items-center justify-between gap-1">
-                      <span className="truncate text-xs text-slate-500">{CATEGORY_LABEL[c]}</span>
-                      <span className="text-slate-700">{euro(p.byCategory[c])}</span>
+                      <span className="truncate text-xs text-slate-500 dark:text-slate-400">{CATEGORY_LABEL[c]}</span>
+                      <span className="text-slate-700 dark:text-slate-200">{euro(p.byCategory[c])}</span>
                     </div>
                   ) : null,
                 )}
                 {p.estimatedHours > 0 && (
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-xs text-slate-500">Eigenleistung</span>
-                    <span className="text-slate-700">{fmtHours(p.estimatedHours)}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Eigenleistung</span>
+                    <span className="text-slate-700 dark:text-slate-200">{fmtHours(p.estimatedHours)}</span>
                   </div>
                 )}
               </div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           Beträge sind teils Platzhalter. Die konkrete allkauf-Grundpreis-Aufteilung und Bemusterungs-Positionen kannst du je
           Aufgabe bzw. unter „Pauschalen" in der Phase eintragen.
         </p>

@@ -162,14 +162,14 @@ export default function Users() {
           {data?.map((u) => {
             const isSelf = me?.id === u.id;
             return (
-              <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-slate-50 p-3">
+              <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
                 <div className="min-w-0">
-                  <div className="font-medium text-slate-800">
+                  <div className="font-medium text-slate-800 dark:text-slate-100">
                     {u.name}
-                    {isSelf && <span className="ml-1 text-xs text-slate-500">(du)</span>}
+                    {isSelf && <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">(du)</span>}
                     {u.role === 'admin' && <Badge className="ml-2 bg-violet-100 text-violet-700">Admin</Badge>}
                   </div>
-                  <div className="truncate text-xs text-slate-500">{u.email}</div>
+                  <div className="truncate text-xs text-slate-500 dark:text-slate-400">{u.email}</div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Select
@@ -193,7 +193,7 @@ export default function Users() {
             );
           })}
         </div>
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
           Hinweis: Sich selbst kann man nicht löschen oder degradieren; der letzte Admin bleibt erhalten.
           Rollenänderungen greifen für betroffene Nutzer beim nächsten Login vollständig.
         </p>

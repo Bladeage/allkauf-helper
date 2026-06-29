@@ -64,28 +64,28 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
   }
 
   return (
-    <div className="rounded-xl bg-white ring-1 ring-slate-200">
+    <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
       <div className="flex items-center gap-3 p-3">
         <input
           type="checkbox"
           checked={it.isPaid}
           onChange={togglePaid}
-          className="h-5 w-5 shrink-0 rounded border-slate-300 text-brand-700 focus:ring-brand"
+          className="h-5 w-5 shrink-0 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
           aria-label={`Bezahlt: ${it.label}`}
         />
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          <div className={`font-medium ${it.isPaid ? 'text-slate-500' : 'text-slate-800'}`}>{it.label}</div>
-          {it.dueCondition && <div className="truncate text-xs text-slate-500">{it.dueCondition}</div>}
+          <div className={`font-medium ${it.isPaid ? 'text-slate-500 dark:text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>{it.label}</div>
+          {it.dueCondition && <div className="truncate text-xs text-slate-500 dark:text-slate-400">{it.dueCondition}</div>}
         </button>
         <div className="shrink-0 text-right">
-          <div className="font-semibold text-slate-800">
+          <div className="font-semibold text-slate-800 dark:text-slate-100">
             {it.plannedAmount != null ? euro(it.plannedAmount) : it.percent != null ? `${it.percent} %` : '–'}
           </div>
           {it.isPaid && <Badge className="bg-emerald-100 text-emerald-700">bezahlt{it.paidDate ? ` ${fmtDate(it.paidDate)}` : ''}</Badge>}
         </div>
       </div>
       {open && (
-        <div className="space-y-3 border-t border-slate-100 p-3">
+        <div className="space-y-3 border-t border-slate-100 dark:border-slate-700 p-3">
           <Field label="Bezeichnung">
             <Input value={f.label} onChange={(e) => setF((s) => ({ ...s, label: e.target.value }))} />
           </Field>
@@ -160,19 +160,19 @@ export default function Payments() {
       />
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
-          <div className="text-xs text-slate-500">Soll gesamt</div>
-          <div className="text-2xl font-bold text-slate-800">{euro(s.plannedTotal)}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Soll gesamt</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(s.plannedTotal)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-500">Bezahlt</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Bezahlt</div>
           <div className="text-2xl font-bold text-emerald-600">{euro(s.paidTotal)}</div>
-          <div className="mt-1 text-xs text-slate-500">
+          <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             {s.paidCount}/{s.total} Raten
           </div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-500">Offen</div>
-          <div className="text-2xl font-bold text-slate-800">{euro(s.openTotal)}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Offen</div>
+          <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(s.openTotal)}</div>
         </Card>
       </div>
       {data.installments.length === 0 ? (
@@ -184,7 +184,7 @@ export default function Payments() {
           ))}
         </div>
       )}
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-slate-500 dark:text-slate-400">
         Die Beträge/Prozente stammen aus deinem konkreten Vertrag — bitte eintragen. Hinweis: Abschlagszahlungen sind bis zur
         Fertigstellung auf max. 90 % begrenzt; 5 % Fertigstellungssicherheit (§ 650m BGB) sind zulässig.
       </p>

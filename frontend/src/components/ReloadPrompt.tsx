@@ -18,7 +18,7 @@ export function ReloadPrompt() {
       <button onClick={() => updateServiceWorker(true)} className="rounded-lg bg-brand-700 px-3 py-1.5 font-medium hover:bg-brand-800">
         Neu laden
       </button>
-      <button onClick={() => setNeedRefresh(false)} className="rounded-lg px-3 py-1.5 text-slate-300 hover:text-white">
+      <button onClick={() => setNeedRefresh(false)} className="rounded-lg px-3 py-1.5 text-slate-300 dark:text-slate-600 hover:text-white">
         Später
       </button>
     </div>

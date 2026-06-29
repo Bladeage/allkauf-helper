@@ -14,12 +14,12 @@ const STATUS_BADGE: Record<DefectStatus, string> = {
   open: 'bg-amber-100 text-amber-800',
   in_progress: 'bg-sky-100 text-sky-700',
   fixed: 'bg-emerald-100 text-emerald-700',
-  rejected: 'bg-slate-100 text-slate-500',
+  rejected: 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400',
 };
 const SEV: DefectSeverity[] = ['minor', 'normal', 'major', 'critical'];
 const SEV_LABEL: Record<DefectSeverity, string> = { minor: 'Gering', normal: 'Normal', major: 'Erheblich', critical: 'Kritisch' };
 const SEV_BADGE: Record<DefectSeverity, string> = {
-  minor: 'bg-slate-100 text-slate-600',
+  minor: 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
   normal: 'bg-sky-100 text-sky-700',
   major: 'bg-amber-100 text-amber-800',
   critical: 'bg-red-100 text-red-700',
@@ -52,23 +52,23 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
   }
 
   return (
-    <div className="rounded-xl bg-white ring-1 ring-slate-200">
+    <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
       <div className="flex items-center gap-3 p-3">
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          <div className={`font-medium ${d.status === 'fixed' ? 'text-slate-500 line-through' : 'text-slate-800'}`}>{d.title}</div>
+          <div className={`font-medium ${d.status === 'fixed' ? 'text-slate-500 dark:text-slate-400 line-through' : 'text-slate-800 dark:text-slate-100'}`}>{d.title}</div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             <Badge className={SEV_BADGE[d.severity]}>{SEV_LABEL[d.severity]}</Badge>
             <Badge className={STATUS_BADGE[d.status]}>{STATUS_LABEL[d.status]}</Badge>
-            {d.location && <Badge className="bg-slate-100 text-slate-600">📍 {d.location}</Badge>}
+            {d.location && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">📍 {d.location}</Badge>}
             {d.dueDate && <Badge className="bg-sky-100 text-sky-700">Frist {fmtDate(d.dueDate)}</Badge>}
-            {d.attachments && d.attachments.length > 0 && <Badge className="bg-slate-100 text-slate-500">📎 {d.attachments.length}</Badge>}
+            {d.attachments && d.attachments.length > 0 && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">📎 {d.attachments.length}</Badge>}
           </div>
         </button>
-        <span className="select-none text-xs text-slate-500" aria-hidden="true">{open ? '▲' : '▼'}</span>
+        <span className="select-none text-xs text-slate-500 dark:text-slate-400" aria-hidden="true">{open ? '▲' : '▼'}</span>
       </div>
       {open && (
-        <div className="space-y-3 border-t border-slate-100 p-3">
-          {d.description && <p className="rounded-lg bg-slate-50 p-2 text-sm text-slate-600">{d.description}</p>}
+        <div className="space-y-3 border-t border-slate-100 dark:border-slate-700 p-3">
+          {d.description && <p className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm text-slate-600 dark:text-slate-300">{d.description}</p>}
           <div className="grid grid-cols-2 gap-3">
             <Field label="Status">
               <Select value={d.status} onChange={(e) => patch({ status: e.target.value })}>
@@ -98,7 +98,7 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
               <Input type="date" defaultValue={toInputDate(d.dueDate)} onChange={(e) => patch({ dueDate: e.target.value || null })} />
             </Field>
           </div>
-          <div className="rounded-lg bg-slate-50 p-2">
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2">
             <AttachmentList defectId={d.id} />
           </div>
           {err && <ErrorBox>{err}</ErrorBox>}
@@ -203,7 +203,7 @@ export default function Defects() {
               {busy ? 'Anlegen…' : 'Anlegen'}
             </Button>
           </div>
-          <p className="text-xs text-slate-400">Fotos kannst du nach dem Anlegen direkt am Mangel-Eintrag hinzufügen.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Fotos kannst du nach dem Anlegen direkt am Mangel-Eintrag hinzufügen.</p>
         </div>
       </Modal>
     </div>

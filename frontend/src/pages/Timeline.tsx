@@ -77,7 +77,7 @@ export default function Timeline() {
   return (
     <div>
       <PageHeader title="Zeitleiste" subtitle="Bauphasen als Balken — dürfen sich überlappen, horizontal scrollbar" />
-      <div className="mb-3 flex flex-wrap gap-3 text-xs text-slate-500">
+      <div className="mb-3 flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_FILL.done }} />
           Fertig
@@ -94,7 +94,7 @@ export default function Timeline() {
         {showToday && <span className="flex items-center gap-1 text-red-500">▏heute</span>}
       </div>
 
-      <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-slate-200">
+      <div className="overflow-x-auto rounded-2xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
         <svg width={width} height={height} className="block" role="img" aria-label="Bauphasen-Zeitleiste (Gantt)">
           {/* Monats-Gridlines (hinten) */}
           {ticks.map((t, i) => (
@@ -172,7 +172,7 @@ export default function Timeline() {
           })}
         </svg>
       </div>
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
         Tipp: Auf einen Balken tippen (oder mit Tab + Enter) öffnet die Phase. Termine je Phase (bearbeiten) bzw.
         Projektstart/-ende unter „Einstellungen" pflegen.
         {partialCount > 0 && ` ${partialCount} Phase(n) mit nur einem Datum werden hier noch nicht angezeigt.`}

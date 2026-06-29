@@ -28,25 +28,25 @@ function EntryCard({ e, reload }: { e: DiaryEntry; reload: () => void }) {
   }
 
   return (
-    <div className="rounded-xl bg-white ring-1 ring-slate-200">
+    <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
       <button className="flex w-full items-center gap-3 p-3 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <div className="min-w-0 flex-1">
-          <div className="font-medium text-slate-800">
+          <div className="font-medium text-slate-800 dark:text-slate-100">
             {fmtDate(e.entryDate)}
             {e.title ? ` — ${e.title}` : ''}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {e.trade && <Badge className="bg-sky-100 text-sky-700">{e.trade}</Badge>}
             {e.weather && <Badge className="bg-amber-100 text-amber-800">{e.weather}</Badge>}
-            {e.attachments && e.attachments.length > 0 && <Badge className="bg-slate-100 text-slate-500">📎 {e.attachments.length}</Badge>}
+            {e.attachments && e.attachments.length > 0 && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">📎 {e.attachments.length}</Badge>}
           </div>
         </div>
-        <span className="select-none text-xs text-slate-500" aria-hidden="true">{open ? '▲' : '▼'}</span>
+        <span className="select-none text-xs text-slate-500 dark:text-slate-400" aria-hidden="true">{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div className="space-y-3 border-t border-slate-100 p-3">
-          <p className="whitespace-pre-wrap text-sm text-slate-700">{e.content}</p>
-          <div className="rounded-lg bg-slate-50 p-2">
+        <div className="space-y-3 border-t border-slate-100 dark:border-slate-700 p-3">
+          <p className="whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{e.content}</p>
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2">
             <AttachmentList diaryEntryId={e.id} />
           </div>
           {err && <ErrorBox>{err}</ErrorBox>}
@@ -107,7 +107,7 @@ export default function Diary() {
           <div className="flex gap-2">
             <a
               href="/api/exports/diary.pdf"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600"
             >
               ⬇ PDF
             </a>

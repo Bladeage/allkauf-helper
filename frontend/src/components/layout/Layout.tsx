@@ -24,7 +24,7 @@ export default function Layout() {
   return (
     <div className="flex h-full">
       {/* Desktop-Sidebar */}
-      <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white md:block">
+      <aside className="hidden w-64 shrink-0 border-r border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 md:block">
         <Sidebar />
       </aside>
 
@@ -32,7 +32,7 @@ export default function Layout() {
       {open && (
         <div className="fixed inset-0 z-40 md:hidden" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Navigation">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-64 bg-white shadow-xl">
+          <aside className="absolute left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 shadow-xl">
             <Sidebar onNavigate={() => setOpen(false)} />
           </aside>
         </div>

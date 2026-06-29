@@ -92,14 +92,14 @@ export default function Contacts() {
             <Card key={c.id}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="font-semibold text-slate-800">{c.name}</div>
-                  {(c.role || c.company) && <div className="text-xs text-slate-500">{[c.role, c.company].filter(Boolean).join(' · ')}</div>}
+                  <div className="font-semibold text-slate-800 dark:text-slate-100">{c.name}</div>
+                  {(c.role || c.company) && <div className="text-xs text-slate-500 dark:text-slate-400">{[c.role, c.company].filter(Boolean).join(' · ')}</div>}
                 </div>
                 <div className="flex shrink-0 gap-1">
-                  <button onClick={() => openEdit(c)} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100" aria-label={`${c.name} bearbeiten`}>
+                  <button onClick={() => openEdit(c)} className="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label={`${c.name} bearbeiten`}>
                     ✏️
                   </button>
-                  <button onClick={() => del(c)} className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label={`${c.name} löschen`}>
+                  <button onClick={() => del(c)} className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label={`${c.name} löschen`}>
                     🗑️
                   </button>
                 </div>
@@ -107,20 +107,20 @@ export default function Contacts() {
               <div className="mt-2 space-y-1 text-sm">
                 {c.phone && (
                   <div>
-                    <a href={`tel:${c.phone}`} className="text-brand-700 hover:underline">
+                    <a href={`tel:${c.phone}`} className="text-brand-700 dark:text-brand-300 hover:underline">
                       📞 {c.phone}
                     </a>
                   </div>
                 )}
                 {c.email && (
                   <div>
-                    <a href={`mailto:${c.email}`} className="text-brand-700 hover:underline">
+                    <a href={`mailto:${c.email}`} className="text-brand-700 dark:text-brand-300 hover:underline">
                       ✉️ {c.email}
                     </a>
                   </div>
                 )}
-                {c.address && <div className="text-slate-600">📍 {c.address}</div>}
-                {c.note && <div className="text-slate-500">{c.note}</div>}
+                {c.address && <div className="text-slate-600 dark:text-slate-300">📍 {c.address}</div>}
+                {c.note && <div className="text-slate-500 dark:text-slate-400">{c.note}</div>}
               </div>
             </Card>
           ))}

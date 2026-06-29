@@ -63,7 +63,7 @@ export default function AttachmentList(props: {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-slate-500">Anhänge{list.length > 0 ? ` (${list.length})` : ''}</span>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Anhänge{list.length > 0 ? ` (${list.length})` : ''}</span>
         <Button variant="secondary" type="button" onClick={() => fileRef.current?.click()} disabled={busy}>
           {busy ? 'Lädt…' : '+ Datei/Foto'}
         </Button>
@@ -78,27 +78,27 @@ export default function AttachmentList(props: {
       {loading ? (
         <Spinner />
       ) : list.length === 0 ? (
-        <p className="text-xs text-slate-400">Noch keine Anhänge.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">Noch keine Anhänge.</p>
       ) : (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {list.map((a) => (
-            <li key={a.id} className="overflow-hidden rounded-lg ring-1 ring-slate-200">
+            <li key={a.id} className="overflow-hidden rounded-lg ring-1 ring-slate-200 dark:ring-slate-700">
               <a href={fileUrl(a)} target="_blank" rel="noreferrer" className="block" title={a.originalName}>
                 {isImage(a.mimeType) ? (
                   <img src={fileUrl(a)} alt={a.originalName} loading="lazy" className="h-24 w-full object-cover" />
                 ) : (
-                  <div className="flex h-24 w-full flex-col items-center justify-center bg-slate-50 p-2 text-center">
+                  <div className="flex h-24 w-full flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 p-2 text-center">
                     <span className="text-2xl">📄</span>
-                    <span className="mt-1 w-full truncate text-[11px] text-slate-600">{a.originalName}</span>
+                    <span className="mt-1 w-full truncate text-[11px] text-slate-600 dark:text-slate-300">{a.originalName}</span>
                   </div>
                 )}
               </a>
-              <div className="flex items-center justify-between gap-1 px-1.5 py-1 text-[11px] text-slate-500">
+              <div className="flex items-center justify-between gap-1 px-1.5 py-1 text-[11px] text-slate-500 dark:text-slate-400">
                 <span className="truncate">{size(a.size)}</span>
                 <button
                   type="button"
                   onClick={() => del(a)}
-                  className="text-slate-400 hover:text-red-600"
+                  className="text-slate-400 dark:text-slate-500 hover:text-red-600"
                   aria-label={`Anhang ${a.originalName} löschen`}
                 >
                   ✕

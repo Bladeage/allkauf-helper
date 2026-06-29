@@ -28,29 +28,29 @@ export default function PhaseDetail() {
 
   return (
     <div className="space-y-4">
-      <Link to="/phases" className="text-sm text-slate-500 hover:text-brand-700">
+      <Link to="/phases" className="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-700">
         ← Alle Phasen
       </Link>
 
       <Card>
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h1 className="text-xl font-bold text-slate-800">{phase.title}</h1>
-            {phase.description && <p className="mt-1 text-sm text-slate-500">{phase.description}</p>}
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">{phase.title}</h1>
+            {phase.description && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{phase.description}</p>}
           </div>
           <Badge className={STATUS_BADGE[phase.status]}>{STATUS_LABEL[phase.status]}</Badge>
         </div>
         <div className="mt-3 flex items-center gap-3">
           <ProgressBar value={phase.progress} className="flex-1" />
-          <span className="whitespace-nowrap text-xs font-medium text-slate-500">
+          <span className="whitespace-nowrap text-xs font-medium text-slate-500 dark:text-slate-400">
             {phase.doneCount}/{phase.taskCount} erledigt
           </span>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
           <span>Start: {fmtDate(phase.startDate)}</span>
           <span>Ende: {fmtDate(phase.endDate)}</span>
           {phase.budget != null && <span>Budget: {euro(phase.budget)}</span>}
-          <button onClick={() => setShowEdit(true)} className="text-brand-700 hover:underline">
+          <button onClick={() => setShowEdit(true)} className="text-brand-700 dark:text-brand-300 hover:underline">
             bearbeiten
           </button>
         </div>
@@ -128,11 +128,11 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
       <div className="space-y-2">
         {phase.lumpSums.length === 0 && <EmptyState>Keine Pauschale hinterlegt.</EmptyState>}
         {phase.lumpSums.map((l) => (
-          <div key={l.id} className="flex items-center justify-between rounded-lg bg-slate-50 p-2 text-sm">
-            <span className="text-slate-700">{l.label}</span>
+          <div key={l.id} className="flex items-center justify-between rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm">
+            <span className="text-slate-700 dark:text-slate-200">{l.label}</span>
             <span className="flex items-center gap-3">
-              <b className="text-slate-800">{euro(l.amount)}</b>
-              <button onClick={() => del(l.id)} className="text-xs text-slate-500 hover:text-red-600">
+              <b className="text-slate-800 dark:text-slate-100">{euro(l.amount)}</b>
+              <button onClick={() => del(l.id)} className="text-xs text-slate-500 dark:text-slate-400 hover:text-red-600">
                 löschen
               </button>
             </span>

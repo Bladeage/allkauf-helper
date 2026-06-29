@@ -130,11 +130,11 @@ export default function HouseAreas() {
           <button
             key={a.id}
             onClick={() => setActive(a)}
-            className="flex flex-col items-center gap-1 rounded-2xl bg-white p-4 text-center shadow-sm ring-1 ring-slate-200 transition hover:ring-brand-200"
+            className="flex flex-col items-center gap-1 rounded-2xl bg-white dark:bg-slate-800 p-4 text-center shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 transition hover:ring-brand-200"
           >
             <span className="text-3xl">{a.icon || '🏠'}</span>
-            <span className="w-full break-words text-sm font-medium text-slate-700">{a.name}</span>
-            {a.planningNotes && <span className="text-[10px] text-slate-500">notiert</span>}
+            <span className="w-full break-words text-sm font-medium text-slate-700 dark:text-slate-200">{a.name}</span>
+            {a.planningNotes && <span className="text-[10px] text-slate-500 dark:text-slate-400">notiert</span>}
           </button>
         ))}
       </div>

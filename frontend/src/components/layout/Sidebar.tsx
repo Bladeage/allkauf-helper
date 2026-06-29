@@ -36,8 +36,8 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <div className="flex items-center gap-2 px-4 py-4">
         <span className="text-2xl">🏠</span>
         <div>
-          <div className="font-bold leading-tight text-slate-800">Haus-Helfer</div>
-          <div className="text-xs text-slate-500">allkauf Bau-Begleiter</div>
+          <div className="font-bold leading-tight text-slate-800 dark:text-slate-100">Haus-Helfer</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">allkauf Bau-Begleiter</div>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3">
@@ -48,7 +48,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             end={it.end}
             onClick={onNavigate}
             className={({ isActive }) =>
-              `${linkBase} ${isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-600 hover:bg-slate-100'}`
+              `${linkBase} ${isActive ? 'bg-brand-50 dark:bg-brand-700/20 text-brand-700 dark:text-brand-300' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`
             }
           >
             <span className="text-lg">{it.icon}</span>
@@ -56,7 +56,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           </NavLink>
         ))}
       </nav>
-      <div className="px-4 py-3 text-xs text-slate-300">v1.0 · self-hosted</div>
+      <div className="px-4 py-3 text-xs text-slate-300 dark:text-slate-600">v1.0 · self-hosted</div>
     </div>
   );
 }

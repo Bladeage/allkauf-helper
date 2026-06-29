@@ -46,9 +46,9 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
   return (
     <div className="space-y-2">
       {data?.map((n) => (
-        <div key={n.id} className="group rounded-lg bg-slate-50 p-2 text-sm">
-          <div className="whitespace-pre-wrap text-slate-700">{n.content}</div>
-          <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+        <div key={n.id} className="group rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm">
+          <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-200">{n.content}</div>
+          <div className="mt-1 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             <span>{fmtDateTime(n.createdAt)}</span>
             <button
               onClick={() => del(n.id)}

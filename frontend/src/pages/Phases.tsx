@@ -17,21 +17,21 @@ export default function Phases() {
           <Link
             key={p.id}
             to={`/phases/${p.id}`}
-            className="block rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:ring-brand-200"
+            className="block rounded-2xl bg-white dark:bg-slate-800 p-4 shadow-sm ring-1 ring-slate-200 dark:ring-slate-700 transition hover:ring-brand-200"
           >
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-semibold text-slate-800">{p.title}</h3>
+              <h3 className="font-semibold text-slate-800 dark:text-slate-100">{p.title}</h3>
               <Badge className={STATUS_BADGE[p.status]}>{STATUS_LABEL[p.status]}</Badge>
             </div>
-            {p.description && <p className="mt-1 text-sm text-slate-500">{p.description}</p>}
+            {p.description && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{p.description}</p>}
             <div className="mt-3 flex items-center gap-3">
               <ProgressBar value={p.progress} className="flex-1" />
-              <span className="whitespace-nowrap text-xs font-medium text-slate-500">
+              <span className="whitespace-nowrap text-xs font-medium text-slate-500 dark:text-slate-400">
                 {p.doneCount}/{p.taskCount}
               </span>
             </div>
             {(p.startDate || p.endDate) && (
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 {fmtDate(p.startDate)} – {fmtDate(p.endDate)}
               </div>
             )}

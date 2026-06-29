@@ -4,6 +4,15 @@
 
 :root {
   color-scheme: light;
+  --app-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html {
+  font-size: 16px; /* wird vom ThemeProvider übersteuert (Schriftgröße) */
 }
 
 html,
@@ -13,7 +22,8 @@ body,
 }
 
 body {
-  @apply bg-slate-100 text-slate-900 antialiased;
+  @apply bg-slate-100 text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100;
+  font-family: var(--app-font);
 }
 
 /* Safe-area Padding für Notch-Geräte (PWA standalone) */

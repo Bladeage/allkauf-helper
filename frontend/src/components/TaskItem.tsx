@@ -127,18 +127,18 @@ export default function TaskItem({
   }
 
   return (
-    <div className="rounded-xl bg-white ring-1 ring-slate-200">
+    <div className="rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
       <div className="flex items-center gap-3 p-3">
         <input
           type="checkbox"
           checked={task.isDone}
           onChange={toggleDone}
           disabled={busy}
-          className="h-5 w-5 shrink-0 rounded border-slate-300 text-brand-700 focus:ring-brand"
+          className="h-5 w-5 shrink-0 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
           aria-label={`Erledigt: ${task.title}`}
         />
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
-          <div className={`font-medium ${task.isDone ? 'text-slate-500 line-through' : 'text-slate-800'}`}>{task.title}</div>
+          <div className={`font-medium ${task.isDone ? 'text-slate-500 dark:text-slate-400 line-through' : 'text-slate-800 dark:text-slate-100'}`}>{task.title}</div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {task.costCategory && (
               <Badge className={CATEGORY_BADGE[task.costCategory]}>
@@ -146,7 +146,7 @@ export default function TaskItem({
                 {task.costAmount != null ? ` · ${euro(task.costAmount)}` : ''}
               </Badge>
             )}
-            {task.estimatedHours != null && <Badge className="bg-slate-100 text-slate-600">{task.estimatedHours} h</Badge>}
+            {task.estimatedHours != null && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{task.estimatedHours} h</Badge>}
             {(task.priority === 'high' || task.priority === 'urgent') && (
               <Badge className="bg-orange-100 text-orange-700">{PRIORITY_LABEL[task.priority]}</Badge>
             )}
@@ -158,14 +158,14 @@ export default function TaskItem({
             )}
             {task.isPaid && <Badge className="bg-emerald-100 text-emerald-700">bezahlt</Badge>}
             {task.isCustom && <Badge className="bg-violet-100 text-violet-700">ergänzt</Badge>}
-            {task._count && task._count.notes > 0 && <Badge className="bg-slate-100 text-slate-500">📝 {task._count.notes}</Badge>}
+            {task._count && task._count.notes > 0 && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">📝 {task._count.notes}</Badge>}
           </div>
         </button>
-        <span className="select-none text-xs text-slate-500" aria-hidden="true">{open ? '▲' : '▼'}</span>
+        <span className="select-none text-xs text-slate-500 dark:text-slate-400" aria-hidden="true">{open ? '▲' : '▼'}</span>
       </div>
 
       {open && (
-        <div className="space-y-4 border-t border-slate-100 p-3">
+        <div className="space-y-4 border-t border-slate-100 dark:border-slate-700 p-3">
           {task.isCustom ? (
             <>
               <Field label="Titel">
@@ -176,7 +176,7 @@ export default function TaskItem({
               </Field>
             </>
           ) : (
-            task.description && <p className="rounded-lg bg-slate-50 p-2 text-sm text-slate-600">{task.description}</p>
+            task.description && <p className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm text-slate-600 dark:text-slate-300">{task.description}</p>
           )}
 
           <div className="grid grid-cols-2 gap-3">
@@ -219,19 +219,19 @@ export default function TaskItem({
             </Field>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-600">
+          <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <input
               type="checkbox"
               checked={form.isPaid}
               onChange={(e) => up('isPaid', e.target.checked)}
-              className="h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand"
+              className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
             />
             als bezahlt markiert
           </label>
 
           {/* Relative Fälligkeit über Meilenstein (Abschnitt 7.4) */}
-          <div className="rounded-lg bg-slate-50 p-3">
-            <div className="mb-2 text-xs font-medium text-slate-500">Relative Fälligkeit (X Tage vor Meilenstein)</div>
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
+            <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Relative Fälligkeit (X Tage vor Meilenstein)</div>
             <div className="flex flex-wrap items-end gap-2">
               <div className="min-w-[10rem] flex-1">
                 <Select value={mid} onChange={(e) => setMid(e.target.value)}>
@@ -258,18 +258,18 @@ export default function TaskItem({
               </Button>
             </div>
             {task.effectiveDueDate && (
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 Effektive Fälligkeit: <b>{fmtDate(task.effectiveDueDate)}</b>
               </div>
             )}
           </div>
 
           <div>
-            <div className="mb-1 text-xs font-medium text-slate-500">Notizen</div>
+            <div className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">Notizen</div>
             <NoteEditor taskId={task.id} />
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-2">
+          <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2">
             <AttachmentList taskId={task.id} />
           </div>
 
@@ -281,7 +281,7 @@ export default function TaskItem({
                 Löschen
               </Button>
             ) : (
-              <span className="text-xs text-slate-500">Offizieller Checklisten-Punkt</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">Offizieller Checklisten-Punkt</span>
             )}
             <Button onClick={save} disabled={busy}>
               {busy ? 'Speichern…' : 'Speichern'}

@@ -33,7 +33,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
       {children}
       {state && (
         <Modal open onClose={() => close(false)} title={state.title || 'Bestätigen'}>
-          <p className="text-sm text-slate-600">{state.message}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => close(false)}>
               Abbrechen
