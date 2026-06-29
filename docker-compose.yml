@@ -47,8 +47,13 @@ services:
       SEED_USER2_NAME: ${SEED_USER2_NAME:-Partnerin}
       SEED_USER2_EMAIL: ${SEED_USER2_EMAIL:-partnerin@example.com}
       SEED_USER2_PASSWORD: ${SEED_USER2_PASSWORD:-}
+      # --- Block 4: Datei-/Foto-Ablage ---
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
     depends_on:
       db: { condition: service_healthy }
+    volumes:
+      - uploads_data:/app/uploads
     networks: [alkauf_net]
 
   frontend:
@@ -87,3 +92,4 @@ networks:
 
 volumes:
   db_data: { driver: local }
+  uploads_data: { driver: local }

@@ -63,6 +63,19 @@ const PHASES = [
       S('Erwerbsnebenkosten: Grunderwerbsteuer', { costCategory: CAT.sonst }),
       S('Erwerbsnebenkosten: Notar & Grundbucheintrag', { costCategory: CAT.sonst }),
       S('Maklerprovision (falls angefallen)', { costCategory: CAT.sonst }),
+      S('Bereitstellungszinsen verhandelt & im Budget eingeplant', {
+        costCategory: CAT.sonst,
+        description:
+          'Banken verlangen ~3 %/Jahr (0,15–0,25 %/Monat) auf noch nicht abgerufene Kreditbeträge nach der bereitstellungszinsfreien Zeit (3–12 Monate verhandelbar). Bei langer Bauzeit mit viel Eigenleistung schnell 2.000–5.000 € extra.',
+      }),
+      S('Bereitstellungszinsfreie Zeit & phasengenauen Kapitalabruf mit der Bank abgestimmt', {
+        description:
+          'Kapitalabruf an den MaBV-Ratenplan koppeln, sonst drohen Bereitstellungszinsen oder eine Liquiditätslücke. Zwischenfinanzierung für phasenversetzte Mittelabrufe (Bauspardarlehen/KfW) prüfen.',
+      }),
+      S('Grunderwerbsteuer-Vorteil Fertighaus genutzt (Grundstücks- & Hauskaufvertrag sauber getrennt)', {
+        description:
+          'Stammen Grundstückskauf und allkauf-Hausliefervertrag von verschiedenen Parteien, fällt Grunderwerbsteuer nur auf den Grundstückspreis an — spart 3,5–6,5 % der Hauskosten (oft 5.000–15.000 €). Verträge sauber trennen und belegen.',
+      }),
     ],
   },
   {
@@ -101,6 +114,16 @@ const PHASES = [
       S('Bemusterung: Aufpreis-Posten (Upgrades Fliesen/Bäder/Böden)', { costCategory: CAT.bem }),
       S('Markenküche (optional über allkauf)', { costCategory: CAT.bem }),
       S('Optionale Zusatzleistungen (Garage/Carport, PV-Anlage, Kingfire-Kamin, Klimaanlage, Garten-Paket)', { costCategory: CAT.bem }),
+      S('Ausbaupaket-Stufe „Free Time" (Vielbeschäftigte) gewählt — allkauf übernimmt Trockenbau, Estrich, Sanitär, Heizung & Elektro', {
+        priority: 'high',
+        description:
+          'Geringste Eigenleistung der drei Dienstleistungspakete (Baubeschreibung S. 109). Deine Eigenleistung beschränkt sich auf den Endausbau: Spachteln/Malern/Tapezieren, Bodenbeläge, Fliesen, Sanitärobjekte montieren, Küche, Innentüren — plus Bauherrenpflichten (Bodenplatte, Anschlüsse beantragen, Lüften während der Estrich-Trocknung, Schornsteinfeger). Prüfen, ob „Dienstleistung Spachtelarbeiten" separat dazugebucht ist (nicht automatisch in Free Time enthalten).',
+      }),
+      S('Sonderwünsche Leerrohre/Netzwerk früh dem allkauf-Elektropartner mitgeteilt (PV-DC, Speicher, KNX, Glasfaser, LAN)', {
+        priority: 'high',
+        description:
+          'Die Elektro-Rohinstallation (bei Free Time durch den allkauf-Partner) erfolgt VOR der Dämmung — Leerrohre jetzt festlegen. Nachträgliche Verlegung kostet das 10–30-fache; ein Glasfaser-Singlemode-Leerrohr altert nicht und ist in 30 Jahren noch nutzbar.',
+      }),
     ],
   },
   {
@@ -131,6 +154,14 @@ const PHASES = [
       S('Abfallcontainer organisiert (Bauschuttentsorgung nach Gewerbeabfallverordnung)', { costCategory: CAT.sonst }),
       S('Baustrom & Bauwasser (Provisorium)', { costCategory: CAT.sonst }),
       S('Versicherungspaket Bauzeit aktiviert (über allkauf oder extern)', { costCategory: CAT.sonst }),
+      S('Stellplatznachweis erbracht (KFZ/Fahrrad, Stellplatzsatzung der Gemeinde)', {
+        description:
+          'Die Gemeinde kann per Satzung Mindest-Stellplätze vorschreiben; der Nachweis oder ein Ablösebetrag ist oft schon zum Bauantrag fällig (Nachforderung/Bußgeld möglich).',
+      }),
+      S('Niederschlagswasser: Versickerungsnachweis & gesplittete Abwassergebühr beim Versorger angezeigt', {
+        description:
+          'Befestigte/angeschlossene Flächen als Berechnungsgrundlage angeben; ggf. Genehmigung/Nachweis für eine Versickerungsanlage (Mulde/Rigole) nach Entwässerungssatzung erforderlich.',
+      }),
     ],
   },
   {
@@ -166,6 +197,11 @@ const PHASES = [
       S('Lieferung kontrolliert (Mengen-/Mängelkontrolle, sofort auf Lieferschein rügen)'),
       S('Bautagebuch / Fotodokumentation geführt'),
       S('Richtfest 🎉'),
+      S('Rückstausicherung für Abläufe unter der Rückstauebene eingebaut (DIN EN 13564)', {
+        priority: 'high',
+        description:
+          'Die kommunale Entwässerungssatzung schreibt eine Rückstauklappe/-hebeanlage für Entwässerungsgegenstände unterhalb der Straßenoberkante vor. Fehlt sie, entfällt der Versicherungsschutz bei Kanalrückstau. Lage der Hausentwässerung berücksichtigen.',
+      }),
     ],
   },
   {
@@ -210,6 +246,48 @@ const PHASES = [
       S('Material: Wandfarbe / Tapeten (Platzhalter)', { costCategory: CAT.eigen }),
       S('Material: Fliesen (Platzhalter)', { costCategory: CAT.eigen }),
       S('Dienstleistungspaket (ProTime/ActiveTime/FreeTime), falls beauftragt', { costCategory: CAT.bem }),
+      // — Ergänzungen für Free Time: allkauf macht Trockenbau/Estrich/Sanitär/Heizung/Elektro;
+      //   deine Eigenleistung ist der Endausbau → Nachweise einfordern & Schnittstellen absichern —
+      S('Aufheizprotokoll + Nachbehandlungs-Empfehlung vom allkauf-Estrichleger erhalten & abgelegt', {
+        priority: 'high',
+        description:
+          'Bei Free Time legt der allkauf-Partner den Estrich. Laut Baubeschreibung (S. 105) bist DU während der Aufheiz-/Trocknungsphase fürs Lüften verantwortlich und erhältst die „Empfehlung zur Nachbehandlung" — das Aufheizprotokoll (datiert/unterschrieben) einfordern, sonst Gewährleistungsrisiko.',
+      }),
+      S('CM-Messung / Belegreife schriftlich nachgewiesen VOR eigenem Bodenbelag', {
+        priority: 'high',
+        description:
+          'Du verlegst Bodenbeläge/Fliesen selbst (Free-Time-Eigenleistung). Ohne dokumentierte Restfeuchtemessung (CM) erlischt die Gewährleistung deiner Bodenarbeiten — gilt für Parkett/Laminat, Fliesen und Vinyl gleichermaßen.',
+      }),
+      S('Vor dem Schließen der Wände: Rohinstallation & Dampfbremse fotodokumentiert', {
+        description:
+          'Bei Free Time schließt der allkauf-Trockenbauer die Wände. Vorher Elektro-/Sanitär-Rohinstallation sowie Dampfbrems-/Dämmungsausführung fotografieren — letzte Kontrollmöglichkeit; spätere Kondensat-/Wärmeschäden zeigen sich erst nach Jahren.',
+      }),
+      S('Baufeuchte im Endausbau überwacht (Hygrometer/Messgerät)', {
+        description:
+          'Im Neubau werden ~100 l Wasser pro m² eingebracht; zu frühes Schließen von Böden/Verkleidungen begünstigt Schimmel hinter Belägen. Vor Bodenbelag/Verkleidung die Feuchte messen.',
+      }),
+      S('Schall-/Brandschutz-Nachweis des Trockenbaus (allkauf) bei Übergabe eingefordert', {
+        description:
+          'Bei Free Time führt der allkauf-Trockenbauer aus → Systemnachweis/Protokoll (Schallschutz DIN 4109:2023, Brandschutz systemzugelassene Aufbauten) für die Unterlagen einfordern. Bei eigenen Vorwänden/Anpassungen das Herstellersystem vollständig einhalten.',
+      }),
+      S('Eigenleistungs-Schnittstellen zu den allkauf-Gewerken dokumentiert & abgenommen', {
+        description:
+          'Deine Endausbau-Eigenleistung (Bodenbeläge, Fliesen, Sanitärobjekt-Montage, Küche) sitzt auf allkauf-Vorleistungen. Zustand vor Beginn deiner Arbeit dokumentieren/abnehmen — an Schnittstellen haftet sonst, wer zuletzt ohne Rüge übernommen hat.',
+      }),
+      S('Elektro: VDE-0100-600-Prüfprotokoll/Konformitätserklärung vom allkauf-Elektropartner erhalten', {
+        priority: 'high',
+        description:
+          'Voraussetzung für die Zählersetzung durch den Netzbetreiber. Bei Free Time prüft & meldet der allkauf-Elektropartner die Anlage beim EVU — Protokoll für die Unterlagen einfordern. (Der Stromanschluss-Antrag beim Versorger bleibt Bauherrenleistung.)',
+      }),
+      S('Trinkwasser: Druckprüfung + Hygienespülung dokumentiert (VDI/DVGW 6023)', {
+        priority: 'high',
+        description:
+          'Vor Inbetriebnahme Pflicht: Dichtheits-/Druckprüfung und Hygiene-Erstspülung. Bei Free Time durch den allkauf-Sanitärpartner — Protokoll einfordern; die Erstspülung innerhalb 72 h nach Befüllung dokumentieren.',
+      }),
+      S('Rauchwarnmelder in Schlaf-/Kinderzimmern & Fluren montiert (Landesbauordnung)', {
+        description:
+          'In allen Bundesländern Pflicht vor Erstbezug — mindestens Schlaf-/Kinderzimmer und Rettungswegflure. Teil deiner Endausbau-Eigenleistung.',
+      }),
     ],
   },
   {
@@ -236,6 +314,25 @@ const PHASES = [
       S('Ummeldung beim Einwohnermeldeamt (innerhalb 2 Wochen)'),
       S('Außenanlagen: Einfahrt/Zufahrt (Platzhalter)', { costCategory: CAT.eigen }),
       S('Puffer / Unvorhergesehenes (Platzhalter)', { costCategory: CAT.sonst }),
+      S('Baufertigstellungsanzeige bei der Bauaufsichtsbehörde eingereicht', {
+        priority: 'high',
+        description:
+          'Die Fertigstellung eines genehmigungspflichtigen Baus ist vor dem Bezug anzuzeigen (Landesbauordnung). Eine Nichtanzeige ist eine Ordnungswidrigkeit.',
+      }),
+      S('Schornsteinfeger-Erstabnahme (Feuerstättenschau) vor Inbetriebnahme der Heizung', {
+        priority: 'high',
+        description:
+          'Jede neue Feuerungsanlage/Wärmepumpe mit Abgasführung muss vor Erstbetrieb vom Bezirksschornsteinfeger abgenommen werden. Die Verkleidung der Abgasführung ist mit dem Schornsteinfeger abzustimmen (Bauherrenleistung laut Baubeschreibung S. 103).',
+      }),
+      S('PV-Anlage + Batteriespeicher im Marktstammdatenregister (MaStR) angemeldet', {
+        priority: 'high',
+        description:
+          'Pflicht innerhalb 1 Monat nach Inbetriebnahme (EEG); ein Verstoß führt zu Bußgeld und Verlust der Einspeisevergütung. (Nur falls eine PV-Anlage gewählt wurde.)',
+      }),
+      S('Wallbox & Wärmepumpe als steuerbare Verbraucher beim Netzbetreiber angemeldet (§ 14a EnWG)', {
+        description:
+          'Pflichtanmeldung für steuerbare Verbrauchseinrichtungen; eine Wallbox > 11 kW ist zusätzlich genehmigungspflichtig. Bringt ein günstigeres Netzentgelt.',
+      }),
     ],
   },
   {
@@ -253,6 +350,25 @@ const PHASES = [
       S('Wohngebäudeversicherung auf Elementarschadendeckung geprüft'),
       S('Jährliche Wartung (Wärmepumpe, KWL-Lüftung, Schornsteinfeger)'),
       S('Effektives Lüften beachtet (3× täglich Durchzug; Hygrometer 40–65 %)'),
+      S('Amtliche Gebäudeeinmessung beim Katasteramt veranlasst', {
+        priority: 'high',
+        costCategory: CAT.sonst,
+        description:
+          'Der Neubau ist nach Fertigstellung auf Eigentümerkosten ins Liegenschaftskataster einzumessen (Frist je Bundesland 1–12 Monate). Bei Versäumnis erfolgt die Einmessung durch die Behörde mit Aufschlag.',
+      }),
+      S('Grundsteuer-Nachfeststellung beim Finanzamt gemeldet', {
+        priority: 'high',
+        description:
+          'Den Neubau bis zum 31.03. des Folgejahres der Fertigstellung dem Finanzamt anzeigen (§ 19 GrStG) → neuer Grundsteuerwert- und Messbescheid als Basis der laufenden Grundsteuer.',
+      }),
+      S('§ 35a EStG: ab Einzug Handwerker-/Wartungsrechnungen sammeln (Lohnanteil)', {
+        description:
+          'Gilt nicht für den Neubau, aber für alle späteren Wartungen/Reparaturen ab Einzug: 20 % des Lohnanteils, max. 1.200 €/Jahr Steuererstattung. Voraussetzung: Rechnung + Banküberweisung (keine Barzahlung).',
+      }),
+      S('Häusliches Arbeitszimmer steuerlich dokumentiert (Raumfunktion in Plänen/beim Finanzamt)', {
+        description:
+          'Bei Mittelpunkt der beruflichen Tätigkeit anteilig voll absetzbar, sonst Homeoffice-Pauschale 6 €/Tag (max. 1.260 €/Jahr). Raumfunktion früh festlegen — eine nachträgliche Änderung ist schwierig.',
+      }),
     ],
   },
 ];
@@ -289,6 +405,34 @@ const HOUSE_AREAS = [
   { name: 'Kinderzimmer zwei', icon: '🧒', description: 'Flexible Nutzung, Netzwerk/Leerrohre.' },
   { name: 'Flur oben', icon: '🔝', description: 'Galerie/Flur OG, Beleuchtung, Steckdosen.' },
   { name: 'Dachboden', icon: '📦', description: 'Dämmung, Stauraum, evtl. späterer Ausbau.' },
+];
+
+// Abschlags-/Zahlungsplan (Block 4) — Struktur nach allkauf-Ablauf & § 650m BGB.
+// Beträge/Prozente bewusst LEER — aus dem konkreten Vertrag/Zahlungsplan füllen.
+const PAYMENT_PLAN = [
+  { label: 'Abschlag nach Vertrag & Planungsfreigabe', dueCondition: 'Vertragsabschluss / Planungsbeginn', note: 'Verbraucherbauvertrag (§ 650m BGB): Bei der 1. Abschlagszahlung dürfen 5 % als Fertigstellungssicherheit einbehalten werden.' },
+  { label: 'Abschlag nach Baugenehmigung / Produktionsfreigabe', dueCondition: 'Baugenehmigung erhalten, Bürgschaft vorgelegt' },
+  { label: 'Abschlag vor Hausmontage (Materiallieferung)', dueCondition: 'Liefer- & Bauvoraussetzungen erfüllt (Bodenplatte abgenommen)' },
+  { label: 'Abschlag nach Hausmontage (Stelltermin)', dueCondition: 'Haus aufgebaut, wind-/wetterdicht übergeben' },
+  { label: 'Abschlag nach Ausbau-Dienstleistungen (Free Time)', dueCondition: 'allkauf-Gewerke Trockenbau/Estrich/HLS/Elektro fertig' },
+  { label: 'Schlussrate nach Abnahme', dueCondition: 'Bauabnahme ohne wesentliche Mängel', note: 'Abschlagszahlungen sind bis zur Fertigstellung auf max. 90 % der Gesamtsumme begrenzt (§ 650m BGB).' },
+  { label: 'Sicherheitseinbehalt 5 % nach Mängelbeseitigung', dueCondition: 'Alle gerügten Mängel beseitigt', note: 'Zur Absicherung der Mängelfreiheit; erst nach Nachweis auszahlen.' },
+];
+
+// Kontakte-Verzeichnis (Block 4) — Rollen-Platzhalter; Kontaktdaten selbst eintragen.
+const CONTACTS = [
+  { name: 'allkauf / DFH — Projektabwicklung', role: 'Bauträger / Vertrieb', company: 'DFH Haus GmbH' },
+  { name: 'DFH-Bauleiter', role: 'Bauleitung (Montage & Abnahme Bodenplatte)' },
+  { name: 'allkauf-Architekt', role: 'Architekt (Bauantrag, Statik, Bauleitung)' },
+  { name: 'Vermesser', role: 'Vermessung (Lageplan, Absteckung, Einmessung)' },
+  { name: 'allkauf-Elektropartner', role: 'Elektro (Free Time)' },
+  { name: 'allkauf-Sanitär-/Heizungspartner', role: 'Heizung / Sanitär (Free Time)' },
+  { name: 'allkauf-Trockenbau-/Estrichpartner', role: 'Trockenbau & Estrich (Free Time)' },
+  { name: 'Bezirksschornsteinfeger', role: 'Feuerstättenschau / Abnahme' },
+  { name: 'Netzbetreiber Strom', role: 'Stromanschluss / Zählersetzung' },
+  { name: 'Wasser-/Abwasserversorger', role: 'Hausanschluss Wasser / Abwasser' },
+  { name: 'Untere Bauaufsicht / Bauamt', role: 'Behörde (Genehmigung, Fertigstellungsanzeige)' },
+  { name: 'Bank / Finanzierung', role: 'Finanzierung (Abschläge, Bereitstellung)' },
 ];
 
 async function ensureUser(u, idx) {
@@ -366,6 +510,28 @@ async function ensureHouseArea(a, idx) {
   });
 }
 
+async function ensurePaymentPlan() {
+  if ((await prisma.paymentInstallment.count()) > 0) return;
+  for (let i = 0; i < PAYMENT_PLAN.length; i++) {
+    const p = PAYMENT_PLAN[i];
+    await prisma.paymentInstallment.create({
+      data: { sortOrder: i, label: p.label, dueCondition: p.dueCondition || null, note: p.note || null },
+    });
+  }
+  console.log('[seed] Zahlungsplan (Platzhalter) angelegt.');
+}
+
+async function ensureContacts() {
+  if ((await prisma.contact.count()) > 0) return;
+  for (let i = 0; i < CONTACTS.length; i++) {
+    const c = CONTACTS[i];
+    await prisma.contact.create({
+      data: { sortOrder: i, name: c.name, role: c.role || null, company: c.company || null },
+    });
+  }
+  console.log('[seed] Kontakte (Platzhalter) angelegt.');
+}
+
 async function main() {
   console.log('[seed] Start.');
 
@@ -403,6 +569,9 @@ async function main() {
   for (let i = 0; i < HOUSE_AREAS.length; i++) {
     await ensureHouseArea(HOUSE_AREAS[i], i);
   }
+
+  await ensurePaymentPlan();
+  await ensureContacts();
 
   console.log('[seed] Fertig.');
 }

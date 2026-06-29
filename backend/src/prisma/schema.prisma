@@ -37,9 +37,10 @@ model Phase {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  tasks    Task[]
-  notes    Note[]
-  lumpSums PhaseLumpSum[]
+  tasks       Task[]
+  notes       Note[]
+  lumpSums    PhaseLumpSum[]
+  attachments Attachment[]
 
   @@map("phases")
 }
@@ -76,6 +77,7 @@ model Task {
 
   notes          Note[]
   milestoneLinks TaskMilestoneLink[]
+  attachments    Attachment[]
 
   @@index([phaseId])
   @@map("tasks")
@@ -173,4 +175,101 @@ model ProjectSettings {
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
   @@map("project_settings")
+}
+
+// ---------- Mängelliste (Block 4) ----------
+model Defect {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  location     String? // Raum/Bereich (Freitext)
+  phaseId      Int?      @map("phase_id")
+  status       String    @default("open") // open | in_progress | fixed | rejected
+  severity     String    @default("normal") // minor | normal | major | critical
+  dueDate      DateTime? @map("due_date") @db.Date
+  reportedDate DateTime? @map("reported_date") @db.Date
+  fixedDate    DateTime? @map("fixed_date") @db.Date
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  attachments Attachment[]
+
+  @@map("defects")
+}
+
+// ---------- Bautagebuch (Block 4) ----------
+model DiaryEntry {
+  id        Int      @id @default(autoincrement())
+  entryDate DateTime @map("entry_date") @db.Date
+  weather   String?
+  trade     String? // Gewerk
+  title     String?
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  attachments Attachment[]
+
+  @@map("diary_entries")
+}
+
+// ---------- Datei-/Foto-Anhänge (polymorph an Task/Phase/Defect/DiaryEntry) ----------
+model Attachment {
+  id           Int      @id @default(autoincrement())
+  filename     String // gespeicherter Name auf der Platte (uuid.ext)
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  size         Int
+  taskId       Int?     @map("task_id")
+  phaseId      Int?     @map("phase_id")
+  defectId     Int?     @map("defect_id")
+  diaryEntryId Int?     @map("diary_entry_id")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  task       Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  phase      Phase?      @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  defect     Defect?     @relation(fields: [defectId], references: [id], onDelete: Cascade)
+  diaryEntry DiaryEntry? @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([phaseId])
+  @@index([defectId])
+  @@index([diaryEntryId])
+  @@map("attachments")
+}
+
+// ---------- MaBV-/Abschlags-Zahlungsplan (Block 4) ----------
+model PaymentInstallment {
+  id            Int       @id @default(autoincrement())
+  sortOrder     Int       @default(0) @map("sort_order")
+  label         String
+  percent       Decimal?  @db.Decimal(5, 2)
+  plannedAmount Decimal?  @map("planned_amount") @db.Decimal(12, 2)
+  dueCondition  String?   @map("due_condition")
+  dueDate       DateTime? @map("due_date") @db.Date
+  isPaid        Boolean   @default(false) @map("is_paid")
+  paidDate      DateTime? @map("paid_date") @db.Date
+  paidAmount    Decimal?  @map("paid_amount") @db.Decimal(12, 2)
+  note          String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("payment_installments")
+}
+
+// ---------- Kontakte/Firmen-Verzeichnis (Block 4) ----------
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  company   String?
+  role      String? // Rolle/Gewerk
+  phone     String?
+  email     String?
+  address   String?
+  note      String?
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("contacts")
 }

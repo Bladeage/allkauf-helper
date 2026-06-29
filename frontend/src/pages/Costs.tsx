@@ -18,7 +18,35 @@ export default function Costs() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Kosten" subtitle="allkauf-Grundpreis · Bemusterung · Eigenleistung · Sonstiges" />
+      <PageHeader
+        title="Kosten"
+        subtitle="allkauf-Grundpreis · Bemusterung · Eigenleistung · Sonstiges"
+        actions={
+          <div className="flex gap-2">
+            <a href="/api/exports/costs.csv" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+              ⬇ CSV
+            </a>
+            <a href="/api/exports/costs.pdf" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+              ⬇ PDF
+            </a>
+          </div>
+        }
+      />
+
+      {data.warnings && data.warnings.length > 0 && (
+        <div className="space-y-2">
+          {data.warnings.map((w, i) => (
+            <div
+              key={i}
+              role="alert"
+              className={`rounded-lg px-3 py-2 text-sm ${w.level === 'danger' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800'}`}
+            >
+              {w.level === 'danger' ? '🚨 ' : '⚠ '}
+              {w.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Summen */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

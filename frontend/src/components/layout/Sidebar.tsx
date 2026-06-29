@@ -15,6 +15,10 @@ const baseItems: NavItem[] = [
   { to: '/phases', label: 'Phasen', icon: '✅' },
   { to: '/costs', label: 'Kosten', icon: '💶' },
   { to: '/reminders', label: 'Wiedervorlagen', icon: '🔔' },
+  { to: '/defects', label: 'Mängel', icon: '🔧' },
+  { to: '/diary', label: 'Bautagebuch', icon: '📓' },
+  { to: '/payments', label: 'Zahlungen', icon: '🧾' },
+  { to: '/contacts', label: 'Kontakte', icon: '📇' },
 ];
 
 const linkBase = 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium';

@@ -12,6 +12,12 @@ import reminders from './reminders.js';
 import settings from './settings.js';
 import configRoute from './config.js';
 import health from './health.js';
+import defects from './defects.js';
+import diary from './diary.js';
+import attachments from './attachments.js';
+import payments from './payments.js';
+import contacts from './contacts.js';
+import exportsRoute from './exports.js';
 
 const router = Router();
 
@@ -28,5 +34,11 @@ router.use('/costs', costs);
 router.use('/house-areas', houseAreas);
 router.use('/reminders', reminders);
 router.use('/settings', settings);
+router.use('/defects', defects);
+router.use('/diary', diary);
+router.use('/attachments', attachments);
+router.use('/payments', payments);
+router.use('/contacts', contacts);
+router.use('/exports', exportsRoute);
 
 export default router;

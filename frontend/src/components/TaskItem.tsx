@@ -4,6 +4,7 @@ import type { CostCategory, Milestone, Priority, Task } from '../types';
 import { Badge, Button, Input, Select, Textarea, Field, ErrorBox } from './ui';
 import { CATEGORY_BADGE, CATEGORY_LABEL, PRIORITY_LABEL, euro, fmtDate, toInputDate } from '../lib/format';
 import NoteEditor from './NoteEditor';
+import AttachmentList from './AttachmentList';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
 
@@ -266,6 +267,10 @@ export default function TaskItem({
           <div>
             <div className="mb-1 text-xs font-medium text-slate-500">Notizen</div>
             <NoteEditor taskId={task.id} />
+          </div>
+
+          <div className="rounded-lg bg-slate-50 p-2">
+            <AttachmentList taskId={task.id} />
           </div>
 
           {err && <ErrorBox>{err}</ErrorBox>}

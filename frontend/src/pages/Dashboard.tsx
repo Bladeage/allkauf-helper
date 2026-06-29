@@ -39,6 +39,21 @@ export default function Dashboard() {
         <ProgressBar value={overall} className="mt-2" />
       </div>
 
+      {costs.warnings && costs.warnings.length > 0 && (
+        <div className="space-y-2">
+          {costs.warnings.map((w, i) => (
+            <div
+              key={i}
+              role="alert"
+              className={`rounded-lg px-3 py-2 text-sm ${w.level === 'danger' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800'}`}
+            >
+              {w.level === 'danger' ? '🚨 ' : '⚠ '}
+              {w.message}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Aktuelle Phase */}
         <Card title="Aktuelle Phase">

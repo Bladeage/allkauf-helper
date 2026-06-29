@@ -10,6 +10,10 @@ import Phases from './pages/Phases';
 import PhaseDetail from './pages/PhaseDetail';
 import Costs from './pages/Costs';
 import Reminders from './pages/Reminders';
+import Defects from './pages/Defects';
+import Diary from './pages/Diary';
+import Payments from './pages/Payments';
+import Contacts from './pages/Contacts';
 import HouseAreas from './pages/HouseAreas';
 import Settings from './pages/Settings';
 import Users from './pages/Users';
@@ -68,6 +72,10 @@ export default function App() {
           <Route path="/phases/:id" element={<PhaseDetailRoute />} />
           <Route path="/costs" element={<Costs />} />
           <Route path="/reminders" element={<Reminders />} />
+          <Route path="/defects" element={<Defects />} />
+          <Route path="/diary" element={<Diary />} />
+          <Route path="/payments" element={<Payments />} />
+          <Route path="/contacts" element={<Contacts />} />
           <Route path="/house" element={<HouseRoute />} />
           <Route path="/users" element={<AdminRoute />} />
           <Route path="/settings" element={<Settings />} />

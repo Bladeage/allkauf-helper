@@ -149,9 +149,14 @@ export default function Reminders() {
         title="Wiedervorlagen"
         subtitle="Termine & relative Meilensteine — überfällig zuerst"
         actions={
-          <Button variant="secondary" onClick={sendNow} disabled={sending}>
-            {sending ? 'Sende…' : 'Test-Mail senden'}
-          </Button>
+          <div className="flex gap-2">
+            <a href="/api/exports/reminders.ics" className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+              ⬇ ICS
+            </a>
+            <Button variant="secondary" onClick={sendNow} disabled={sending}>
+              {sending ? 'Sende…' : 'Test-Mail senden'}
+            </Button>
+          </div>
         }
       />
       {msg && (

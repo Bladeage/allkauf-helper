@@ -70,8 +70,28 @@ export async function getCostSummary() {
     paidTotal += pPaid;
   }
 
+  // Budget-Warnungen (Block 4): Gesamt- und Phasen-Budget gegen Ist/Soll prüfen.
+  const eur = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' €';
+  const warnings = [];
+  const tb = settings?.totalBudget != null ? num(settings.totalBudget) : 0;
+  if (tb > 0) {
+    if (actualTotal > tb) {
+      warnings.push({ level: 'danger', scope: 'total', over: actualTotal - tb, message: `Gesamtkosten (Ist) überschreiten das Budget um ${eur(actualTotal - tb)}.` });
+    } else if (plannedTotal > tb) {
+      warnings.push({ level: 'warn', scope: 'total', over: plannedTotal - tb, message: `Geplante Kosten (Soll) liegen ${eur(plannedTotal - tb)} über dem Budget.` });
+    } else if (actualTotal / tb >= 0.9) {
+      warnings.push({ level: 'warn', scope: 'total', over: 0, message: `Budget zu ${Math.round((actualTotal / tb) * 100)} % ausgeschöpft.` });
+    }
+  }
+  for (const ph of byPhase) {
+    if (ph.phaseBudget != null && ph.phaseBudget > 0 && ph.total > ph.phaseBudget) {
+      warnings.push({ level: 'warn', scope: 'phase', phaseId: ph.phaseId, over: ph.total - ph.phaseBudget, message: `${ph.title}: Ausgaben ${eur(ph.total - ph.phaseBudget)} über Phasen-Budget.` });
+    }
+  }
+
   return {
     byPhase,
+    warnings,
     totals: {
       byCategory: totalByCategory,
       taskCostTotal,

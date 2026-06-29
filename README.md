@@ -1,6 +1,6 @@
 # 🏠 allkauf Fertighaus-Helfer
 
-Selbst gehosteter, mobil-optimierter Bau-Begleiter (PWA) für ein allkauf-Ausbauhaus (Modell *Home 12*, ~172 m²).
+Selbst gehosteter, mobil-optimierter Bau-Begleiter (PWA) für ein allkauf-Ausbauhaus (Dienstleistungspaket *Free Time*).
 Bildet das Bauvorhaben **Phase für Phase** ab: Checklisten, Kostentracking, Wiedervorlagen mit E-Mail-Erinnerung,
 Gantt-Zeitleiste, relative Meilensteine und ein experimentelles Haus-Planungsmodul.
 
@@ -51,6 +51,7 @@ docker compose exec backend node src/prisma/seed.js
 | `MAIL_TO` | Empfänger der Erinnerungen (kommagetrennt) |
 | `APP_URL` | Basis-URL für Links in den E-Mails (eure Domain bzw. `http://<host>:8081`) |
 | `ENABLE_HOUSE_MODULE` | `true`/`false` — Feature-Flag fürs Haus-Modul |
+| `MAX_UPLOAD_MB` | max. Größe je Datei-/Foto-Anhang (Default 15) |
 | `SEED_USER1_*`, `SEED_USER2_*` | Die zwei Login-Accounts (Name/E-Mail/Passwort) |
 
 ---
@@ -125,6 +126,13 @@ docker compose exec backend node src/scripts/resetPassword.js <email> <neues-pas
   pro Phase & gesamt, Soll/Ist, Eigenleistungs-Stunden + kalkulatorischer Geldwert.
 - **Wiedervorlagen** — absolute Termine **oder** relative Meilensteine (X Tage vorher), überfällig hervorgehoben,
   tägliche Zusammenfassungs-Mail (ProtonMail, `node-cron`, 08:00 Europe/Berlin).
+- **Mängelliste** — Mängel mit Foto, Ort, Schwere, Frist & Status (zentral bei Abnahme + Gewährleistung).
+- **Bautagebuch** — datierte Einträge (Wetter, Gewerk, Text) mit Fotos; PDF-Export.
+- **Zahlungsplan** — Abschläge nach Baufortschritt (MaBV / § 650m BGB), Soll-/Bezahlt-Übersicht.
+- **Kontakte** — Bauleiter, Gewerke, Ämter, Versorger (Tel-/E-Mail-Direktlinks).
+- **Datei-/Foto-Anhänge** — an jeder Aufgabe, jedem Mangel und Tagebuch-Eintrag (lokales Volume, kein externer Dienst).
+- **Exporte** — Kosten als CSV/PDF, Bautagebuch als PDF, Termine als ICS (Kalender-Abo).
+- **Budget-Warnungen** — Hinweis bei Überschreitung von Gesamt- oder Phasen-Budget (Dashboard & Kosten).
 - **Haus** — experimentelles Planungsmodul (hinter `ENABLE_HOUSE_MODULE`).
 - **PWA** — installierbar, App-Shell-Caching (offline-Grundnavigation).
 
@@ -149,8 +157,12 @@ Inhalte hinzugefügt. Alle Ergänzungen sind **klar markiert** und leicht entfer
   `priority`; an Phasen `budget`; eine `project_settings`-Tabelle (Gesamtbudget, Projektstart/-ende, Übergabedatum,
   Eigenleistungs-Stundensatz, Wohnfläche) — speist Dashboard-Budget, Gantt-Marker und Stunden→Geldwert-Hochrechnung.
 
-Nicht eingebaut, aber sinnvoll als nächste Schritte (bei Bedarf): Dokumenten-/Foto-Anhänge je Aufgabe,
-CSV-/PDF-Export der Kosten, MaBV-Zahlungsplan-Ansicht.
+**Block 4 (umgesetzt):** Mängelliste, Bautagebuch, Datei-/Foto-Anhänge (je Aufgabe/Mangel/Tagebuch),
+MaBV-Zahlungsplan, Kontakte-Verzeichnis, CSV-/PDF-/ICS-Export und Budget-Warnungen. Dazu ~25 ergänzte
+Checklisten-Punkte: Behörden-/Inbetriebnahme-Pflichten (Baufertigstellungsanzeige, Gebäudeeinmessung,
+Grundsteuer, Schornsteinfeger, Rauchwarnmelder, Rückstau, MaStR/§ 14a), Eigenleistungs-Nachweise für das
+Paket *Free Time* (Aufheiz-/CM-Protokoll, Dampfbremse-Fotodoku, Schnittstellen) sowie Finanzierungskosten
+& Steuervorteile — alle als „ergänzt" markiert und löschbar.
 
 ---
 
@@ -161,6 +173,12 @@ und der **allkauf-FAQ** abgeglichen: Ausbaupakete AP 1a/1b/2, Bemusterung im Bem
 Bauherrenleistungen (SiGeKo, Zufahrt/Kran/Baustrom, Bodenplatte/Keller in Eigenleistung, Untermörteln …),
 Versicherungspaket über allkauf, der offizielle Bauzeitenplan (Stelltermin 14 Wochen) und die Innenausbau-
 Reihenfolge (Elektro → Trockenbau → HLS → Estrich → Trocknung → Spachteln → Außenputz).
+
+**Gewähltes Dienstleistungspaket: Free Time** („Vielbeschäftigte", geringste Eigenleistung der drei Pakete laut
+Baubeschreibung S. 109) — die allkauf-Partner übernehmen **Trockenbau, Estrich, Sanitär, Heizung und Elektro**;
+die Eigenleistung beschränkt sich auf den **Endausbau** (Spachteln/Malern, Bodenbeläge, Fliesen, Sanitärobjekt-
+Montage, Küche, Innentüren) plus die Bauherrenpflichten (Bodenplatte, Anschlüsse beantragen, Lüften während der
+Estrich-Trocknung, Schornsteinfeger).
 
 Bewusst **leer** (vom Bauherrn zu füllen):
 - **Beträge** (allkauf-Grundpreis-Pauschale, Bemusterungs-Aufpreise, Material) → je Aufgabe „Kosten" bzw. Phase „Pauschalen".

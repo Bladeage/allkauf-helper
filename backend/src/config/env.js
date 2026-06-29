@@ -37,6 +37,10 @@ export const config = {
   corsOrigin: list(process.env.CORS_ORIGIN),
   enableHouseModule: bool(process.env.ENABLE_HOUSE_MODULE, true),
 
+  // Block 4: Datei-/Foto-Ablage
+  uploadDir: process.env.UPLOAD_DIR || '/app/uploads',
+  maxUploadBytes: (Number(process.env.MAX_UPLOAD_MB) || 15) * 1024 * 1024,
+
   seedUsers: [
     {
       name: process.env.SEED_USER1_NAME || 'Fabian',
