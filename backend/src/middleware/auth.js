@@ -1,0 +1,22 @@
+import jwt from 'jsonwebtoken';
+import { config } from '../config/env.js';
+
+export function requireAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) {
+    return res.status(401).json({ error: 'Nicht authentifiziert' });
+  }
+  try {
+    const payload = jwt.verify(token, config.jwtSecret);
+    req.user = {
+      id: Number(payload.sub),
+      email: payload.email,
+      name: payload.name,
+      role: payload.role,
+    };
+    return next();
+  } catch {
+    return res.status(401).json({ error: 'Token ungültig oder abgelaufen' });
+  }
+}

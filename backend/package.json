@@ -1,0 +1,34 @@
+{
+  "name": "alkauf-fertighaus-helper-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend für den allkauf Fertighaus-Helfer (Express + Prisma + PostgreSQL)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "seed": "node src/prisma/seed.js",
+    "reset-password": "node src/scripts/resetPassword.js"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.16",
+    "prisma": "^5.22.0",
+    "zod": "^3.23.8"
+  }
+}

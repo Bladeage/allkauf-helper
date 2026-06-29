@@ -1,0 +1,1 @@
+# Nginx Proxy Manager legt hier ./npm/data und ./npm/letsencrypt an (per .gitignore ausgeschlossen).

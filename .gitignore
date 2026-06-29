@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+*.local
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Nginx Proxy Manager runtime data (created on first start)
+npm/data/
+npm/letsencrypt/
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

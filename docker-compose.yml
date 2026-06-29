@@ -1,0 +1,83 @@
+# docker-compose.yml — allkauf Fertighaus-Helfer
+# Topologie (Abschnitt 3): WebUI extern via Nginx Proxy Manager auf Port 8081,
+# Backend intern 5000, PostgreSQL intern 5432, NPM-Admin auf 81.
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: alkauf-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alkauf_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: alkauf_haus
+      TZ: Europe/Berlin
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks: [alkauf_net]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alkauf_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: alkauf-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD}@db:5432/alkauf_haus
+      JWT_SECRET: ${JWT_SECRET}
+      PROTON_SMTP_USER: ${PROTON_SMTP_USER}
+      PROTON_SMTP_PASSWORD: ${PROTON_SMTP_PASSWORD}
+      PROTON_SMTP_SERVER: smtp.protonmail.ch
+      PROTON_SMTP_PORT: 587
+      MAIL_TO: ${MAIL_TO}                 # Empfänger der Erinnerungen (ihr beide)
+      REMINDER_LOOKAHEAD_DAYS: 7          # konfigurierbar
+      TZ: Europe/Berlin
+      # --- Ergänzungen über Abschnitt 3 hinaus (für eine lauffähige App nötig) ---
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
+      APP_URL: ${APP_URL:-http://localhost:8081}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+      ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}
+      SEED_USER1_NAME: ${SEED_USER1_NAME:-Fabian}
+      SEED_USER1_EMAIL: ${SEED_USER1_EMAIL:-fabian@example.com}
+      SEED_USER1_PASSWORD: ${SEED_USER1_PASSWORD:-}
+      SEED_USER2_NAME: ${SEED_USER2_NAME:-Partnerin}
+      SEED_USER2_EMAIL: ${SEED_USER2_EMAIL:-partnerin@example.com}
+      SEED_USER2_PASSWORD: ${SEED_USER2_PASSWORD:-}
+    depends_on:
+      db: { condition: service_healthy }
+    networks: [alkauf_net]
+
+  frontend:
+    build: ./frontend
+    container_name: alkauf-frontend
+    restart: unless-stopped
+    # Wird vom NPM bedient; nach außen geht NPM auf 8081 (siehe npm-Service).
+    # Das Frontend-Nginx liefert die PWA und proxyt /api -> backend:5000.
+    expose: ["80"]
+    depends_on: [backend]
+    networks: [alkauf_net]
+
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: alkauf-npm
+    restart: unless-stopped
+    ports:
+      - "8081:80"      # << WebUI extern auf Port 8081
+      - "443:443"      # HTTPS
+      - "81:81"        # NPM Admin-UI
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    environment:
+      TZ: Europe/Berlin
+    networks: [alkauf_net]
+
+networks:
+  alkauf_net: { driver: bridge }
+
+volumes:
+  db_data: { driver: local }
