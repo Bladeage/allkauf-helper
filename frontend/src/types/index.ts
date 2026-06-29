@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  createdAt?: string;
 }
 
 export type PhaseStatus = 'not_started' | 'in_progress' | 'done';

@@ -25,6 +25,10 @@ export function errorHandler(err, req, res, next) {
   if (err.code === 'P2003') {
     return res.status(400).json({ error: 'Ungültige Referenz (z. B. unbekannte ID)' });
   }
+  // Prisma Unique-Verletzung (z. B. E-Mail schon vergeben) -> 409
+  if (err.code === 'P2002') {
+    return res.status(409).json({ error: 'Bereits vergeben (eindeutiges Feld, z. B. E-Mail)' });
+  }
   // Ungültige Query-Eingaben (z. B. nicht-numerische :id -> NaN) -> 400 statt 500
   if (err.name === 'PrismaClientValidationError') {
     console.warn('[warn] PrismaClientValidationError:', String(err.message).split('\n').pop());

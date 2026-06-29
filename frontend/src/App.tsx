@@ -12,6 +12,7 @@ import Costs from './pages/Costs';
 import Reminders from './pages/Reminders';
 import HouseAreas from './pages/HouseAreas';
 import Settings from './pages/Settings';
+import Users from './pages/Users';
 import NotFound from './pages/NotFound';
 import { ReloadPrompt } from './components/ReloadPrompt';
 
@@ -19,6 +20,11 @@ import { ReloadPrompt } from './components/ReloadPrompt';
 function PhaseDetailRoute() {
   const { id } = useParams();
   return <PhaseDetail key={id} />;
+}
+
+function AdminRoute() {
+  const { user } = useAuth();
+  return user?.role === 'admin' ? <Users /> : <Navigate to="/" replace />;
 }
 
 function HouseRoute() {
@@ -63,6 +69,7 @@ export default function App() {
           <Route path="/costs" element={<Costs />} />
           <Route path="/reminders" element={<Reminders />} />
           <Route path="/house" element={<HouseRoute />} />
+          <Route path="/users" element={<AdminRoute />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Route>

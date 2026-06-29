@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import auth from './auth.js';
+import users from './users.js';
 import phases from './phases.js';
 import lumpSums from './lumpSums.js';
 import tasks from './tasks.js';
@@ -17,6 +18,7 @@ const router = Router();
 router.use('/health', health);
 router.use('/config', configRoute);
 router.use('/auth', auth);
+router.use('/users', users);
 router.use('/phases', phases);
 router.use('/lump-sums', lumpSums);
 router.use('/tasks', tasks);

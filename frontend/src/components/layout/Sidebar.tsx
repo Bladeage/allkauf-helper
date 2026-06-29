@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface NavItem {
   to: string;
@@ -20,8 +21,10 @@ const linkBase = 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medi
 
 export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const { enableHouseModule } = useData();
+  const { user } = useAuth();
   const items: NavItem[] = [...baseItems];
   if (enableHouseModule) items.push({ to: '/house', label: 'Haus', icon: '🧱' });
+  if (user?.role === 'admin') items.push({ to: '/users', label: 'Nutzer', icon: '👤' });
   items.push({ to: '/settings', label: 'Einstellungen', icon: '⚙️' });
 
   return (
