@@ -1,0 +1,319 @@
+// Prisma schema — allkauf Fertighaus-Helfer
+// Datenmodell nach Abschnitt 4 des Handovers, plus klar markierte Ergänzungen
+// (siehe README -> "Erweiterungen gegenüber dem Handover").
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Nutzer (Login) ----------
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("user")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Zwei-Faktor-Authentisierung (TOTP). Secrets sind AES-GCM-verschlüsselt gespeichert.
+  totpEnabled       Boolean @default(false) @map("totp_enabled")
+  totpSecret        String? @map("totp_secret")         // aktives Secret (verschlüsselt)
+  totpPendingSecret String? @map("totp_pending_secret") // während der Einrichtung (verschlüsselt)
+
+  recoveryCodes RecoveryCode[]
+
+  @@map("users")
+}
+
+// Einmal-Wiederherstellungscodes für 2FA (bcrypt-gehasht, einmalig verwendbar).
+model RecoveryCode {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  codeHash  String    @map("code_hash")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("recovery_codes")
+}
+
+// ---------- Phasen ----------
+model Phase {
+  id          Int       @id @default(autoincrement())
+  orderNumber Int       @unique @map("order_number")
+  title       String
+  description String?
+  status      String    @default("not_started") // not_started | in_progress | done (aus Tasks ableitbar)
+  startDate   DateTime? @map("start_date") @db.Date // für die Gantt-Zeitleiste
+  endDate     DateTime? @map("end_date") @db.Date
+  budget      Decimal?  @db.Decimal(12, 2) // Ergänzung: Phasen-Budget (Soll)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  tasks       Task[]
+  notes       Note[]
+  lumpSums    PhaseLumpSum[]
+  attachments Attachment[]
+
+  @@map("phases")
+}
+
+// ---------- Aufgaben / Checklisten-Punkte ----------
+model Task {
+  id          Int     @id @default(autoincrement())
+  phaseId     Int     @map("phase_id")
+  phase       Phase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  isDone      Boolean @default(false) @map("is_done")
+  isCustom    Boolean @default(false) @map("is_custom") // true = vom Nutzer selbst angelegt
+
+  // Kosten (Abschnitt 5)
+  costCategory   String?  @map("cost_category") // allkauf_paket | bemusterung_extra | eigenleistung_material | sonstiges
+  costAmount     Decimal? @map("cost_amount") @db.Decimal(12, 2) // Ist-Betrag
+  costStatus     String   @default("geschaetzt") @map("cost_status") // Reifegrad: geschaetzt | bemustert | beauftragt | abgerechnet
+  estimatedHours Int?     @map("estimated_hours") // geschätzte Eigenleistungs-Stunden (nur zur Info)
+
+  // Termine (Abschnitt 7.4)
+  dueDate DateTime? @map("due_date") @db.Date // absolute Wiedervorlage (optional)
+
+  // --- Ergänzungen (siehe README) ---
+  plannedAmount Decimal?  @map("planned_amount") @db.Decimal(12, 2) // Soll-Betrag für Soll/Ist
+  vendor        String? // Anbieter/Firma
+  isPaid        Boolean   @default(false) @map("is_paid")
+  paidDate      DateTime? @map("paid_date") @db.Date
+  priority      String    @default("normal") // low | normal | high | urgent
+  attachmentUrl String?   @map("attachment_url")
+  sortOrder     Int       @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  notes          Note[]
+  milestoneLinks TaskMilestoneLink[]
+  attachments    Attachment[]
+
+  @@index([phaseId])
+  @@map("tasks")
+}
+
+// ---------- Notizen (an Phase ODER Aufgabe) ----------
+model Note {
+  id        Int      @id @default(autoincrement())
+  phaseId   Int?     @map("phase_id")
+  taskId    Int?     @map("task_id")
+  phase     Phase?   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("notes")
+}
+
+// ---------- Relative Meilensteine (z. B. "Estrich fertig") ----------
+model Milestone {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  actualDate  DateTime? @map("actual_date") @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  taskLinks TaskMilestoneLink[]
+
+  @@map("milestones")
+}
+
+// ---------- Verknüpfung: Aufgabe X Tage vor einem Meilenstein fällig ----------
+model TaskMilestoneLink {
+  id          Int @id @default(autoincrement())
+  taskId      Int @map("task_id")
+  milestoneId Int @map("milestone_id")
+  daysBefore  Int @map("days_before") // z. B. 56 = 8 Wochen vor dem Meilenstein
+
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  milestone Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  @@map("task_milestone_links")
+}
+
+// ---------- Phasen-Pauschale (allkauf-Grundpreis-Anteil pro Phase) ----------
+model PhaseLumpSum {
+  id      Int     @id @default(autoincrement())
+  phaseId Int     @map("phase_id")
+  phase   Phase   @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  label   String
+  amount  Decimal @db.Decimal(12, 2)
+
+  @@map("phase_lump_sums")
+}
+
+// ---------- Haus-Bereiche (experimentelles Planungsmodul) ----------
+model HouseArea {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  planningNotes String?  @map("planning_notes")
+  icon          String? // Ergänzung: Emoji/Icon-Key für die Kachel
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("house_areas")
+}
+
+// ---------- E-Mail-Log (Debugging) ----------
+model EmailLog {
+  id           Int       @id @default(autoincrement())
+  recipient    String
+  subject      String
+  status       String // sent | error | skipped
+  errorMessage String?   @map("error_message")
+  sentAt       DateTime? @map("sent_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@map("email_logs")
+}
+
+// ---------- Projekt-Einstellungen (Ergänzung: Single-Row Settings) ----------
+model ProjectSettings {
+  id                      Int       @id @default(autoincrement())
+  projectName             String    @default("allkauf Haus-Helfer") @map("project_name")
+  livingAreaSqm           Decimal?  @map("living_area_sqm") @db.Decimal(8, 2)
+  totalBudget             Decimal?  @map("total_budget") @db.Decimal(12, 2)
+  projectStart            DateTime? @map("project_start") @db.Date
+  projectEnd              DateTime? @map("project_end") @db.Date
+  handoverDate            DateTime? @map("handover_date") @db.Date // Start der Gewährleistungsfrist
+  hourlyRateEigenleistung Decimal?  @map("hourly_rate_eigenleistung") @db.Decimal(8, 2)
+  contingencyPercent      Decimal?  @map("contingency_percent") @db.Decimal(5, 2) // Puffer/Reserve in % (Unvorhergesehenes/Nachträge)
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  @@map("project_settings")
+}
+
+// ---------- Mängelliste (Block 4) ----------
+model Defect {
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String?
+  location     String? // Raum/Bereich (Freitext)
+  phaseId      Int?      @map("phase_id")
+  status       String    @default("open") // open | in_progress | fixed | rejected
+  severity     String    @default("normal") // minor | normal | major | critical
+  dueDate      DateTime? @map("due_date") @db.Date
+  reportedDate DateTime? @map("reported_date") @db.Date
+  fixedDate    DateTime? @map("fixed_date") @db.Date
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  attachments Attachment[]
+
+  @@map("defects")
+}
+
+// ---------- Bautagebuch (Block 4) ----------
+model DiaryEntry {
+  id        Int      @id @default(autoincrement())
+  entryDate DateTime @map("entry_date") @db.Date
+  weather   String?
+  trade     String? // Gewerk
+  title     String?
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  attachments Attachment[]
+
+  @@map("diary_entries")
+}
+
+// ---------- Datei-/Foto-Anhänge (polymorph an Task/Phase/Defect/DiaryEntry) ----------
+model Attachment {
+  id           Int      @id @default(autoincrement())
+  filename     String // gespeicherter Name auf der Platte (uuid.ext)
+  originalName String   @map("original_name")
+  mimeType     String   @map("mime_type")
+  size         Int
+  taskId       Int?     @map("task_id")
+  phaseId      Int?     @map("phase_id")
+  defectId     Int?     @map("defect_id")
+  diaryEntryId Int?     @map("diary_entry_id")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  task       Task?       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  phase      Phase?      @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  defect     Defect?     @relation(fields: [defectId], references: [id], onDelete: Cascade)
+  diaryEntry DiaryEntry? @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([phaseId])
+  @@index([defectId])
+  @@index([diaryEntryId])
+  @@map("attachments")
+}
+
+// ---------- MaBV-/Abschlags-Zahlungsplan (Block 4) ----------
+model PaymentInstallment {
+  id            Int       @id @default(autoincrement())
+  sortOrder     Int       @default(0) @map("sort_order")
+  label         String
+  percent       Decimal?  @db.Decimal(5, 2)
+  plannedAmount Decimal?  @map("planned_amount") @db.Decimal(12, 2)
+  dueCondition  String?   @map("due_condition")
+  dueDate       DateTime? @map("due_date") @db.Date
+  isPaid        Boolean   @default(false) @map("is_paid")
+  paidDate      DateTime? @map("paid_date") @db.Date
+  paidAmount    Decimal?  @map("paid_amount") @db.Decimal(12, 2)
+  note          String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("payment_installments")
+}
+
+// ---------- Kontakte/Firmen-Verzeichnis (Block 4) ----------
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  company   String?
+  role      String? // Rolle/Gewerk
+  phone     String?
+  email     String?
+  address   String?
+  note      String?
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("contacts")
+}
+
+// ---------- Kostenstand-Snapshots (Verlauf der Prognose über die Phasen) ----------
+model CostSnapshot {
+  id                 Int      @id @default(autoincrement())
+  label              String
+  note               String?
+  phaseOrder         Int?     @map("phase_order") // welche Phase den Auto-Snapshot ausgelöst hat
+  auto               Boolean  @default(false)
+  expected           Decimal  @db.Decimal(12, 2) // beste Schätzung (Ist wo bekannt, sonst Soll) + Pauschalen
+  fixed              Decimal  @db.Decimal(12, 2) // abgerechnet/bezahlt
+  committed          Decimal  @db.Decimal(12, 2) // beauftragt + Festpreis-Pauschalen
+  openAmount         Decimal  @map("open_amount") @db.Decimal(12, 2) // noch geschätzt/bemustert
+  contingencyPercent Decimal? @map("contingency_percent") @db.Decimal(5, 2)
+  contingencyAmount  Decimal? @map("contingency_amount") @db.Decimal(12, 2)
+  optimistic         Decimal  @db.Decimal(12, 2)
+  pessimistic        Decimal  @db.Decimal(12, 2)
+  withContingency    Decimal  @map("with_contingency") @db.Decimal(12, 2)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("cost_snapshots")
+}

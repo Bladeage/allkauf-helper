@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.local
+*.local
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Nginx Proxy Manager runtime data (created on first start)
+npm/data/
+npm/letsencrypt/
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Referenz-Dokumente (Handover/Baubeschreibung) nicht hochladen
+*.pdf
+
+# Persönlicher/herstellerspezifischer Seed-Datensatz — bleibt lokal, nie ins
+# öffentliche Repo/Image (herstellerspezifische, aus der Baubeschreibung abgeleitete Inhalte).
+# Der committete Standard ist der herstellerneutrale backend/src/prisma/data/generic.js.
+backend/src/prisma/data/custom.js
+backend/src/prisma/data/*.local.js

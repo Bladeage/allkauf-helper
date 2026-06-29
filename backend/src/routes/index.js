@@ -1,0 +1,46 @@
+import { Router } from 'express';
+import auth from './auth.js';
+import users from './users.js';
+import phases from './phases.js';
+import lumpSums from './lumpSums.js';
+import tasks from './tasks.js';
+import notes from './notes.js';
+import milestones from './milestones.js';
+import costs from './costs.js';
+import houseAreas from './houseAreas.js';
+import reminders from './reminders.js';
+import settings from './settings.js';
+import configRoute from './config.js';
+import health from './health.js';
+import defects from './defects.js';
+import diary from './diary.js';
+import attachments from './attachments.js';
+import payments from './payments.js';
+import contacts from './contacts.js';
+import exportsRoute from './exports.js';
+import costSnapshots from './costSnapshots.js';
+
+const router = Router();
+
+router.use('/health', health);
+router.use('/config', configRoute);
+router.use('/auth', auth);
+router.use('/users', users);
+router.use('/phases', phases);
+router.use('/lump-sums', lumpSums);
+router.use('/tasks', tasks);
+router.use('/notes', notes);
+router.use('/milestones', milestones);
+router.use('/costs', costs);
+router.use('/house-areas', houseAreas);
+router.use('/reminders', reminders);
+router.use('/settings', settings);
+router.use('/defects', defects);
+router.use('/diary', diary);
+router.use('/attachments', attachments);
+router.use('/payments', payments);
+router.use('/contacts', contacts);
+router.use('/exports', exportsRoute);
+router.use('/cost-snapshots', costSnapshots);
+
+export default router;
