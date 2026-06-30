@@ -1,14 +1,23 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import type { Phase, CostSummary, Reminder, ProjectSettings } from '../types';
-import { Spinner, Card, ProgressBar, Badge, EmptyState, ErrorBox } from '../components/ui';
+import { Spinner, Card, ProgressBar, Badge, Button, EmptyState, ErrorBox } from '../components/ui';
 import { euro, fmtDate, STATUS_BADGE, STATUS_LABEL } from '../lib/format';
+import SetupWizard from '../components/SetupWizard';
 
 export default function Dashboard() {
-  const { data: phases, loading: lp, error: ep } = useFetch<Phase[]>('/phases');
-  const { data: costs, loading: lc, error: ec } = useFetch<CostSummary>('/costs/summary');
-  const { data: reminders } = useFetch<Reminder[]>('/reminders');
-  const { data: settings } = useFetch<ProjectSettings>('/settings');
+  const { data: phases, loading: lp, error: ep, reload: reloadPhases } = useFetch<Phase[]>('/phases');
+  const { data: costs, loading: lc, error: ec, reload: reloadCosts } = useFetch<CostSummary>('/costs/summary');
+  const { data: reminders, reload: reloadReminders } = useFetch<Reminder[]>('/reminders');
+  const { data: settings, reload: reloadSettings } = useFetch<ProjectSettings>('/settings');
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const reloadAll = () => {
+    reloadPhases();
+    reloadCosts();
+    reloadReminders();
+    reloadSettings();
+  };
 
   if (lp || lc) return <Spinner />;
   if (ep || ec) return <ErrorBox>{ep || ec}</ErrorBox>;
@@ -28,16 +37,36 @@ export default function Dashboard() {
   const currentCost = costs.byPhase.find((b) => b.phaseId === current?.id);
   const upcoming = (reminders ?? []).slice(0, 5);
   const overdueCount = (reminders ?? []).filter((r) => r.overdue).length;
+  const needsSetup = settings != null && settings.totalBudget == null && settings.projectStart == null;
 
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">{settings?.projectName ?? 'allkauf Haus-Helfer'}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Gesamtfortschritt: {doneTasks}/{totalTasks} Aufgaben
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">{settings?.projectName ?? 'allkauf Haus-Helfer'}</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Gesamtfortschritt: {doneTasks}/{totalTasks} Aufgaben
+            </p>
+          </div>
+          <Button variant="secondary" onClick={() => setWizardOpen(true)}>
+            🧭 Einrichtung
+          </Button>
+        </div>
         <ProgressBar value={overall} className="mt-2" />
       </div>
+
+      {needsSetup && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-700/40 dark:bg-brand-700/15">
+          <div className="min-w-0">
+            <div className="font-semibold text-slate-800 dark:text-slate-100">Projekt einrichten</div>
+            <div className="text-sm text-slate-600 dark:text-slate-300">
+              Lege in wenigen Schritten Budget, Termine, Vertrag und Zahlungsplan an — und hol Verpasstes nach.
+            </div>
+          </div>
+          <Button onClick={() => setWizardOpen(true)}>Jetzt einrichten</Button>
+        </div>
+      )}
 
       {costs.warnings && costs.warnings.length > 0 && (
         <div className="space-y-2">
@@ -129,6 +158,8 @@ export default function Dashboard() {
           </Link>
         </Card>
       </div>
+
+      <SetupWizard open={wizardOpen} onClose={() => setWizardOpen(false)} onDone={reloadAll} />
     </div>
   );
 }
