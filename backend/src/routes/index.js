@@ -18,6 +18,7 @@ import attachments from './attachments.js';
 import payments from './payments.js';
 import contacts from './contacts.js';
 import exportsRoute from './exports.js';
+import costSnapshots from './costSnapshots.js';
 
 const router = Router();
 
@@ -40,5 +41,6 @@ router.use('/attachments', attachments);
 router.use('/payments', payments);
 router.use('/contacts', contacts);
 router.use('/exports', exportsRoute);
+router.use('/cost-snapshots', costSnapshots);
 
 export default router;

@@ -123,6 +123,12 @@ export default function Dashboard() {
             {over && <Badge className="bg-red-100 text-red-700">über Budget</Badge>}
           </div>
           <ProgressBar value={budgetPct} className={`mt-3 ${over ? '[&>div]:bg-red-500' : ''}`} />
+          {costs.forecast && costs.forecast.expected > 0 && (
+            <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+              Prognose: <b className="text-slate-700 dark:text-slate-200">{euro(costs.forecast.withContingency)}</b>{' '}
+              ({euro(costs.forecast.optimistic)}–{euro(costs.forecast.pessimistic)})
+            </div>
+          )}
           <Link to="/costs" className="mt-2 inline-block text-xs text-brand-700 dark:text-brand-300 hover:underline">
             → Kostenübersicht
           </Link>

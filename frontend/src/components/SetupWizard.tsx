@@ -46,7 +46,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
   const [currentPhase, setCurrentPhase] = useState(0);
   const [doRetro, setDoRetro] = useState(true);
-  const [proj, setProj] = useState({ projectName: '', livingAreaSqm: '', totalBudget: '', hourlyRate: '' });
+  const [proj, setProj] = useState({ projectName: '', livingAreaSqm: '', totalBudget: '', hourlyRate: '', contingency: '' });
   const [grundpreisId, setGrundpreisId] = useState<number | null>(null);
   const [grundpreis, setGrundpreis] = useState('');
   const [bemTaskId, setBemTaskId] = useState<number | null>(null);
@@ -85,6 +85,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
           livingAreaSqm: s.data.livingAreaSqm != null ? String(s.data.livingAreaSqm) : '',
           totalBudget: s.data.totalBudget != null ? String(s.data.totalBudget) : '',
           hourlyRate: s.data.hourlyRateEigenleistung != null ? String(s.data.hourlyRateEigenleistung) : '',
+          contingency: s.data.contingencyPercent != null ? String(s.data.contingencyPercent) : '',
         });
         setDates({ projectStart: toInputDate(s.data.projectStart), projectEnd: toInputDate(s.data.projectEnd) });
         setMsDates(Object.fromEntries(m.data.map((x) => [x.id, toInputDate(x.actualDate)])));
@@ -163,6 +164,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
         livingAreaSqm: num(proj.livingAreaSqm),
         totalBudget: num(proj.totalBudget),
         hourlyRateEigenleistung: num(proj.hourlyRate),
+        contingencyPercent: num(proj.contingency),
       });
     } else if (cur.key === 'contract') {
       if (grundpreisId !== null && grundpreis.trim() !== '') {
@@ -332,6 +334,9 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                     </Field>
                     <Field label="Stundensatz Eigenleistung (€/h)">
                       <Input type="number" inputMode="decimal" value={proj.hourlyRate} onChange={(e) => setProj((f) => ({ ...f, hourlyRate: e.target.value }))} />
+                    </Field>
+                    <Field label="Puffer / Reserve (%)">
+                      <Input type="number" inputMode="decimal" value={proj.contingency} onChange={(e) => setProj((f) => ({ ...f, contingency: e.target.value }))} placeholder="z. B. 10" />
                     </Field>
                   </div>
                 </div>

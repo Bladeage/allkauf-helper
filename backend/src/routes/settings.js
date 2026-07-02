@@ -23,6 +23,7 @@ const bodySchema = z.object({
   projectEnd: dateField,
   handoverDate: dateField,
   hourlyRateEigenleistung: z.number().nonnegative().nullable().optional(),
+  contingencyPercent: z.number().nonnegative().max(100).nullable().optional(),
 });
 
 router.get(
@@ -45,6 +46,7 @@ router.patch(
     if (b.projectEnd !== undefined) data.projectEnd = toDate(b.projectEnd);
     if (b.handoverDate !== undefined) data.handoverDate = toDate(b.handoverDate);
     if (b.hourlyRateEigenleistung !== undefined) data.hourlyRateEigenleistung = toMoney(b.hourlyRateEigenleistung);
+    if (b.contingencyPercent !== undefined) data.contingencyPercent = toMoney(b.contingencyPercent);
     const s = await prisma.projectSettings.update({ where: { id: current.id }, data });
     send(res, s);
   }),

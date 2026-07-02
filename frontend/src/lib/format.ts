@@ -1,4 +1,4 @@
-import type { CostCategory, Priority } from '../types';
+import type { CostCategory, CostStatus, Priority } from '../types';
 
 export const euro = (n: number | null | undefined): string =>
   n == null
@@ -82,4 +82,19 @@ export const STATUS_BADGE: Record<string, string> = {
   not_started: 'bg-slate-100 text-slate-600',
   in_progress: 'bg-amber-100 text-amber-800',
   done: 'bg-emerald-100 text-emerald-800',
+};
+
+// Reifegrad einer Kostenposition (Kostenprognose)
+export const COST_STATUS_LABEL: Record<CostStatus, string> = {
+  geschaetzt: 'Geschätzt',
+  bemustert: 'Bemustert',
+  beauftragt: 'Beauftragt',
+  abgerechnet: 'Abgerechnet',
+};
+
+export const COST_STATUS_BADGE: Record<CostStatus, string> = {
+  geschaetzt: 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400',
+  bemustert: 'bg-amber-100 text-amber-800',
+  beauftragt: 'bg-sky-100 text-sky-700',
+  abgerechnet: 'bg-emerald-100 text-emerald-700',
 };

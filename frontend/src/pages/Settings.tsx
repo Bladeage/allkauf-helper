@@ -19,6 +19,7 @@ export default function Settings() {
     projectEnd: '',
     handoverDate: '',
     hourlyRateEigenleistung: '',
+    contingencyPercent: '',
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export default function Settings() {
       projectEnd: toInputDate(data.projectEnd),
       handoverDate: toInputDate(data.handoverDate),
       hourlyRateEigenleistung: data.hourlyRateEigenleistung != null ? String(data.hourlyRateEigenleistung) : '',
+      contingencyPercent: data.contingencyPercent != null ? String(data.contingencyPercent) : '',
     });
   }, [data]);
 
@@ -56,6 +58,7 @@ export default function Settings() {
         projectEnd: form.projectEnd || null,
         handoverDate: form.handoverDate || null,
         hourlyRateEigenleistung: num(form.hourlyRateEigenleistung),
+        contingencyPercent: num(form.contingencyPercent),
       });
       setSaved(true);
       toast.success('Einstellungen gespeichert');
@@ -143,6 +146,9 @@ export default function Settings() {
             </Field>
             <Field label="Stundensatz Eigenleistung (€/h)">
               <Input type="number" min="0" inputMode="decimal" value={form.hourlyRateEigenleistung} onChange={(e) => up('hourlyRateEigenleistung', e.target.value)} />
+            </Field>
+            <Field label="Puffer / Reserve (%)">
+              <Input type="number" min="0" inputMode="decimal" value={form.contingencyPercent} onChange={(e) => up('contingencyPercent', e.target.value)} placeholder="z. B. 10" />
             </Field>
           </div>
           {err && <ErrorBox>{err}</ErrorBox>}

@@ -6,6 +6,7 @@ import { asyncHandler, HttpError } from '../middleware/errorHandler.js';
 import { send } from '../utils/serialize.js';
 import { parse, toDate, toMoney, COST_CATEGORIES, PRIORITIES } from '../utils/validation.js';
 import { withEffectiveDueDate } from '../utils/dueDate.js';
+import { maybeAutoSnapshotForPhase } from '../services/costService.js';
 
 const router = Router();
 router.use(requireAuth);
@@ -17,6 +18,7 @@ const taskInclude = {
 
 const dateField = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD').nullable().optional();
 const money = z.number().nonnegative().nullable().optional();
+const COST_STATUS = ['geschaetzt', 'bemustert', 'beauftragt', 'abgerechnet'];
 
 const createSchema = z.object({
   phaseId: z.number().int().positive(),
@@ -29,6 +31,7 @@ const createSchema = z.object({
   dueDate: dateField,
   vendor: z.string().max(300).nullable().optional(),
   priority: z.enum(PRIORITIES).optional(),
+  costStatus: z.enum(COST_STATUS).optional(),
 });
 
 const updateSchema = z.object({
@@ -46,6 +49,7 @@ const updateSchema = z.object({
   priority: z.enum(PRIORITIES).optional(),
   attachmentUrl: z.string().max(2000).nullable().optional(),
   sortOrder: z.number().int().optional(),
+  costStatus: z.enum(COST_STATUS).optional(),
 });
 
 router.get(
@@ -93,6 +97,7 @@ router.post(
         dueDate: toDate(b.dueDate),
         vendor: b.vendor ?? null,
         priority: b.priority || 'normal',
+        costStatus: b.costStatus || 'geschaetzt',
       },
       include: taskInclude,
     });
@@ -131,8 +136,17 @@ router.patch(
     if (b.priority !== undefined) data.priority = b.priority;
     if (b.attachmentUrl !== undefined) data.attachmentUrl = b.attachmentUrl;
     if (b.sortOrder !== undefined) data.sortOrder = b.sortOrder;
+    if (b.costStatus !== undefined) data.costStatus = b.costStatus;
 
     const task = await prisma.task.update({ where: { id }, data, include: taskInclude });
+    // Auto-Snapshot, falls diese Phase mit dem Abhaken vollständig fertig wurde (best effort)
+    if (b.isDone === true) {
+      try {
+        await maybeAutoSnapshotForPhase(task.phaseId);
+      } catch {
+        /* Snapshot ist optional */
+      }
+    }
     send(res, withEffectiveDueDate(task));
   }),
 );

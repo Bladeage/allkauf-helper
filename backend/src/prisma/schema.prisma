@@ -58,6 +58,7 @@ model Task {
   // Kosten (Abschnitt 5)
   costCategory   String?  @map("cost_category") // allkauf_paket | bemusterung_extra | eigenleistung_material | sonstiges
   costAmount     Decimal? @map("cost_amount") @db.Decimal(12, 2) // Ist-Betrag
+  costStatus     String   @default("geschaetzt") @map("cost_status") // Reifegrad: geschaetzt | bemustert | beauftragt | abgerechnet
   estimatedHours Int?     @map("estimated_hours") // geschätzte Eigenleistungs-Stunden (nur zur Info)
 
   // Termine (Abschnitt 7.4)
@@ -171,6 +172,7 @@ model ProjectSettings {
   projectEnd              DateTime? @map("project_end") @db.Date
   handoverDate            DateTime? @map("handover_date") @db.Date // Start der Gewährleistungsfrist
   hourlyRateEigenleistung Decimal?  @map("hourly_rate_eigenleistung") @db.Decimal(8, 2)
+  contingencyPercent      Decimal?  @map("contingency_percent") @db.Decimal(5, 2) // Puffer/Reserve in % (Unvorhergesehenes/Nachträge)
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
@@ -272,4 +274,25 @@ model Contact {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("contacts")
+}
+
+// ---------- Kostenstand-Snapshots (Verlauf der Prognose über die Phasen) ----------
+model CostSnapshot {
+  id                 Int      @id @default(autoincrement())
+  label              String
+  note               String?
+  phaseOrder         Int?     @map("phase_order") // welche Phase den Auto-Snapshot ausgelöst hat
+  auto               Boolean  @default(false)
+  expected           Decimal  @db.Decimal(12, 2) // beste Schätzung (Ist wo bekannt, sonst Soll) + Pauschalen
+  fixed              Decimal  @db.Decimal(12, 2) // abgerechnet/bezahlt
+  committed          Decimal  @db.Decimal(12, 2) // beauftragt + Festpreis-Pauschalen
+  openAmount         Decimal  @map("open_amount") @db.Decimal(12, 2) // noch geschätzt/bemustert
+  contingencyPercent Decimal? @map("contingency_percent") @db.Decimal(5, 2)
+  contingencyAmount  Decimal? @map("contingency_amount") @db.Decimal(12, 2)
+  optimistic         Decimal  @db.Decimal(12, 2)
+  pessimistic        Decimal  @db.Decimal(12, 2)
+  withContingency    Decimal  @map("with_contingency") @db.Decimal(12, 2)
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("cost_snapshots")
 }

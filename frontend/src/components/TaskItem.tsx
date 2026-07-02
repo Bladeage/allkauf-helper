@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { api, apiError } from '../lib/api';
-import type { CostCategory, Milestone, Priority, Task } from '../types';
+import type { CostCategory, CostStatus, Milestone, Priority, Task } from '../types';
 import { Badge, Button, Input, Select, Textarea, Field, ErrorBox } from './ui';
-import { CATEGORY_BADGE, CATEGORY_LABEL, PRIORITY_LABEL, euro, fmtDate, toInputDate } from '../lib/format';
+import { CATEGORY_BADGE, CATEGORY_LABEL, COST_STATUS_LABEL, PRIORITY_LABEL, euro, fmtDate, toInputDate } from '../lib/format';
 import NoteEditor from './NoteEditor';
 import AttachmentList from './AttachmentList';
 import { useToast } from '../context/ToastContext';
@@ -10,6 +10,7 @@ import { useConfirm } from '../context/ConfirmContext';
 
 const CATS: CostCategory[] = ['allkauf_paket', 'bemusterung_extra', 'eigenleistung_material', 'sonstiges'];
 const PRIOS: Priority[] = ['low', 'normal', 'high', 'urgent'];
+const CSTATUS: CostStatus[] = ['geschaetzt', 'bemustert', 'beauftragt', 'abgerechnet'];
 
 export default function TaskItem({
   task,
@@ -39,6 +40,7 @@ export default function TaskItem({
     isPaid: task.isPaid,
     paidDate: toInputDate(task.paidDate),
     priority: task.priority as Priority,
+    costStatus: task.costStatus,
   });
   const [mid, setMid] = useState(link ? String(link.milestoneId) : '');
   const [daysBefore, setDaysBefore] = useState(link ? String(link.daysBefore) : '56');
@@ -79,6 +81,7 @@ export default function TaskItem({
       isPaid: form.isPaid,
       paidDate: form.paidDate || null,
       priority: form.priority,
+      costStatus: form.costStatus,
     };
     if (task.isCustom) {
       data.title = form.title;
@@ -186,6 +189,15 @@ export default function TaskItem({
                 {CATS.map((c) => (
                   <option key={c} value={c}>
                     {CATEGORY_LABEL[c]}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Reifegrad (Sicherheit)">
+              <Select value={form.costStatus} onChange={(e) => up('costStatus', e.target.value as CostStatus)}>
+                {CSTATUS.map((s) => (
+                  <option key={s} value={s}>
+                    {COST_STATUS_LABEL[s]}
                   </option>
                 ))}
               </Select>

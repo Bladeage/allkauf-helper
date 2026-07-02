@@ -123,7 +123,11 @@ docker compose exec backend node src/scripts/resetPassword.js <email> <neues-pas
 - **Zeitleiste** — Gantt (eigenes SVG) mit überlappenden Phasen-Balken, Meilenstein-Markern und „heute"-Linie.
 - **Phasen** — Checklisten mit Abhaken, eigene Aufgaben, Fortschritt, abgeleiteter Status.
 - **Kosten** — 4 Kategorien (allkauf-Grundpreis / Bemusterung / Eigenleistung Material / Sonstiges),
-  pro Phase & gesamt, Soll/Ist, Eigenleistungs-Stunden + kalkulatorischer Geldwert.
+  pro Phase & gesamt, Soll/Ist, Eigenleistungs-Stunden + kalkulatorischer Geldwert. Dazu eine
+  **Kostenprognose**, die sich Phase für Phase verdichtet: beste Schätzung (Ist wo bekannt, sonst Soll) mit
+  **Bandbreite** und **Reifegrad je Position** (geschätzt → bemustert → beauftragt → abgerechnet), ein
+  **Puffer/Reserve (%)** für Unvorhergesehenes sowie ein **Kostenstand-Verlauf** (Snapshots — automatisch beim
+  Abschluss einer Phase oder manuell).
 - **Wiedervorlagen** — absolute Termine **oder** relative Meilensteine (X Tage vorher), überfällig hervorgehoben,
   tägliche Zusammenfassungs-Mail (ProtonMail, `node-cron`, 08:00 Europe/Berlin).
 - **Mängelliste** — Mängel mit Foto, Ort, Schwere, Frist & Status (zentral bei Abnahme + Gewährleistung).

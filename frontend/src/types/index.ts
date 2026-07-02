@@ -55,6 +55,7 @@ export interface Task {
   isCustom: boolean;
   costCategory: CostCategory | null;
   costAmount: number | null;
+  costStatus: CostStatus;
   plannedAmount: number | null;
   estimatedHours: number | null;
   dueDate: string | null;
@@ -138,14 +139,51 @@ export interface CostSummary {
   totalBudget: number | null;
   livingAreaSqm: number | null;
   warnings?: BudgetWarning[];
+  forecast?: Forecast;
 }
 
 export interface BudgetWarning {
   level: 'warn' | 'danger';
-  scope: 'total' | 'phase';
+  scope: 'total' | 'phase' | 'forecast';
   phaseId?: number;
   over: number;
   message: string;
+}
+
+export interface Forecast {
+  expected: number;
+  fixed: number;
+  committed: number;
+  open: number;
+  fixedPct: number;
+  committedPct: number;
+  openPct: number;
+  band: number;
+  contingencyPercent: number;
+  contingencyAmount: number;
+  optimistic: number;
+  pessimistic: number;
+  withContingency: number;
+}
+
+export type CostStatus = 'geschaetzt' | 'bemustert' | 'beauftragt' | 'abgerechnet';
+
+export interface CostSnapshot {
+  id: number;
+  label: string;
+  note: string | null;
+  phaseOrder: number | null;
+  auto: boolean;
+  expected: number;
+  fixed: number;
+  committed: number;
+  openAmount: number;
+  contingencyPercent: number | null;
+  contingencyAmount: number | null;
+  optimistic: number;
+  pessimistic: number;
+  withContingency: number;
+  createdAt: string;
 }
 
 export interface HouseArea {
@@ -166,6 +204,7 @@ export interface ProjectSettings {
   projectEnd: string | null;
   handoverDate: string | null;
   hourlyRateEigenleistung: number | null;
+  contingencyPercent: number | null;
 }
 
 export interface AppConfig {
