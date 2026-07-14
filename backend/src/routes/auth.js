@@ -10,9 +10,10 @@ import {
   confirmTotpEnrollment,
   disableTotp,
   recoveryStatus,
+  changeOwnPassword,
 } from '../services/authService.js';
 import { requireAuth } from '../middleware/auth.js';
-import { loginLimiter } from '../middleware/rateLimit.js';
+import { loginLimiter, sensitiveActionLimiter } from '../middleware/rateLimit.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { parse } from '../utils/validation.js';
 import { send } from '../utils/serialize.js';
@@ -36,6 +37,10 @@ const setupSchema = z.object({
 });
 const codeSchema = z.object({ code: z.string().min(1, 'Code erforderlich') });
 const passwordSchema = z.object({ password: z.string().min(1, 'Passwort erforderlich') });
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Aktuelles Passwort erforderlich'),
+  newPassword: z.string().min(8, 'Neues Passwort muss mindestens 8 Zeichen haben').max(200),
+});
 
 function cookieOptions(req, extra = {}) {
   return {
@@ -138,6 +143,7 @@ router.post(
 router.post(
   '/2fa/enable',
   requireAuth,
+  sensitiveActionLimiter,
   asyncHandler(async (req, res) => {
     const { code } = parse(codeSchema, req.body || {});
     // { recoveryCodes: [...] } — nur EINMAL sichtbar.
@@ -148,9 +154,23 @@ router.post(
 router.post(
   '/2fa/disable',
   requireAuth,
+  sensitiveActionLimiter,
   asyncHandler(async (req, res) => {
     const { password } = parse(passwordSchema, req.body || {});
     res.json(await disableTotp(req.user.id, password));
+  }),
+);
+
+// Self-Service-Passwortwechsel (eingeloggt) — setzt eine frische Session.
+router.post(
+  '/password',
+  requireAuth,
+  sensitiveActionLimiter,
+  asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = parse(changePasswordSchema, req.body || {});
+    const result = await changeOwnPassword(req.user.id, currentPassword, newPassword);
+    setSessionCookie(req, res, result);
+    res.json({ ok: true });
   }),
 );
 

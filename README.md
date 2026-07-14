@@ -9,6 +9,12 @@ keine externen Dienste**, alle Daten bleiben bei dir.
 > Ein Haushalt = eine Instanz. Der erste Nutzer legt sich beim ersten Start selbst als Administrator an;
 > weitere Mitnutzer (z. B. Partner:in) lädt der Admin ein.
 
+> **🇬🇧 English:** *Fertighaus-Helfer* is a self-hosted PWA companion for building a prefab / owner-finished
+> house **in Germany**. The interface and the built-in checklists are **German only** and reference German
+> building law (MaBV, § 650m BGB, KfW/BEG); a partial English UI would be misleading, so it is intentionally
+> not provided. Installation, configuration and Docker usage are documented below (in German). One instance
+> per household; the first visitor creates the admin account via the onboarding page.
+
 ---
 
 ## Funktionen
@@ -57,7 +63,7 @@ Die Images liegen in der GitHub Container Registry (multi-arch amd64/arm64):
 - `ghcr.io/bladeage/allkauf-helper-backend`
 - `ghcr.io/bladeage/allkauf-helper-frontend`
 
-Feste Version statt `latest`: `TAG=v1.0.0 docker compose -f docker-compose.public.yml up -d`.
+Feste Version statt `latest`: `TAG=1.0.0 docker compose -f docker-compose.public.yml up -d` (Image-Tag ohne `v`).
 
 ### Mit Beispieldaten ausprobieren
 

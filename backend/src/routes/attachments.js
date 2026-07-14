@@ -129,8 +129,10 @@ router.delete(
     const id = Number(req.params.id);
     const att = await prisma.attachment.findUnique({ where: { id } });
     if (att) {
-      removeFiles([att]);
+      // Erst DB-Zeile löschen, dann Datei: ein FS-Fehler hinterlässt höchstens eine
+      // verwaiste Datei (harmlos) statt einer DB-Zeile ohne Datei (kaputte Referenz).
       await prisma.attachment.delete({ where: { id } });
+      removeFiles([att]);
     }
     res.status(204).end();
   }),

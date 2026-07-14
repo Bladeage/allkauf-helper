@@ -97,12 +97,14 @@ export default function Login() {
             <Field label="Code">
               <Input
                 type="text"
-                inputMode="numeric"
+                inputMode="text"
                 autoComplete="one-time-code"
+                autoCapitalize="none"
+                autoCorrect="off"
                 autoFocus
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="123456"
+                placeholder="123456 oder Recovery-Code"
                 required
               />
             </Field>

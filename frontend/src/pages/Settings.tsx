@@ -8,6 +8,7 @@ import { toInputDate } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useTheme, FONTS, SIZES, type ThemeMode, type FontKey, type SizeKey } from '../context/ThemeContext';
 import TwoFactorCard from '../components/TwoFactorCard';
+import PasswordChangeCard from '../components/PasswordChangeCard';
 
 export default function Settings() {
   const { data, loading, error } = useFetch<ProjectSettings>('/settings');
@@ -125,6 +126,8 @@ export default function Settings() {
       </Card>
 
       <TwoFactorCard />
+
+      <PasswordChangeCard />
 
       <Card title="Projekt">
         <div className="space-y-3">

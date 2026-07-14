@@ -17,6 +17,16 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Strenges Limit für sensible, passwort-/code-prüfende Aktionen (2FA aktivieren/deaktivieren,
+// eigener Passwortwechsel) — ohne enges Limit per gestohlener Session brute-forcebar.
+export const sensitiveActionLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Zu viele Versuche. Bitte in ein paar Minuten erneut versuchen.' },
+});
+
 // Enges Limit für das manuelle Auslösen der Erinnerungs-Mail (gegen Mail-Bomb / Kontingent)
 export const sendMailLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 Stunde
