@@ -11,9 +11,9 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         id: '/',
-        name: 'allkauf Haus-Helfer',
+        name: 'Fertighaus-Helfer',
         short_name: 'Haus-Helfer',
-        description: 'Bau-Begleiter für das allkauf Ausbauhaus (Home 12)',
+        description: 'Bau-Begleiter für den Fertig-/Ausbauhaus-Bau',
         theme_color: '#ea580c',
         background_color: '#f1f5f9',
         display: 'standalone',

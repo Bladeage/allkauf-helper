@@ -6,7 +6,7 @@ const router = Router();
 // Öffentliche Laufzeit-Konfiguration fürs Frontend (Feature-Flags etc.)
 router.get('/', (req, res) => {
   res.json({
-    appName: 'allkauf Fertighaus-Helfer',
+    appName: 'Fertighaus-Helfer',
     enableHouseModule: config.enableHouseModule,
   });
 });

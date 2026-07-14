@@ -67,6 +67,8 @@ router.patch(
     if (b.name !== undefined) data.name = b.name;
     if (b.email !== undefined) data.email = b.email.toLowerCase().trim();
     if (b.role !== undefined) data.role = b.role;
+    // Rollenwechsel invalidiert bestehende Sessions des Nutzers (frische Rolle erzwingen).
+    if (b.role !== undefined && b.role !== target.role) data.tokenVersion = { increment: 1 };
     send(res, await prisma.user.update({ where: { id }, data, select: selectUser }));
   }),
 );
@@ -77,7 +79,8 @@ router.post(
     const id = Number(req.params.id);
     const b = parse(pwSchema, req.body || {});
     const passwordHash = await bcrypt.hash(b.password, 10);
-    await prisma.user.update({ where: { id }, data: { passwordHash } });
+    // Passwortänderung invalidiert alle bestehenden Sessions dieses Nutzers.
+    await prisma.user.update({ where: { id }, data: { passwordHash, tokenVersion: { increment: 1 } } });
     res.status(204).end();
   }),
 );

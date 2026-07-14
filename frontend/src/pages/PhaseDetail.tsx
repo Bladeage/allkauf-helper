@@ -124,7 +124,7 @@ function LumpSums({ phase, onChanged }: { phase: PD; onChanged: () => void }) {
   }
 
   return (
-    <Card title="allkauf-Pauschalen (Grundpreis-Anteil)">
+    <Card title="Grundpreis-Pauschalen (Haus)">
       <div className="space-y-2">
         {phase.lumpSums.length === 0 && <EmptyState>Keine Pauschale hinterlegt.</EmptyState>}
         {phase.lumpSums.map((l) => (

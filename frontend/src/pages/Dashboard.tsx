@@ -44,7 +44,7 @@ export default function Dashboard() {
       <div>
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">{settings?.projectName ?? 'allkauf Haus-Helfer'}</h1>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">{settings?.projectName ?? 'Fertighaus-Helfer'}</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Gesamtfortschritt: {doneTasks}/{totalTasks} Aufgaben
             </p>

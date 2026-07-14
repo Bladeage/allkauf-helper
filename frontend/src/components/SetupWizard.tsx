@@ -160,7 +160,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
     setErr(null);
     if (cur.key === 'project') {
       await api.patch('/settings', {
-        projectName: proj.projectName.trim() || 'allkauf Haus-Helfer',
+        projectName: proj.projectName.trim() || 'Fertighaus-Helfer',
         livingAreaSqm: num(proj.livingAreaSqm),
         totalBudget: num(proj.totalBudget),
         hourlyRateEigenleistung: num(proj.hourlyRate),
@@ -346,9 +346,9 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900">
                     <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300">Free Time</Badge>
-                    <span className="text-slate-600 dark:text-slate-300">allkauf übernimmt Trockenbau, Estrich, Sanitär, Heizung & Elektro — eure Eigenleistung ist der Endausbau.</span>
+                    <span className="text-slate-600 dark:text-slate-300">Der Anbieter bzw. seine Partnerfirmen übernehmen je nach Vertrag Trockenbau, Estrich, Sanitär, Heizung & Elektro — eure Eigenleistung ist der Endausbau.</span>
                   </div>
-                  <Field label="allkauf-Grundpreis-Pauschale (€)" hint="Hauslieferung + Montage + Ausbaupakete + Architekt/Statik. Aus eurem Vertrag.">
+                  <Field label="Grundpreis-Pauschale Haus (€)" hint="Hauslieferung + Montage + Ausbaupakete + Architekt/Statik. Aus eurem Vertrag.">
                     <Input type="number" inputMode="decimal" value={grundpreis} onChange={(e) => setGrundpreis(e.target.value)} placeholder="z. B. 230000" />
                   </Field>
                   <Field label="Bemusterungs-Aufpreise gesamt (€)" hint="Grobe Summe der Upgrades (Fliesen/Bäder/Böden …) aus dem Bemusterungsprotokoll.">
@@ -461,7 +461,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                       ['Gesamtbudget', check.budget],
                       ['Projektstart', check.start],
                       ['Mind. ein Meilenstein-Termin', check.milestones],
-                      ['allkauf-Grundpreis', check.grundpreis],
+                      ['Grundpreis (Haus)', check.grundpreis],
                       ['Zahlungsplan-Beträge', check.payments],
                     ].map(([label, ok]) => (
                       <li key={label as string} className="flex items-center gap-2">

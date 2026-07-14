@@ -37,7 +37,7 @@ export default function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         <span className="text-2xl">🏠</span>
         <div>
           <div className="font-bold leading-tight text-slate-800 dark:text-slate-100">Haus-Helfer</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">allkauf Bau-Begleiter</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Bau-Begleiter</div>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3">
