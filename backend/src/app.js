@@ -10,9 +10,10 @@ import { apiLimiter } from './middleware/rateLimit.js';
 export function createApp() {
   const app = express();
 
-  // Hinter zwei Reverse-Proxys (NPM -> frontend-nginx -> backend): 2 vertrauenswürdige Hops,
-  // damit req.ip die echte Client-IP ist (sonst keyt der Rate-Limiter alle auf die NPM-IP).
-  app.set('trust proxy', 2);
+  // Vertrauenswürdige Reverse-Proxy-Hops (konfigurierbar via TRUST_PROXY, Default 1).
+  // Wichtig für die Sicherheit: bei zu hohem Wert wird req.ip (Rate-Limit-Key) fälschbar,
+  // weil der Client dann eigene X-Forwarded-For-Einträge unterschieben kann.
+  app.set('trust proxy', config.trustProxy);
   app.disable('x-powered-by');
 
   app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: false }));

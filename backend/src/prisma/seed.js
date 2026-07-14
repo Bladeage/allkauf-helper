@@ -35,12 +35,25 @@ async function loadDataset() {
   throw new Error(`[seed] Kein Datensatz ladbar (versucht: ${tried.join(', ')}).`);
 }
 
-async function ensureSettings() {
+async function ensureSettings(settings) {
   const existing = await prisma.projectSettings.findFirst();
   if (existing) return;
-  // Bewusst leer (Modell/Größe/Budget/Termine/Stundensatz): vom Bauherrn zu füllen.
-  await prisma.projectSettings.create({ data: {} });
-  console.log('[seed] Projekt-Einstellungen (leer) angelegt.');
+  // Standard: bewusst leer (vom Bauherrn zu füllen). Ein Datensatz kann optionale
+  // Beispiel-Einstellungen (SETTINGS) mitliefern (z. B. der Demo-Datensatz).
+  const data = settings
+    ? {
+        ...(settings.projectName != null ? { projectName: settings.projectName } : {}),
+        livingAreaSqm: settings.livingAreaSqm ?? null,
+        totalBudget: settings.totalBudget ?? null,
+        projectStart: d(settings.projectStart),
+        projectEnd: d(settings.projectEnd),
+        handoverDate: d(settings.handoverDate),
+        hourlyRateEigenleistung: settings.hourlyRateEigenleistung ?? null,
+        contingencyPercent: settings.contingencyPercent ?? null,
+      }
+    : {};
+  await prisma.projectSettings.create({ data });
+  console.log(`[seed] Projekt-Einstellungen (${settings ? 'Demo' : 'leer'}) angelegt.`);
 }
 
 async function ensureTask(phaseId, t) {
@@ -115,12 +128,12 @@ async function ensureContacts(CONTACTS) {
 async function main() {
   console.log('[seed] Start.');
 
-  const { PHASES, MILESTONES, HOUSE_AREAS, PAYMENT_PLAN, CONTACTS } = await loadDataset();
+  const { PHASES, MILESTONES, HOUSE_AREAS, PAYMENT_PLAN, CONTACTS, SETTINGS } = await loadDataset();
 
   // Nutzer werden NICHT mehr geseedet — der erste Admin wird beim ersten Start
   // über die Onboarding-Seite (POST /api/auth/setup) angelegt.
 
-  await ensureSettings();
+  await ensureSettings(SETTINGS);
 
   const milestoneByTitle = {};
   for (const m of MILESTONES) {

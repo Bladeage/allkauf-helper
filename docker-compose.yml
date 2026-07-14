@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: alkauf_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt — bitte in .env setzen}
       POSTGRES_DB: alkauf_haus
       TZ: Europe/Berlin
     volumes:
@@ -27,8 +27,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD}@db:5432/alkauf_haus
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD:?DB_PASSWORD fehlt}@db:5432/alkauf_haus
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET fehlt — erzeugen via openssl rand -base64 48}
       PROTON_SMTP_USER: ${PROTON_SMTP_USER}
       PROTON_SMTP_PASSWORD: ${PROTON_SMTP_PASSWORD}
       PROTON_SMTP_SERVER: smtp.protonmail.ch
@@ -41,6 +41,8 @@ services:
       APP_URL: ${APP_URL:-http://localhost:8081}
       CORS_ORIGIN: ${CORS_ORIGIN:-}
       ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}
+      # Vertrauenswürdige Proxy-Hops: externer Reverse-Proxy → frontend-nginx → backend = 2.
+      TRUST_PROXY: ${TRUST_PROXY:-2}
       # Seed-Datensatz: leer = 'custom' bevorzugt (falls vorhanden), sonst 'generic'.
       SEED_DATASET: ${SEED_DATASET:-}
       # Nutzer werden NICHT geseedet — der erste Admin wird beim ersten Start über

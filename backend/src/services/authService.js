@@ -95,7 +95,14 @@ export async function getMe(userId) {
 // ---------- TOTP-Verwaltung ----------
 async function verifyTotp(user, token) {
   if (!user.totpSecret) return false;
-  const secret = decryptSecret(user.totpSecret);
+  let secret;
+  try {
+    secret = decryptSecret(user.totpSecret);
+  } catch {
+    // Nicht mehr entschlüsselbar (z. B. nach JWT_SECRET-Rotation): TOTP scheitert kontrolliert,
+    // damit in loginMfa der Recovery-Code-Pfad erreichbar bleibt statt eines 500ers.
+    return false;
+  }
   return authenticator.verify({ token: String(token || '').replace(/\s+/g, ''), secret });
 }
 
@@ -159,7 +166,9 @@ export async function disableTotp(userId, password) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new HttpError(404, 'Nutzer nicht gefunden');
   const ok = await bcrypt.compare(String(password || ''), user.passwordHash);
-  if (!ok) throw new HttpError(401, 'Passwort falsch');
+  // 403 (nicht 401): Passwort falsch ist KEIN abgelaufener Login — sonst würde der
+  // Frontend-401-Interceptor den eingeloggten Nutzer fälschlich ausloggen.
+  if (!ok) throw new HttpError(403, 'Passwort falsch');
   await prisma.$transaction([
     prisma.user.update({
       where: { id: userId },
