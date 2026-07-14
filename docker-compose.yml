@@ -1,4 +1,4 @@
-# docker-compose.yml — allkauf Fertighaus-Helfer
+# docker-compose.yml — Fertighaus-Helfer
 # Topologie (Abschnitt 3): WebUI extern via Nginx Proxy Manager auf Port 8081,
 # Backend intern 5000, PostgreSQL intern 5432, NPM-Admin auf 81.
 services:

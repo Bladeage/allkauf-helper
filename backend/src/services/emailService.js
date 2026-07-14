@@ -28,12 +28,12 @@ function buildEmail(tasks) {
 
   const html = `
   <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:640px">
-    <h2>🏠 allkauf Fertighaus-Helfer — Wiedervorlagen</h2>
+    <h2>🏠 Fertighaus-Helfer — Wiedervorlagen</h2>
     <p>Diese Aufgaben sind in den nächsten ${config.reminderLookaheadDays} Tagen fällig oder bereits überfällig:</p>
     ${overdue.length ? `<h3 style="color:#b91c1c">Überfällig (${overdue.length})</h3><ul>${overdue.map(row).join('')}</ul>` : ''}
     ${upcoming.length ? `<h3>Demnächst (${upcoming.length})</h3><ul>${upcoming.map(row).join('')}</ul>` : ''}
     <p style="margin-top:24px"><a href="${config.appUrl}" style="background:#ea580c;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">→ Zum Dashboard</a></p>
-    <p style="color:#999;font-size:12px">Automatische Erinnerung des allkauf Fertighaus-Helfers.</p>
+    <p style="color:#999;font-size:12px">Automatische Erinnerung des Fertighaus-Helfers.</p>
   </div>`;
 
   const text =

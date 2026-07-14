@@ -33,3 +33,6 @@ Thumbs.db
 # Der committete Standard ist der herstellerneutrale backend/src/prisma/data/generic.js.
 backend/src/prisma/data/custom.js
 backend/src/prisma/data/*.local.js
+
+# Backup-Skript-Ausgaben
+backups/

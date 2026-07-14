@@ -1,7 +1,27 @@
 # Änderungshistorie
 
-Wesentliche Änderungen am **allkauf Fertighaus-Helfer** — neueste zuerst.
+Wesentliche Änderungen am **Fertighaus-Helfer** — neueste zuerst.
 Details und Hintergründe stehen in den jeweiligen Git-Commits.
+
+## v1.0.0 (2026-07-14) — Öffentliches Release
+
+Erste öffentliche, produktionsreife Version als selbst gehostetes Docker-Image (GHCR).
+
+**Betrieb & Verteilung**
+- Multi-arch Images (amd64/arm64) via GitHub Actions nach **ghcr.io**; `docker-compose.public.yml` für Endnutzer.
+- **CI-Gate** vor jedem Image-Push: Backend-Unit-Tests (vitest), Prisma-Migrations- & Drift-Check, Frontend-Typecheck.
+- Backend-Container läuft **non-root**; Healthchecks; `TRUST_PROXY` konfigurierbar; Compose bricht ohne `.env` sauber ab.
+- **MIT-Lizenz**; `SECURITY.md`; Dependabot; herstellerneutraler Standard-Seed (`generic`) + `demo`-Datensatz.
+- Backup-/Restore-Skript und -Doku.
+
+**Sicherheit & Auth**
+- **Geführtes Onboarding**: erster Admin wird beim ersten Start angelegt (kein Seed-Nutzer/kein Default-Passwort).
+- **Zwei-Faktor-Authentisierung** (TOTP + 10 Recovery-Codes); Secrets AES-256-GCM-verschlüsselt.
+- **Session-Revocation** (`tokenVersion`): Passwort-Reset/Rollenwechsel/Löschung wirken sofort.
+- **Self-Service-Passwortwechsel**; strenge Rate-Limits auf Login/2FA/Passwort; Fix eines XFF-Rate-Limit-Bypass.
+
+**De-Branding**
+- Nutzersichtbare herstellerspezifische Bezeichnungen entfernt (Titel, PWA-Manifest, Labels, Exporte).
 
 ## Kostenprognose
 - **Kostenprognose**, die sich Phase für Phase verdichtet: beste Schätzung (Ist wo bekannt, sonst Soll) mit

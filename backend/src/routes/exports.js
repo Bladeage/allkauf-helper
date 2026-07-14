@@ -203,7 +203,7 @@ router.get(
     for (const r of reminders) {
       lines.push(
         'BEGIN:VEVENT',
-        `UID:task-${r.id}@allkauf-helfer`,
+        `UID:task-${r.id}@fertighaus-helfer`,
         `DTSTAMP:${stamp}`,
         `DTSTART;VALUE=DATE:${ymd(r.effectiveDueDate)}`,
         `DTEND;VALUE=DATE:${plus1(r.effectiveDueDate)}`,
@@ -223,7 +223,7 @@ router.get(
     for (const m of milestones) {
       lines.push(
         'BEGIN:VEVENT',
-        `UID:milestone-${m.id}@allkauf-helfer`,
+        `UID:milestone-${m.id}@fertighaus-helfer`,
         `DTSTAMP:${stamp}`,
         `DTSTART;VALUE=DATE:${ymd(m.actualDate)}`,
         `DTEND;VALUE=DATE:${plus1(m.actualDate)}`,

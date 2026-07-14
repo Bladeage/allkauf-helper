@@ -1,4 +1,4 @@
-// Prisma schema — allkauf Fertighaus-Helfer
+// Prisma schema — Fertighaus-Helfer
 // Datenmodell nach Abschnitt 4 des Handovers, plus klar markierte Ergänzungen
 // (siehe README -> "Erweiterungen gegenüber dem Handover").
 
@@ -148,7 +148,7 @@ model TaskMilestoneLink {
   @@map("task_milestone_links")
 }
 
-// ---------- Phasen-Pauschale (allkauf-Grundpreis-Anteil pro Phase) ----------
+// ---------- Phasen-Pauschale (Grundpreis-Anteil pro Phase) ----------
 model PhaseLumpSum {
   id      Int     @id @default(autoincrement())
   phaseId Int     @map("phase_id")
