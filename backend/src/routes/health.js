@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
   } catch {
     db = false;
   }
-  res.json({ status: 'ok', db, time: new Date().toISOString() });
+  // Ohne DB ist der Dienst nicht funktionsfähig -> 503, damit Healthcheck/Orchestrator es erkennt.
+  res.status(db ? 200 : 503).json({ status: db ? 'ok' : 'degraded', db, time: new Date().toISOString() });
 });
 
 export default router;

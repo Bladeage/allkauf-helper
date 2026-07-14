@@ -2,12 +2,19 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/db.js';
 import { requireAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/errorHandler.js';
+import { asyncHandler, HttpError } from '../middleware/errorHandler.js';
 import { send } from '../utils/serialize.js';
 import { parse, toDate } from '../utils/validation.js';
 import { removeFiles } from '../utils/uploads.js';
 
 const router = Router();
+
+// Datum strikt validieren statt still auf „heute" zu fallen.
+function requireDate(v) {
+  const d = toDate(v);
+  if (!d) throw new HttpError(400, 'Ungültiges Datum (Format YYYY-MM-DD).');
+  return d;
+}
 router.use(requireAuth);
 
 const createSchema = z.object({
@@ -36,7 +43,7 @@ router.post(
     const b = parse(createSchema, req.body || {});
     const entry = await prisma.diaryEntry.create({
       data: {
-        entryDate: toDate(b.entryDate) || new Date(),
+        entryDate: requireDate(b.entryDate),
         weather: b.weather ?? null,
         trade: b.trade ?? null,
         title: b.title ?? null,
@@ -52,7 +59,7 @@ router.patch(
   asyncHandler(async (req, res) => {
     const b = parse(updateSchema, req.body || {});
     const data = {};
-    if (b.entryDate !== undefined) data.entryDate = toDate(b.entryDate) || new Date();
+    if (b.entryDate !== undefined) data.entryDate = requireDate(b.entryDate);
     if (b.weather !== undefined) data.weather = b.weather ?? null;
     if (b.trade !== undefined) data.trade = b.trade ?? null;
     if (b.title !== undefined) data.title = b.title ?? null;

@@ -184,3 +184,18 @@ export async function recoveryStatus(userId) {
   const remaining = await prisma.recoveryCode.count({ where: { userId, usedAt: null } });
   return { remaining };
 }
+
+// Self-Service-Passwortwechsel: verlangt das aktuelle Passwort, invalidiert andere
+// Sessions (tokenVersion++) und gibt eine frische Session zurück (aktuelle bleibt gültig).
+export async function changeOwnPassword(userId, currentPassword, newPassword) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new HttpError(404, 'Nutzer nicht gefunden');
+  const ok = await bcrypt.compare(String(currentPassword || ''), user.passwordHash);
+  if (!ok) throw new HttpError(403, 'Aktuelles Passwort falsch');
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash, tokenVersion: { increment: 1 } },
+  });
+  return issueSession(updated, false);
+}
