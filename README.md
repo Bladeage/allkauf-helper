@@ -182,6 +182,11 @@ Das Backend läuft im Container als non-root; Migration & idempotenter Seed lauf
 
 ---
 
+## Lizenz
+
+Veröffentlicht unter der **MIT-Lizenz** — siehe [LICENSE](LICENSE). Nutzung, Änderung und Weitergabe (auch
+kommerziell) sind frei, solange der Copyright-Vermerk erhalten bleibt. Die Software kommt ohne Gewährleistung.
+
 ## Hinweise
 
 Der herstellerneutrale Datensatz bildet den allgemein üblichen Fertighaus-Ablauf ab; Gesetzes- und Normbezüge
