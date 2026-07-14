@@ -59,6 +59,16 @@ Die Images liegen in der GitHub Container Registry (multi-arch amd64/arm64):
 
 Feste Version statt `latest`: `TAG=v1.0.0 docker compose -f docker-compose.public.yml up -d`.
 
+### Mit Beispieldaten ausprobieren
+
+Für einen ersten Eindruck (befülltes Budget, Kosten, Projektdaten statt leer) den Demo-Datensatz laden:
+
+```bash
+SEED_DATASET=demo docker compose -f docker-compose.public.yml up -d
+```
+
+Für den echten Einsatz `generic` (Default) verwenden. Screenshots liegen unter [`docs/screenshots/`](docs/screenshots/).
+
 ---
 
 ## Konfiguration (`.env`)
@@ -74,7 +84,8 @@ Feste Version statt `latest`: `TAG=v1.0.0 docker compose -f docker-compose.publi
 | `MAIL_TO` | Empfänger der Erinnerungen (kommagetrennt) |
 | `ENABLE_HOUSE_MODULE` | `true`/`false` — Feature-Flag fürs Haus-Modul |
 | `MAX_UPLOAD_MB` | max. Größe je Datei-/Foto-Anhang (Default 15) |
-| `SEED_DATASET` | Startdatensatz (siehe [Datensätze](#datensätze)); leer = Standard |
+| `SEED_DATASET` | Startdatensatz (siehe [Datensätze](#datensätze)); `generic` (Default), `demo` (Beispieldaten) oder eigener `custom` |
+| `TRUST_PROXY` | Anzahl vertrauenswürdiger Reverse-Proxy-Hops. **`1`** (Default) bei Direktzugriff auf `:8081`; **`2`**, wenn ein eigener HTTPS-Reverse-Proxy davor steht. Falscher Wert macht die Rate-Limits wirkungslos. |
 
 > **Nutzer werden nicht über `.env` angelegt.** Der erste Admin entsteht ausschließlich über die Onboarding-Seite.
 
@@ -170,7 +181,24 @@ docker compose down                                  # stoppen
 docker compose down -v                               # stoppen + DB-Volume löschen (Datenverlust!)
 ```
 
-Backup: die beiden Named Volumes `db_data` (Datenbank) und `uploads_data` (Anhänge) sichern.
+### Backup & Restore
+
+Gesichert werden müssen **Datenbank** und **Anhänge** (`uploads_data`). Fertiges Skript (legt Zeitstempel-Archive unter `./backups/` an):
+
+```bash
+./scripts/backup.sh
+# Public-Compose:  COMPOSE="docker compose -f docker-compose.public.yml" ./scripts/backup.sh
+```
+
+**Vor jedem Update ein Backup ziehen** — der Backend-Start migriert die Datenbank automatisch.
+
+Restore (Achtung: überschreibt Daten):
+
+```bash
+gunzip -c backups/db-<stamp>.sql.gz | docker compose exec -T db psql -U alkauf_user -d alkauf_haus
+docker compose exec -T backend tar xzf - -C /app < backups/uploads-<stamp>.tar.gz
+docker compose restart backend
+```
 
 ---
 

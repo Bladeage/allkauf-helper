@@ -12,8 +12,15 @@ api.interceptors.response.use(
   (r) => r,
   (err) => {
     const url = (err.config && err.config.url) || '';
-    // 401 von Login (Falschpasswort) bzw. /auth/me (noch nicht eingeloggt) ist KEIN Session-Ablauf
-    const isAuthProbe = url.endsWith('/auth/login') || url.endsWith('/auth/me');
+    // 401 aus dem Anmelde-/Onboarding-Flow ist KEIN Session-Ablauf (Falschpasswort/-code,
+    // noch nicht eingeloggt) und darf den Nutzer nicht ausloggen.
+    // Hinweis: /auth/login deckt auch /auth/login/2fa ab; /auth/2fa/disable liefert bei
+    // falschem Passwort bewusst 403 (nicht 401), damit es hier nicht als Ablauf gilt.
+    const isAuthProbe =
+      url.includes('/auth/login') ||
+      url.endsWith('/auth/me') ||
+      url.endsWith('/auth/status') ||
+      url.endsWith('/auth/setup');
     if (axios.isAxiosError(err) && err.response?.status === 401 && !isAuthProbe) {
       onUnauthorized?.();
     }

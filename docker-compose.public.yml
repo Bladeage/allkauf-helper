@@ -12,7 +12,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: alkauf_user
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt — bitte in .env setzen}
       POSTGRES_DB: alkauf_haus
       TZ: Europe/Berlin
     volumes:
@@ -31,8 +31,8 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD}@db:5432/alkauf_haus
-      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD:?DB_PASSWORD fehlt}@db:5432/alkauf_haus
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET fehlt — erzeugen via openssl rand -base64 48}
       PROTON_SMTP_USER: ${PROTON_SMTP_USER}
       PROTON_SMTP_PASSWORD: ${PROTON_SMTP_PASSWORD}
       PROTON_SMTP_SERVER: ${PROTON_SMTP_SERVER:-smtp.protonmail.ch}
@@ -44,6 +44,9 @@ services:
       APP_URL: ${APP_URL:-http://localhost:8081}
       CORS_ORIGIN: ${CORS_ORIGIN:-}
       ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}
+      # Proxy-Hops: Default 1 (nur der ausliefernde nginx). Wenn du einen eigenen
+      # Reverse-Proxy für HTTPS davorschaltest, auf 2 setzen (sonst ist req.ip fälschbar).
+      TRUST_PROXY: ${TRUST_PROXY:-1}
       SEED_DATASET: ${SEED_DATASET:-generic}
       # Erster Admin wird beim ersten Start über die Onboarding-Seite angelegt.
       UPLOAD_DIR: /app/uploads
