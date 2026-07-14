@@ -14,7 +14,7 @@ const passwordHash = await bcrypt.hash(password, 10);
 try {
   const u = await prisma.user.update({
     where: { email: email.toLowerCase().trim() },
-    data: { passwordHash },
+    data: { passwordHash, tokenVersion: { increment: 1 } },
   });
   console.log(`Passwort für ${u.email} aktualisiert.`);
 } catch (e) {

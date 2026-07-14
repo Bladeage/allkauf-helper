@@ -38,7 +38,7 @@ export const toInputDate = (iso: string | null | undefined): string => {
 export const fmtHours = (n: number | null | undefined): string => (n == null ? '–' : `${n} h`);
 
 export const CATEGORY_LABEL: Record<CostCategory, string> = {
-  allkauf_paket: 'allkauf-Grundpreis',
+  allkauf_paket: 'Grundpreis (Haus)',
   bemusterung_extra: 'Bemusterung',
   eigenleistung_material: 'Eigenleistung Material',
   sonstiges: 'Sonstiges',

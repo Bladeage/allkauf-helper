@@ -91,7 +91,7 @@ router.get(
     res.setHeader('Content-Disposition', 'attachment; filename="kosten.pdf"');
     doc.pipe(res);
 
-    doc.fontSize(18).font('Helvetica-Bold').text(`Kostenübersicht — ${settings?.projectName || 'allkauf Haus-Helfer'}`);
+    doc.fontSize(18).font('Helvetica-Bold').text(`Kostenübersicht — ${settings?.projectName || 'Fertighaus-Helfer'}`);
     doc.moveDown(0.2).font('Helvetica').fontSize(9).fillColor('#666').text(`Erstellt: ${deDate(new Date())}`);
     doc.fillColor('#000').moveDown(1);
 
@@ -196,7 +196,7 @@ router.get(
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//allkauf Fertighaus-Helfer//DE',
+      'PRODID:-//Fertighaus-Helfer//DE',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
     ];
@@ -234,7 +234,7 @@ router.get(
     }
     lines.push('END:VCALENDAR');
     res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="allkauf-termine.ics"');
+    res.setHeader('Content-Disposition', 'attachment; filename="fertighaus-termine.ics"');
     res.send(lines.join('\r\n'));
   }),
 );

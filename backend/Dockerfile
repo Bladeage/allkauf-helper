@@ -6,9 +6,10 @@ RUN apk add --no-cache openssl libc6-compat
 
 WORKDIR /app
 
-# Install dependencies from the lockfile for reproducible builds
+# Install dependencies from the lockfile for reproducible builds.
+# --omit=dev: Test-/Dev-Deps (vitest) gehören nicht ins Produktions-Image.
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --omit=dev --no-audit --no-fund
 
 # App source
 COPY . .

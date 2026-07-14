@@ -52,7 +52,7 @@ export default function Settings() {
     setSaved(false);
     try {
       await api.patch('/settings', {
-        projectName: form.projectName.trim() || 'allkauf Haus-Helfer',
+        projectName: form.projectName.trim() || 'Fertighaus-Helfer',
         livingAreaSqm: num(form.livingAreaSqm),
         totalBudget: num(form.totalBudget),
         projectStart: form.projectStart || null,

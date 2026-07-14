@@ -22,7 +22,7 @@ const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, role: u.rol
 
 function issueSession(user, remember) {
   const token = jwt.sign(
-    { sub: String(user.id), email: user.email, name: user.name, role: user.role },
+    { sub: String(user.id), email: user.email, name: user.name, role: user.role, tv: user.tokenVersion ?? 0 },
     config.jwtSecret,
     { expiresIn: remember ? config.jwtRememberExpiresIn : config.jwtExpiresIn },
   );

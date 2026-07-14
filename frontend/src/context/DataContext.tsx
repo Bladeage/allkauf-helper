@@ -19,7 +19,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       .get<AppConfig>('/config')
       .then((r) => setConfig(r.data))
       // Fail closed: bei Fehler Modul aus, bis Config geladen ist
-      .catch(() => setConfig({ appName: 'allkauf Fertighaus-Helfer', enableHouseModule: false }))
+      .catch(() => setConfig({ appName: 'Fertighaus-Helfer', enableHouseModule: false }))
       .finally(() => setReady(true));
   }, []);
 

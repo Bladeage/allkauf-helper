@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Backend für den allkauf Fertighaus-Helfer (Express + Prisma + PostgreSQL)",
+  "description": "Backend für den Fertighaus-Helfer (Express + Prisma + PostgreSQL)",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -13,7 +13,8 @@
     "prisma:studio": "prisma studio",
     "seed": "node src/prisma/seed.js",
     "reset-password": "node src/scripts/resetPassword.js",
-    "disable-2fa": "node src/scripts/disable2fa.js"
+    "disable-2fa": "node src/scripts/disable2fa.js",
+    "test": "vitest run"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"
@@ -36,5 +37,8 @@
     "prisma": "^5.22.0",
     "qrcode": "^1.5.4",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.9"
   }
 }
