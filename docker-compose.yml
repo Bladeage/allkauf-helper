@@ -41,12 +41,10 @@ services:
       APP_URL: ${APP_URL:-http://localhost:8081}
       CORS_ORIGIN: ${CORS_ORIGIN:-}
       ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}
-      SEED_USER1_NAME: ${SEED_USER1_NAME:-Fabian}
-      SEED_USER1_EMAIL: ${SEED_USER1_EMAIL:-fabian@example.com}
-      SEED_USER1_PASSWORD: ${SEED_USER1_PASSWORD:-}
-      SEED_USER2_NAME: ${SEED_USER2_NAME:-Partnerin}
-      SEED_USER2_EMAIL: ${SEED_USER2_EMAIL:-partnerin@example.com}
-      SEED_USER2_PASSWORD: ${SEED_USER2_PASSWORD:-}
+      # Seed-Datensatz: leer = 'custom' bevorzugt (falls vorhanden), sonst 'generic'.
+      SEED_DATASET: ${SEED_DATASET:-}
+      # Nutzer werden NICHT geseedet — der erste Admin wird beim ersten Start über
+      # die Onboarding-Seite angelegt.
       # --- Block 4: Datei-/Foto-Ablage ---
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
@@ -66,7 +64,8 @@ services:
     ports:
       - "8081:80"
     expose: ["80"]
-    depends_on: [backend]
+    depends_on:
+      backend: { condition: service_healthy }
     networks: [alkauf_net]
 
   npm:

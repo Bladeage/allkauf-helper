@@ -4,6 +4,7 @@ import { useData } from './context/DataContext';
 import { Spinner } from './components/ui';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Timeline from './pages/Timeline';
 import Phases from './pages/Phases';
@@ -44,7 +45,7 @@ function HouseRoute() {
 }
 
 export default function App() {
-  const { user, ready } = useAuth();
+  const { user, ready, needsSetup } = useAuth();
 
   if (!ready) {
     return (
@@ -55,9 +56,11 @@ export default function App() {
   }
 
   if (!user) {
+    // Frische Instanz ohne jeden Nutzer -> geführte Ersteinrichtung statt Login.
+    const Entry = needsSetup ? Onboarding : Login;
     return (
       <Routes>
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Entry />} />
       </Routes>
     );
   }

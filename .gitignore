@@ -27,3 +27,9 @@ Thumbs.db
 
 # Referenz-Dokumente (Handover/Baubeschreibung) nicht hochladen
 *.pdf
+
+# Persönlicher/herstellerspezifischer Seed-Datensatz — bleibt lokal, nie ins
+# öffentliche Repo/Image (herstellerspezifische, aus der Baubeschreibung abgeleitete Inhalte).
+# Der committete Standard ist der herstellerneutrale backend/src/prisma/data/generic.js.
+backend/src/prisma/data/custom.js
+backend/src/prisma/data/*.local.js

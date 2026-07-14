@@ -7,6 +7,7 @@ import { Spinner, Card, Button, Input, Select, Field, ErrorBox, PageHeader, Badg
 import { toInputDate } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useTheme, FONTS, SIZES, type ThemeMode, type FontKey, type SizeKey } from '../context/ThemeContext';
+import TwoFactorCard from '../components/TwoFactorCard';
 
 export default function Settings() {
   const { data, loading, error } = useFetch<ProjectSettings>('/settings');
@@ -122,6 +123,8 @@ export default function Settings() {
           <p className="text-xs text-slate-500 dark:text-slate-400">Design wird lokal auf diesem Gerät gespeichert.</p>
         </div>
       </Card>
+
+      <TwoFactorCard />
 
       <Card title="Projekt">
         <div className="space-y-3">

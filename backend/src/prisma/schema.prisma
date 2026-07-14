@@ -21,7 +21,28 @@ model User {
   role         String   @default("user")
   createdAt    DateTime @default(now()) @map("created_at")
 
+  // Zwei-Faktor-Authentisierung (TOTP). Secrets sind AES-GCM-verschlüsselt gespeichert.
+  totpEnabled       Boolean @default(false) @map("totp_enabled")
+  totpSecret        String? @map("totp_secret")         // aktives Secret (verschlüsselt)
+  totpPendingSecret String? @map("totp_pending_secret") // während der Einrichtung (verschlüsselt)
+
+  recoveryCodes RecoveryCode[]
+
   @@map("users")
+}
+
+// Einmal-Wiederherstellungscodes für 2FA (bcrypt-gehasht, einmalig verwendbar).
+model RecoveryCode {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  codeHash  String    @map("code_hash")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("recovery_codes")
 }
 
 // ---------- Phasen ----------

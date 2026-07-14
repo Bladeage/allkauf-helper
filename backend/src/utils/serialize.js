@@ -14,7 +14,7 @@ export function serialize(value) {
     const out = {};
     for (const [k, v] of Object.entries(value)) {
       // Defensive: sensible Felder niemals an den Client serialisieren
-      if (k === 'passwordHash' || k === 'password') continue;
+      if (k === 'passwordHash' || k === 'password' || k === 'totpSecret' || k === 'totpPendingSecret' || k === 'codeHash') continue;
       out[k] = serialize(v);
     }
     return out;

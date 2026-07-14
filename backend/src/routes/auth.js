@@ -1,6 +1,16 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { login, getMe } from '../services/authService.js';
+import {
+  login,
+  loginMfa,
+  getMe,
+  authStatus,
+  setupAdmin,
+  startTotpEnrollment,
+  confirmTotpEnrollment,
+  disableTotp,
+  recoveryStatus,
+} from '../services/authService.js';
 import { requireAuth } from '../middleware/auth.js';
 import { loginLimiter } from '../middleware/rateLimit.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
@@ -15,12 +25,22 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Passwort erforderlich'),
   remember: z.boolean().optional(),
 });
+const mfaSchema = z.object({
+  mfaToken: z.string().min(1, 'MFA-Token erforderlich'),
+  code: z.string().min(1, 'Code erforderlich'),
+});
+const setupSchema = z.object({
+  name: z.string().min(1, 'Name erforderlich').max(120),
+  email: z.string().email('Gültige E-Mail erforderlich').max(200),
+  password: z.string().min(8, 'Passwort muss mindestens 8 Zeichen haben').max(200),
+});
+const codeSchema = z.object({ code: z.string().min(1, 'Code erforderlich') });
+const passwordSchema = z.object({ password: z.string().min(1, 'Passwort erforderlich') });
 
 function cookieOptions(req, extra = {}) {
   return {
     httpOnly: true,
     // Secure nur bei echter HTTPS-Verbindung (req.secure via trust proxy / X-Forwarded-Proto).
-    // Prod hinter NPM = HTTPS -> Secure-Cookie; Direktzugriff/lokal über HTTP -> nicht-secure (funktioniert trotzdem).
     secure: Boolean(req.secure),
     sameSite: 'lax',
     path: '/',
@@ -28,15 +48,56 @@ function cookieOptions(req, extra = {}) {
   };
 }
 
+function setSessionCookie(req, res, result) {
+  res.cookie(
+    config.cookieName,
+    result.token,
+    cookieOptions(req, result.remember ? { maxAge: config.rememberMaxAgeMs } : {}),
+  );
+}
+
+// ---------- Ersteinrichtung / Onboarding ----------
+router.get(
+  '/status',
+  asyncHandler(async (req, res) => {
+    res.json(await authStatus());
+  }),
+);
+
+router.post(
+  '/setup',
+  loginLimiter,
+  asyncHandler(async (req, res) => {
+    const body = parse(setupSchema, req.body || {});
+    const result = await setupAdmin(body);
+    setSessionCookie(req, res, result);
+    res.status(201).json({ user: result.user, token: result.token });
+  }),
+);
+
+// ---------- Login ----------
 router.post(
   '/login',
   loginLimiter,
   asyncHandler(async (req, res) => {
     const { email, password, remember } = parse(loginSchema, req.body || {});
     const result = await login(email, password, remember);
-    // httpOnly-Cookie (nicht per JS lesbar). „eingeloggt bleiben" -> persistentes Cookie, sonst Session-Cookie.
-    res.cookie(config.cookieName, result.token, cookieOptions(req, result.remember ? { maxAge: config.rememberMaxAgeMs } : {}));
-    // token zusätzlich im Body für API-/CLI-Clients (Browser nutzt das Cookie)
+    if (result.mfaRequired) {
+      // Noch keine Session — Client fordert im zweiten Schritt den 2FA-Code an.
+      return res.json({ mfaRequired: true, mfaToken: result.mfaToken });
+    }
+    setSessionCookie(req, res, result);
+    res.json({ user: result.user, token: result.token });
+  }),
+);
+
+router.post(
+  '/login/2fa',
+  loginLimiter,
+  asyncHandler(async (req, res) => {
+    const { mfaToken, code } = parse(mfaSchema, req.body || {});
+    const result = await loginMfa(mfaToken, code);
+    setSessionCookie(req, res, result);
     res.json({ user: result.user, token: result.token });
   }),
 );
@@ -51,6 +112,45 @@ router.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     send(res, await getMe(req.user.id));
+  }),
+);
+
+// ---------- 2FA-Verwaltung (eingeloggt) ----------
+router.get(
+  '/2fa/status',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const me = await getMe(req.user.id);
+    const rec = await recoveryStatus(req.user.id);
+    res.json({ totpEnabled: me.totpEnabled, recoveryRemaining: rec.remaining });
+  }),
+);
+
+router.post(
+  '/2fa/setup',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    // Gibt otpauth-URI, QR-Code (Data-URL) und das Klartext-Secret (für manuelle Eingabe) zurück.
+    res.json(await startTotpEnrollment(req.user.id));
+  }),
+);
+
+router.post(
+  '/2fa/enable',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { code } = parse(codeSchema, req.body || {});
+    // { recoveryCodes: [...] } — nur EINMAL sichtbar.
+    res.json(await confirmTotpEnrollment(req.user.id, code));
+  }),
+);
+
+router.post(
+  '/2fa/disable',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { password } = parse(passwordSchema, req.body || {});
+    res.json(await disableTotp(req.user.id, password));
   }),
 );
 

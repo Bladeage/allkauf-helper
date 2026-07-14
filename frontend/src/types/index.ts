@@ -4,6 +4,7 @@ export interface User {
   email: string;
   role: string;
   createdAt?: string;
+  totpEnabled?: boolean;
 }
 
 export type PhaseStatus = 'not_started' | 'in_progress' | 'done';

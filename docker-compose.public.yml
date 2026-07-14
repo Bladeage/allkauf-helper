@@ -1,0 +1,73 @@
+# docker-compose.public.yml — für Endnutzer, die fertige Images ziehen.
+# Kein Quellcode-Checkout nötig:
+#   1) .env.example als .env anlegen und Werte eintragen
+#   2) docker compose -f docker-compose.public.yml up -d
+#
+# Images werden von GitHub Actions nach ghcr.io gepusht (siehe .github/workflows).
+# TAG überschreibbar:  TAG=v1.0.0 docker compose -f docker-compose.public.yml up -d
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: alkauf-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alkauf_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: alkauf_haus
+      TZ: Europe/Berlin
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks: [alkauf_net]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alkauf_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: ghcr.io/bladeage/allkauf-helper-backend:${TAG:-latest}
+    container_name: alkauf-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://alkauf_user:${DB_PASSWORD}@db:5432/alkauf_haus
+      JWT_SECRET: ${JWT_SECRET}
+      PROTON_SMTP_USER: ${PROTON_SMTP_USER}
+      PROTON_SMTP_PASSWORD: ${PROTON_SMTP_PASSWORD}
+      PROTON_SMTP_SERVER: ${PROTON_SMTP_SERVER:-smtp.protonmail.ch}
+      PROTON_SMTP_PORT: ${PROTON_SMTP_PORT:-587}
+      MAIL_TO: ${MAIL_TO}
+      REMINDER_LOOKAHEAD_DAYS: ${REMINDER_LOOKAHEAD_DAYS:-7}
+      TZ: Europe/Berlin
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      APP_URL: ${APP_URL:-http://localhost:8081}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+      ENABLE_HOUSE_MODULE: ${ENABLE_HOUSE_MODULE:-true}
+      SEED_DATASET: ${SEED_DATASET:-generic}
+      # Erster Admin wird beim ersten Start über die Onboarding-Seite angelegt.
+      UPLOAD_DIR: /app/uploads
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - uploads_data:/app/uploads
+    networks: [alkauf_net]
+
+  frontend:
+    image: ghcr.io/bladeage/allkauf-helper-frontend:${TAG:-latest}
+    container_name: alkauf-frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8081}:80"
+    expose: ["80"]
+    depends_on:
+      backend: { condition: service_healthy }
+    networks: [alkauf_net]
+
+networks:
+  alkauf_net: { driver: bridge }
+
+volumes:
+  db_data: { driver: local }
+  uploads_data: { driver: local }

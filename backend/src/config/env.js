@@ -40,19 +40,6 @@ export const config = {
   // Block 4: Datei-/Foto-Ablage
   uploadDir: process.env.UPLOAD_DIR || '/app/uploads',
   maxUploadBytes: (Number(process.env.MAX_UPLOAD_MB) || 15) * 1024 * 1024,
-
-  seedUsers: [
-    {
-      name: process.env.SEED_USER1_NAME || 'Fabian',
-      email: process.env.SEED_USER1_EMAIL || 'fabian@example.com',
-      password: process.env.SEED_USER1_PASSWORD || '',
-    },
-    {
-      name: process.env.SEED_USER2_NAME || 'Partnerin',
-      email: process.env.SEED_USER2_EMAIL || 'partnerin@example.com',
-      password: process.env.SEED_USER2_PASSWORD || '',
-    },
-  ],
 };
 
 export function assertSecrets() {
