@@ -80,7 +80,7 @@ The images live in the GitHub Container Registry (multi-arch amd64/arm64):
 - `ghcr.io/bladeage/fertighaus-helper-backend`
 - `ghcr.io/bladeage/fertighaus-helper-frontend`
 
-Pin a version instead of `latest`: `TAG=1.0.0 docker compose -f docker-compose.public.yml up -d` (image tag without `v`).
+Pin a version instead of `latest`: `TAG=1.1.0 docker compose -f docker-compose.public.yml up -d` (image tag without `v`).
 
 ### Try it with sample data
 

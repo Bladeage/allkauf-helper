@@ -3,6 +3,16 @@
 Wesentliche Änderungen am **Fertighaus-Helfer** — neueste zuerst.
 Details und Hintergründe stehen in den jeweiligen Git-Commits.
 
+## v1.1.0 (2026-07-15)
+
+- **Zweisprachig (Deutsch/Englisch)**: komplette Oberfläche umschaltbar — Umschalter in der
+  Sidebar (🇩🇪 DE / 🇬🇧 EN) und in den Einstellungen; auch Backend-Fehlermeldungen werden übersetzt.
+  Englischer Seed-Datensatz `SEED_DATASET=generic-en`; englische Doku `README.en.md`.
+- **Projekt/Repo neutralisiert & umbenannt** zu `fertighaus-helper`; neue Images unter
+  `ghcr.io/bladeage/fertighaus-helper-backend` / `-frontend` (multi-arch, `latest` + `1.1.0`).
+- **Screenshots** im README (DE/EN).
+- Restliche herstellerspezifische Bezeichnungen entfernt (Erinnerungs-Mails, ICS-Export, Kommentare).
+
 ## v1.0.0 (2026-07-14) — Öffentliches Release
 
 Erste öffentliche, produktionsreife Version als selbst gehostetes Docker-Image (GHCR).
