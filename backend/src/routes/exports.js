@@ -10,7 +10,7 @@ const router = Router();
 router.use(requireAuth);
 
 const CAT_LABEL = {
-  allkauf_paket: 'allkauf-Paket',
+  allkauf_paket: 'Grundpreis (Haus)',
   bemusterung_extra: 'Bemusterung',
   eigenleistung_material: 'Eigenleistung Material',
   sonstiges: 'Sonstiges',
@@ -112,7 +112,7 @@ router.get(
     doc.text(`Gesamt Soll: ${money(t.plannedTotal)} EUR`);
     if (s.totalBudget) doc.text(`Budget:      ${money(s.totalBudget)} EUR`);
     doc.moveDown(0.4);
-    doc.text(`allkauf-Paket:           ${money(t.byCategory.allkauf_paket)} EUR`);
+    doc.text(`Grundpreis (Haus):       ${money(t.byCategory.allkauf_paket)} EUR`);
     doc.text(`Bemusterung:             ${money(t.byCategory.bemusterung_extra)} EUR`);
     doc.text(`Eigenleistung Material:  ${money(t.byCategory.eigenleistung_material)} EUR`);
     doc.text(`Sonstiges:               ${money(t.byCategory.sonstiges)} EUR`);

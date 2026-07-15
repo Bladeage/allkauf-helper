@@ -62,7 +62,7 @@ Erste öffentliche, produktionsreife Version als selbst gehostetes Docker-Image 
   Finanzierungskosten & Steuervorteile (alle als „ergänzt" markiert und löschbar).
 
 ## Datenbasis & Administration
-- Seed an die **offizielle allkauf-Baubeschreibung (06/2025)** und die allkauf-FAQ angeglichen; gewähltes
+- Seed an eine **reale Baubeschreibung und FAQ des Hausanbieters** angeglichen; gewähltes
   Dienstleistungspaket **Free Time**; Beträge/Termine bewusst als Platzhalter leer.
 - Haus-Bereiche = reales **17-Raum-Programm** (u. a. „Flur" EG vs. „Flur oben" getrennt).
 - **Admin-Nutzerverwaltung** (RBAC): anlegen / auflisten / Rolle / Passwort / löschen (mit Selbst- und
