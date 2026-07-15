@@ -7,6 +7,7 @@ import { Spinner, Card, Button, Input, Select, Field, ErrorBox, PageHeader, Badg
 import { toInputDate } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useTheme, FONTS, SIZES, type ThemeMode, type FontKey, type SizeKey } from '../context/ThemeContext';
+import { useLang, type Lang } from '../i18n/LanguageContext';
 import TwoFactorCard from '../components/TwoFactorCard';
 import PasswordChangeCard from '../components/PasswordChangeCard';
 
@@ -28,6 +29,7 @@ export default function Settings() {
   const [saved, setSaved] = useState(false);
   const toast = useToast();
   const { mode, font, size, setMode, setFont, setSize } = useTheme();
+  const { lang, setLang } = useLang();
 
   useEffect(() => {
     if (!data) return;
@@ -97,6 +99,24 @@ export default function Settings() {
                   }`}
                 >
                   {m === 'light' ? '☀️ Hell' : m === 'dark' ? '🌙 Dunkel' : '🖥️ System'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Sprache / Language</div>
+            <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
+              {(['de', 'en'] as Lang[]).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                    lang === l
+                      ? 'bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  }`}
+                >
+                  {l === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}
                 </button>
               ))}
             </div>

@@ -3,7 +3,7 @@
 ## Sicherheitslücken melden
 
 Bitte melde vermutete Sicherheitslücken **nicht** über öffentliche Issues, sondern über ein
-[GitHub Security Advisory](https://github.com/Bladeage/allkauf-helper/security/advisories/new)
+[GitHub Security Advisory](https://github.com/Bladeage/fertighaus-helper/security/advisories/new)
 (privat). Wir bemühen uns um eine zeitnahe Rückmeldung.
 
 ## Unterstützte Versionen

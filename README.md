@@ -45,8 +45,8 @@ Voraussetzung: **Docker** + **Docker Compose v2**. Kein Quellcode-Checkout nöti
 
 ```bash
 # 1) Compose-Datei und Env-Vorlage holen
-curl -O https://raw.githubusercontent.com/Bladeage/allkauf-helper/master/docker-compose.public.yml
-curl -o .env https://raw.githubusercontent.com/Bladeage/allkauf-helper/master/.env.example
+curl -O https://raw.githubusercontent.com/Bladeage/fertighaus-helper/master/docker-compose.public.yml
+curl -o .env https://raw.githubusercontent.com/Bladeage/fertighaus-helper/master/.env.example
 
 # 2) .env ausfüllen — mindestens DB_PASSWORD und JWT_SECRET setzen
 nano .env
@@ -60,8 +60,8 @@ Dann **http://<host>:8081** öffnen → die **Onboarding-Seite** führt durch da
 
 Die Images liegen in der GitHub Container Registry (multi-arch amd64/arm64):
 
-- `ghcr.io/bladeage/allkauf-helper-backend`
-- `ghcr.io/bladeage/allkauf-helper-frontend`
+- `ghcr.io/bladeage/fertighaus-helper-backend`
+- `ghcr.io/bladeage/fertighaus-helper-frontend`
 
 Feste Version statt `latest`: `TAG=1.0.0 docker compose -f docker-compose.public.yml up -d` (Image-Tag ohne `v`).
 
@@ -150,8 +150,8 @@ kopierst und anpasst.
 ## Selbst bauen / Entwicklung
 
 ```bash
-git clone https://github.com/Bladeage/allkauf-helper.git
-cd allkauf-helper
+git clone https://github.com/Bladeage/fertighaus-helper.git
+cd fertighaus-helper
 cp .env.example .env && nano .env
 
 # aus dem Quellcode bauen & starten

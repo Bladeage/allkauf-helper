@@ -25,7 +25,7 @@ services:
       retries: 5
 
   backend:
-    image: ghcr.io/bladeage/allkauf-helper-backend:${TAG:-latest}
+    image: ghcr.io/bladeage/fertighaus-helper-backend:${TAG:-latest}
     container_name: alkauf-backend
     restart: unless-stopped
     environment:
@@ -58,7 +58,7 @@ services:
     networks: [alkauf_net]
 
   frontend:
-    image: ghcr.io/bladeage/allkauf-helper-frontend:${TAG:-latest}
+    image: ghcr.io/bladeage/fertighaus-helper-frontend:${TAG:-latest}
     container_name: alkauf-frontend
     restart: unless-stopped
     ports:

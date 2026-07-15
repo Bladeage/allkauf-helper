@@ -8,6 +8,7 @@ import { DataProvider } from './context/DataContext';
 import { ToastProvider } from './context/ToastContext';
 import { ConfirmProvider } from './context/ConfirmContext';
 import { ThemeProvider, FONTS, SIZES, type FontKey, type SizeKey } from './context/ThemeContext';
+import { LanguageProvider, initialLang } from './i18n/LanguageContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // FOUC vermeiden: Theme synchron aus localStorage anwenden, bevor React rendert
@@ -20,6 +21,7 @@ try {
   if (f && FONTS[f]) document.documentElement.style.setProperty('--app-font', FONTS[f].stack);
   const s = localStorage.getItem('alkauf_theme_size') as SizeKey | null;
   if (s && SIZES[s]) document.documentElement.style.fontSize = SIZES[s].px;
+  document.documentElement.lang = initialLang();
 } catch {
   /* localStorage nicht verfügbar */
 }
@@ -27,6 +29,7 @@ try {
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <ErrorBoundary>
+      <LanguageProvider>
       <ThemeProvider>
         <BrowserRouter>
         <AuthProvider>
@@ -40,6 +43,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   </React.StrictMode>,
 );
