@@ -1,7 +1,9 @@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useT } from '../../i18n/LanguageContext';
 
 export default function TopBar({ open, onMenu }: { open: boolean; onMenu: () => void }) {
+  const t = useT();
   const { user, logout } = useAuth();
   const { mode, setMode } = useTheme();
   const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -10,7 +12,7 @@ export default function TopBar({ open, onMenu }: { open: boolean; onMenu: () => 
       <button
         onClick={onMenu}
         className="rounded-lg p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 md:hidden"
-        aria-label="Menü öffnen"
+        aria-label={t('Menü öffnen')}
         aria-expanded={open}
         aria-controls="mobile-nav"
       >
@@ -18,13 +20,13 @@ export default function TopBar({ open, onMenu }: { open: boolean; onMenu: () => 
           <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round" />
         </svg>
       </button>
-      <div className="font-semibold text-slate-700 dark:text-slate-200 md:hidden">🏠 Haus-Helfer</div>
+      <div className="font-semibold text-slate-700 dark:text-slate-200 md:hidden">🏠 {t('Haus-Helfer')}</div>
       <div className="ml-auto flex items-center gap-3">
         <button
           onClick={() => setMode(isDark ? 'light' : 'dark')}
           className="rounded-lg p-2 text-base leading-none text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
-          aria-label={isDark ? 'Zu hellem Design wechseln' : 'Zu dunklem Design wechseln'}
-          title={isDark ? 'Helles Design' : 'Dunkles Design'}
+          aria-label={isDark ? t('Zu hellem Design wechseln') : t('Zu dunklem Design wechseln')}
+          title={isDark ? t('Helles Design') : t('Dunkles Design')}
         >
           {isDark ? '☀️' : '🌙'}
         </button>
@@ -33,7 +35,7 @@ export default function TopBar({ open, onMenu }: { open: boolean; onMenu: () => 
           onClick={logout}
           className="rounded-lg bg-slate-100 dark:bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
         >
-          Abmelden
+          {t('Abmelden')}
         </button>
       </div>
     </header>

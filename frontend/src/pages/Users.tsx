@@ -6,6 +6,7 @@ import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
 import type { User } from '../types';
 import { Spinner, Card, Button, Input, Select, Field, Badge, Modal, PageHeader, EmptyState, ErrorBox } from '../components/ui';
+import { useT } from '../i18n/LanguageContext';
 
 function AddUserModal({ onClose, onDone }: { onClose: () => void; onDone: () => void }) {
   const [name, setName] = useState('');
@@ -15,17 +16,18 @@ function AddUserModal({ onClose, onDone }: { onClose: () => void; onDone: () => 
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const toast = useToast();
+  const t = useT();
 
   async function submit() {
     if (!name.trim() || !email.trim() || password.length < 8) {
-      setErr('Name, E-Mail und Passwort (mind. 8 Zeichen) erforderlich');
+      setErr(t('Name, E-Mail und Passwort (mind. 8 Zeichen) erforderlich'));
       return;
     }
     setBusy(true);
     setErr(null);
     try {
       await api.post('/users', { name: name.trim(), email: email.trim(), password, role });
-      toast.success('Nutzer angelegt');
+      toast.success(t('Nutzer angelegt'));
       onDone();
     } catch (e) {
       setErr(apiError(e));
@@ -35,30 +37,30 @@ function AddUserModal({ onClose, onDone }: { onClose: () => void; onDone: () => 
   }
 
   return (
-    <Modal open onClose={onClose} title="Nutzer anlegen" busy={busy}>
+    <Modal open onClose={onClose} title={t('Nutzer anlegen')} busy={busy}>
       <div className="space-y-3">
-        <Field label="Name">
+        <Field label={t('Name')}>
           <Input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
         </Field>
-        <Field label="E-Mail">
+        <Field label={t('E-Mail')}>
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </Field>
-        <Field label="Passwort (mind. 8 Zeichen)">
+        <Field label={t('Passwort (mind. 8 Zeichen)')}>
           <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </Field>
-        <Field label="Rolle">
+        <Field label={t('Rolle')}>
           <Select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="user">Nutzer</option>
-            <option value="admin">Admin</option>
+            <option value="user">{t('Nutzer')}</option>
+            <option value="admin">{t('Admin')}</option>
           </Select>
         </Field>
         {err && <ErrorBox>{err}</ErrorBox>}
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Abbrechen
+            {t('Abbrechen')}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            Anlegen
+            {t('Anlegen')}
           </Button>
         </div>
       </div>
@@ -71,17 +73,18 @@ function PasswordModal({ user, onClose }: { user: User; onClose: () => void }) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const toast = useToast();
+  const t = useT();
 
   async function submit() {
     if (password.length < 8) {
-      setErr('Mindestens 8 Zeichen');
+      setErr(t('Mindestens 8 Zeichen'));
       return;
     }
     setBusy(true);
     setErr(null);
     try {
       await api.post(`/users/${user.id}/password`, { password });
-      toast.success('Passwort geändert');
+      toast.success(t('Passwort geändert'));
       onClose();
     } catch (e) {
       setErr(apiError(e));
@@ -91,18 +94,18 @@ function PasswordModal({ user, onClose }: { user: User; onClose: () => void }) {
   }
 
   return (
-    <Modal open onClose={onClose} title={`Passwort: ${user.name}`} busy={busy}>
+    <Modal open onClose={onClose} title={t('Passwort: {name}', { name: user.name })} busy={busy}>
       <div className="space-y-3">
-        <Field label="Neues Passwort (mind. 8 Zeichen)">
+        <Field label={t('Neues Passwort (mind. 8 Zeichen)')}>
           <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
         </Field>
         {err && <ErrorBox>{err}</ErrorBox>}
         <div className="flex justify-end gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Abbrechen
+            {t('Abbrechen')}
           </Button>
           <Button onClick={submit} disabled={busy}>
-            Speichern
+            {t('Speichern')}
           </Button>
         </div>
       </div>
@@ -117,6 +120,7 @@ export default function Users() {
   const [pwFor, setPwFor] = useState<User | null>(null);
   const toast = useToast();
   const confirm = useConfirm();
+  const t = useT();
 
   if (loading) return <Spinner />;
 
@@ -124,7 +128,7 @@ export default function Users() {
     if (role === u.role) return;
     try {
       await api.patch(`/users/${u.id}`, { role });
-      toast.success('Rolle geändert');
+      toast.success(t('Rolle geändert'));
       reload();
     } catch (e) {
       toast.error(apiError(e));
@@ -133,10 +137,10 @@ export default function Users() {
   }
 
   async function del(u: User) {
-    if (!(await confirm({ message: `Nutzer „${u.name}" wirklich löschen?`, danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Nutzer „{name}" wirklich löschen?', { name: u.name }), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/users/${u.id}`);
-      toast.success('Nutzer gelöscht');
+      toast.success(t('Nutzer gelöscht'));
       reload();
     } catch (e) {
       toast.error(apiError(e));
@@ -146,11 +150,11 @@ export default function Users() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Nutzer"
-        subtitle="Konten verwalten (nur für Admins)"
+        title={t('Nutzer')}
+        subtitle={t('Konten verwalten (nur für Admins)')}
         actions={
           <Button variant="secondary" onClick={() => setAdding(true)}>
-            + Nutzer
+            {t('+ Nutzer')}
           </Button>
         }
       />
@@ -158,7 +162,7 @@ export default function Users() {
 
       <Card>
         <div className="space-y-2">
-          {data && data.length === 0 && <EmptyState>Keine Nutzer.</EmptyState>}
+          {data && data.length === 0 && <EmptyState>{t('Keine Nutzer.')}</EmptyState>}
           {data?.map((u) => {
             const isSelf = me?.id === u.id;
             return (
@@ -166,8 +170,8 @@ export default function Users() {
                 <div className="min-w-0">
                   <div className="font-medium text-slate-800 dark:text-slate-100">
                     {u.name}
-                    {isSelf && <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">(du)</span>}
-                    {u.role === 'admin' && <Badge className="ml-2 bg-violet-100 text-violet-700">Admin</Badge>}
+                    {isSelf && <span className="ml-1 text-xs text-slate-500 dark:text-slate-400">{t('(du)')}</span>}
+                    {u.role === 'admin' && <Badge className="ml-2 bg-violet-100 text-violet-700">{t('Admin')}</Badge>}
                   </div>
                   <div className="truncate text-xs text-slate-500 dark:text-slate-400">{u.email}</div>
                 </div>
@@ -177,16 +181,16 @@ export default function Users() {
                     onChange={(e) => setRole(u, e.target.value)}
                     className="w-28"
                     disabled={isSelf}
-                    aria-label={`Rolle von ${u.name}`}
+                    aria-label={t('Rolle von {name}', { name: u.name })}
                   >
-                    <option value="user">Nutzer</option>
-                    <option value="admin">Admin</option>
+                    <option value="user">{t('Nutzer')}</option>
+                    <option value="admin">{t('Admin')}</option>
                   </Select>
                   <Button variant="ghost" onClick={() => setPwFor(u)}>
-                    Passwort
+                    {t('Passwort')}
                   </Button>
                   <Button variant="danger" onClick={() => del(u)} disabled={isSelf}>
-                    Löschen
+                    {t('Löschen')}
                   </Button>
                 </div>
               </div>
@@ -194,8 +198,7 @@ export default function Users() {
           })}
         </div>
         <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-          Hinweis: Sich selbst kann man nicht löschen oder degradieren; der letzte Admin bleibt erhalten.
-          Rollenänderungen greifen für betroffene Nutzer beim nächsten Login vollständig.
+          {t('Hinweis: Sich selbst kann man nicht löschen oder degradieren; der letzte Admin bleibt erhalten. Rollenänderungen greifen für betroffene Nutzer beim nächsten Login vollständig.')}
         </p>
       </Card>
 

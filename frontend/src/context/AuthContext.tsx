@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { useNavigate } from 'react-router-dom';
 import { api, setUnauthorizedHandler } from '../lib/api';
 import { AUTH_FLAG, markLoggedIn, markLoggedOut } from '../lib/auth';
+import { useT } from '../i18n/LanguageContext';
 import type { User } from '../types';
 
 interface AuthState {
@@ -29,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [needsSetup, setNeedsSetup] = useState(false);
   const mfaToken = useRef<string | null>(null);
   const navigate = useNavigate();
+  const t = useT();
 
   useEffect(() => {
     // 401 auf geschützte Endpunkte (Token abgelaufen) -> ausloggen + Hinweis
@@ -89,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const completeMfa = async (code: string) => {
-    if (!mfaToken.current) throw new Error('Keine offene Zwei-Faktor-Anmeldung. Bitte erneut anmelden.');
+    if (!mfaToken.current) throw new Error(t('Keine offene Zwei-Faktor-Anmeldung. Bitte erneut anmelden.'));
     const r = await api.post<{ user: User }>('/auth/login/2fa', { mfaToken: mfaToken.current, code });
     mfaToken.current = null;
     setUser(r.data.user);

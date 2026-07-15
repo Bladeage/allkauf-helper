@@ -7,6 +7,7 @@ import NoteEditor from './NoteEditor';
 import AttachmentList from './AttachmentList';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 const CATS: CostCategory[] = ['allkauf_paket', 'bemusterung_extra', 'eigenleistung_material', 'sonstiges'];
 const PRIOS: Priority[] = ['low', 'normal', 'high', 'urgent'];
@@ -21,6 +22,7 @@ export default function TaskItem({
   milestones: Milestone[];
   onChanged: () => void | Promise<void>;
 }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -89,7 +91,7 @@ export default function TaskItem({
     }
     try {
       await api.patch(`/tasks/${task.id}`, data);
-      toast.success('Aufgabe gespeichert');
+      toast.success(t('Aufgabe gespeichert'));
       onChanged();
       setOpen(false);
     } catch (e) {
@@ -100,12 +102,12 @@ export default function TaskItem({
   }
 
   async function remove() {
-    if (!(await confirm({ message: 'Diese Aufgabe wirklich löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Diese Aufgabe wirklich löschen?'), danger: true, confirmLabel: t('Löschen') }))) return;
     setBusy(true);
     setErr(null);
     try {
       await api.delete(`/tasks/${task.id}`);
-      toast.success('Aufgabe gelöscht');
+      toast.success(t('Aufgabe gelöscht'));
       await onChanged();
     } catch (e) {
       setErr(apiError(e));
@@ -138,29 +140,29 @@ export default function TaskItem({
           onChange={toggleDone}
           disabled={busy}
           className="h-5 w-5 shrink-0 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
-          aria-label={`Erledigt: ${task.title}`}
+          aria-label={t('Erledigt: {title}', { title: task.title })}
         />
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <div className={`font-medium ${task.isDone ? 'text-slate-500 dark:text-slate-400 line-through' : 'text-slate-800 dark:text-slate-100'}`}>{task.title}</div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
             {task.costCategory && (
               <Badge className={CATEGORY_BADGE[task.costCategory]}>
-                {CATEGORY_LABEL[task.costCategory]}
+                {t(CATEGORY_LABEL[task.costCategory])}
                 {task.costAmount != null ? ` · ${euro(task.costAmount)}` : ''}
               </Badge>
             )}
             {task.estimatedHours != null && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{task.estimatedHours} h</Badge>}
             {(task.priority === 'high' || task.priority === 'urgent') && (
-              <Badge className="bg-orange-100 text-orange-700">{PRIORITY_LABEL[task.priority]}</Badge>
+              <Badge className="bg-orange-100 text-orange-700">{t(PRIORITY_LABEL[task.priority])}</Badge>
             )}
             {task.effectiveDueDate && (
               <Badge className={overdue ? 'bg-red-100 text-red-700' : 'bg-sky-100 text-sky-700'}>
-                📅 {overdue ? 'Überfällig: ' : ''}
+                📅 {overdue ? t('Überfällig: ') : ''}
                 {fmtDate(task.effectiveDueDate)}
               </Badge>
             )}
-            {task.isPaid && <Badge className="bg-emerald-100 text-emerald-700">bezahlt</Badge>}
-            {task.isCustom && <Badge className="bg-violet-100 text-violet-700">ergänzt</Badge>}
+            {task.isPaid && <Badge className="bg-emerald-100 text-emerald-700">{t('bezahlt')}</Badge>}
+            {task.isCustom && <Badge className="bg-violet-100 text-violet-700">{t('ergänzt')}</Badge>}
             {task._count && task._count.notes > 0 && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">📝 {task._count.notes}</Badge>}
           </div>
         </button>
@@ -171,10 +173,10 @@ export default function TaskItem({
         <div className="space-y-4 border-t border-slate-100 dark:border-slate-700 p-3">
           {task.isCustom ? (
             <>
-              <Field label="Titel">
+              <Field label={t('Titel')}>
                 <Input value={form.title} onChange={(e) => up('title', e.target.value)} />
               </Field>
-              <Field label="Beschreibung">
+              <Field label={t('Beschreibung')}>
                 <Textarea rows={2} value={form.description} onChange={(e) => up('description', e.target.value)} />
               </Field>
             </>
@@ -183,50 +185,50 @@ export default function TaskItem({
           )}
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Kostenart">
+            <Field label={t('Kostenart')}>
               <Select value={form.costCategory} onChange={(e) => up('costCategory', e.target.value)}>
-                <option value="">– keine –</option>
+                <option value="">{t('– keine –')}</option>
                 {CATS.map((c) => (
                   <option key={c} value={c}>
-                    {CATEGORY_LABEL[c]}
+                    {t(CATEGORY_LABEL[c])}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Reifegrad (Sicherheit)">
+            <Field label={t('Reifegrad (Sicherheit)')}>
               <Select value={form.costStatus} onChange={(e) => up('costStatus', e.target.value as CostStatus)}>
                 {CSTATUS.map((s) => (
                   <option key={s} value={s}>
-                    {COST_STATUS_LABEL[s]}
+                    {t(COST_STATUS_LABEL[s])}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Priorität">
+            <Field label={t('Priorität')}>
               <Select value={form.priority} onChange={(e) => up('priority', e.target.value as Priority)}>
                 {PRIOS.map((p) => (
                   <option key={p} value={p}>
-                    {PRIORITY_LABEL[p]}
+                    {t(PRIORITY_LABEL[p])}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Ist-Betrag (€)">
+            <Field label={t('Ist-Betrag (€)')}>
               <Input type="number" min="0" inputMode="decimal" value={form.costAmount} onChange={(e) => up('costAmount', e.target.value)} />
             </Field>
-            <Field label="Soll-Betrag (€)">
+            <Field label={t('Soll-Betrag (€)')}>
               <Input type="number" min="0" inputMode="decimal" value={form.plannedAmount} onChange={(e) => up('plannedAmount', e.target.value)} />
             </Field>
-            <Field label="Eigenleistung (Std.)">
+            <Field label={t('Eigenleistung (Std.)')}>
               <Input type="number" min="0" inputMode="numeric" value={form.estimatedHours} onChange={(e) => up('estimatedHours', e.target.value)} />
             </Field>
-            <Field label="Anbieter / Firma">
+            <Field label={t('Anbieter / Firma')}>
               <Input value={form.vendor} onChange={(e) => up('vendor', e.target.value)} />
             </Field>
-            <Field label="Fälligkeit (festes Datum)">
+            <Field label={t('Fälligkeit (festes Datum)')}>
               <Input type="date" value={form.dueDate} onChange={(e) => up('dueDate', e.target.value)} />
             </Field>
-            <Field label="Bezahlt am">
+            <Field label={t('Bezahlt am')}>
               <Input type="date" value={form.paidDate} onChange={(e) => up('paidDate', e.target.value)} />
             </Field>
           </div>
@@ -238,16 +240,16 @@ export default function TaskItem({
               onChange={(e) => up('isPaid', e.target.checked)}
               className="h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
             />
-            als bezahlt markiert
+            {t('als bezahlt markiert')}
           </label>
 
           {/* Relative Fälligkeit über Meilenstein (Abschnitt 7.4) */}
           <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-3">
-            <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">Relative Fälligkeit (X Tage vor Meilenstein)</div>
+            <div className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-400">{t('Relative Fälligkeit (X Tage vor Meilenstein)')}</div>
             <div className="flex flex-wrap items-end gap-2">
               <div className="min-w-[10rem] flex-1">
                 <Select value={mid} onChange={(e) => setMid(e.target.value)}>
-                  <option value="">– kein Meilenstein –</option>
+                  <option value="">{t('– kein Meilenstein –')}</option>
                   {milestones.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.title}
@@ -262,22 +264,22 @@ export default function TaskItem({
                   inputMode="numeric"
                   value={daysBefore}
                   onChange={(e) => setDaysBefore(e.target.value)}
-                  aria-label="Tage vorher"
+                  aria-label={t('Tage vorher')}
                 />
               </div>
               <Button variant="secondary" onClick={saveMilestoneLink} disabled={busy}>
-                {link ? 'Aktualisieren' : 'Verknüpfen'}
+                {link ? t('Aktualisieren') : t('Verknüpfen')}
               </Button>
             </div>
             {task.effectiveDueDate && (
               <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                Effektive Fälligkeit: <b>{fmtDate(task.effectiveDueDate)}</b>
+                {t('Effektive Fälligkeit:')} <b>{fmtDate(task.effectiveDueDate)}</b>
               </div>
             )}
           </div>
 
           <div>
-            <div className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">Notizen</div>
+            <div className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">{t('Notizen')}</div>
             <NoteEditor taskId={task.id} />
           </div>
 
@@ -290,13 +292,13 @@ export default function TaskItem({
           <div className="flex items-center justify-between">
             {task.isCustom ? (
               <Button variant="danger" onClick={remove} disabled={busy}>
-                Löschen
+                {t('Löschen')}
               </Button>
             ) : (
-              <span className="text-xs text-slate-500 dark:text-slate-400">Offizieller Checklisten-Punkt</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{t('Offizieller Checklisten-Punkt')}</span>
             )}
             <Button onClick={save} disabled={busy}>
-              {busy ? 'Speichern…' : 'Speichern'}
+              {busy ? t('Speichern…') : t('Speichern')}
             </Button>
           </div>
         </div>

@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import { useT } from '../../i18n/LanguageContext';
 
 export default function Layout() {
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   // Mobiler Nav-Drawer: Escape schließt, Body-Scroll sperren
@@ -30,7 +32,7 @@ export default function Layout() {
 
       {/* Mobile-Drawer */}
       {open && (
-        <div className="fixed inset-0 z-40 md:hidden" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Navigation">
+        <div className="fixed inset-0 z-40 md:hidden" id="mobile-nav" role="dialog" aria-modal="true" aria-label={t('Navigation')}>
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <aside className="absolute left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 shadow-xl">
             <Sidebar onNavigate={() => setOpen(false)} />

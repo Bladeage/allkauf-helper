@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
 import { Modal, Button } from '../components/ui';
+import { useT } from '../i18n/LanguageContext';
 
 interface ConfirmOptions {
   title?: string;
@@ -12,6 +13,7 @@ type ConfirmFn = (opts: ConfirmOptions) => Promise<boolean>;
 const ConfirmContext = createContext<ConfirmFn | undefined>(undefined);
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
+  const t = useT();
   const [state, setState] = useState<ConfirmOptions | null>(null);
   const resolver = useRef<((v: boolean) => void) | null>(null);
 
@@ -32,11 +34,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     <ConfirmContext.Provider value={confirm}>
       {children}
       {state && (
-        <Modal open onClose={() => close(false)} title={state.title || 'Bestätigen'}>
+        <Modal open onClose={() => close(false)} title={state.title || t('Bestätigen')}>
           <p className="text-sm text-slate-600 dark:text-slate-300">{state.message}</p>
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="ghost" onClick={() => close(false)}>
-              Abbrechen
+              {t('Abbrechen')}
             </Button>
             <Button variant={state.danger ? 'danger' : 'primary'} onClick={() => close(true)} autoFocus>
               {state.confirmLabel || 'OK'}

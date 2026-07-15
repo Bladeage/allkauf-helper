@@ -5,8 +5,10 @@ import type { Phase, CostSummary, Reminder, ProjectSettings } from '../types';
 import { Spinner, Card, ProgressBar, Badge, Button, EmptyState, ErrorBox } from '../components/ui';
 import { euro, fmtDate, STATUS_BADGE, STATUS_LABEL } from '../lib/format';
 import SetupWizard from '../components/SetupWizard';
+import { useT } from '../i18n/LanguageContext';
 
 export default function Dashboard() {
+  const t = useT();
   const { data: phases, loading: lp, error: ep, reload: reloadPhases } = useFetch<Phase[]>('/phases');
   const { data: costs, loading: lc, error: ec, reload: reloadCosts } = useFetch<CostSummary>('/costs/summary');
   const { data: reminders, reload: reloadReminders } = useFetch<Reminder[]>('/reminders');
@@ -21,7 +23,7 @@ export default function Dashboard() {
 
   if (lp || lc) return <Spinner />;
   if (ep || ec) return <ErrorBox>{ep || ec}</ErrorBox>;
-  if (!phases || !costs) return <ErrorBox>Keine Daten verfügbar.</ErrorBox>;
+  if (!phases || !costs) return <ErrorBox>{t('Keine Daten verfügbar.')}</ErrorBox>;
 
   const allDone = phases.length > 0 && phases.every((p) => p.status === 'done');
   const current = phases.find((p) => p.status === 'in_progress') ?? phases.find((p) => p.status !== 'done') ?? phases[0];
@@ -46,11 +48,11 @@ export default function Dashboard() {
           <div>
             <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100 sm:text-2xl">{settings?.projectName ?? 'Fertighaus-Helfer'}</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Gesamtfortschritt: {doneTasks}/{totalTasks} Aufgaben
+              {t('Gesamtfortschritt: {done}/{total} Aufgaben', { done: doneTasks, total: totalTasks })}
             </p>
           </div>
           <Button variant="secondary" onClick={() => setWizardOpen(true)}>
-            🧭 Einrichtung
+            🧭 {t('Einrichtung')}
           </Button>
         </div>
         <ProgressBar value={overall} className="mt-2" />
@@ -59,12 +61,12 @@ export default function Dashboard() {
       {needsSetup && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-700/40 dark:bg-brand-700/15">
           <div className="min-w-0">
-            <div className="font-semibold text-slate-800 dark:text-slate-100">Projekt einrichten</div>
+            <div className="font-semibold text-slate-800 dark:text-slate-100">{t('Projekt einrichten')}</div>
             <div className="text-sm text-slate-600 dark:text-slate-300">
-              Lege in wenigen Schritten Budget, Termine, Vertrag und Zahlungsplan an — und hol Verpasstes nach.
+              {t('Lege in wenigen Schritten Budget, Termine, Vertrag und Zahlungsplan an — und hol Verpasstes nach.')}
             </div>
           </div>
-          <Button onClick={() => setWizardOpen(true)}>Jetzt einrichten</Button>
+          <Button onClick={() => setWizardOpen(true)}>{t('Jetzt einrichten')}</Button>
         </div>
       )}
 
@@ -85,18 +87,18 @@ export default function Dashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Aktuelle Phase */}
-        <Card title="Aktuelle Phase">
+        <Card title={t('Aktuelle Phase')}>
           {allDone ? (
             <div className="py-2 text-center">
               <div className="text-2xl">🎉</div>
-              <div className="font-semibold text-emerald-700">Projekt abgeschlossen</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">Alle Aufgaben erledigt.</div>
+              <div className="font-semibold text-emerald-700">{t('Projekt abgeschlossen')}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{t('Alle Aufgaben erledigt.')}</div>
             </div>
           ) : current ? (
             <Link to={`/phases/${current.id}`} className="block">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-slate-800 dark:text-slate-100">{current.title}</span>
-                <Badge className={STATUS_BADGE[current.status]}>{STATUS_LABEL[current.status]}</Badge>
+                <Badge className={STATUS_BADGE[current.status]}>{t(STATUS_LABEL[current.status])}</Badge>
               </div>
               <div className="mt-3 flex items-center gap-3">
                 <ProgressBar value={current.progress} className="flex-1" />
@@ -109,43 +111,43 @@ export default function Dashboard() {
               </div>
             </Link>
           ) : (
-            <EmptyState>Keine Phase</EmptyState>
+            <EmptyState>{t('Keine Phase')}</EmptyState>
           )}
         </Card>
 
         {/* Budget */}
-        <Card title="Budget (geplant vs. ausgegeben)">
+        <Card title={t('Budget (geplant vs. ausgegeben)')}>
           <div className="flex items-end justify-between">
             <div>
               <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(spent)}</div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">von {budget > 0 ? euro(budget) : '–'} geplant</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{t('von {b} geplant', { b: budget > 0 ? euro(budget) : '–' })}</div>
             </div>
-            {over && <Badge className="bg-red-100 text-red-700">über Budget</Badge>}
+            {over && <Badge className="bg-red-100 text-red-700">{t('über Budget')}</Badge>}
           </div>
           <ProgressBar value={budgetPct} className={`mt-3 ${over ? '[&>div]:bg-red-500' : ''}`} />
           {costs.forecast && costs.forecast.expected > 0 && (
             <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-              Prognose: <b className="text-slate-700 dark:text-slate-200">{euro(costs.forecast.withContingency)}</b>{' '}
+              {t('Prognose:')} <b className="text-slate-700 dark:text-slate-200">{euro(costs.forecast.withContingency)}</b>{' '}
               ({euro(costs.forecast.optimistic)}–{euro(costs.forecast.pessimistic)})
             </div>
           )}
           <Link to="/costs" className="mt-2 inline-block text-xs text-brand-700 dark:text-brand-300 hover:underline">
-            → Kostenübersicht
+            → {t('Kostenübersicht')}
           </Link>
         </Card>
 
         {/* Ausgaben aktuelle Phase */}
-        <Card title="Ausgaben aktuelle Phase">
+        <Card title={t('Ausgaben aktuelle Phase')}>
           <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(currentCost?.total ?? 0)}</div>
           <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            geplant: {euro(currentCost?.planned ?? 0)} · {currentCost?.estimatedHours ?? 0} h Eigenleistung
+            {t('geplant: {planned} · {hours} h Eigenleistung', { planned: euro(currentCost?.planned ?? 0), hours: currentCost?.estimatedHours ?? 0 })}
           </div>
         </Card>
 
         {/* Wiedervorlagen */}
-        <Card title="Nächste Wiedervorlagen" actions={overdueCount > 0 ? <Badge className="bg-red-100 text-red-700">{overdueCount} überfällig</Badge> : undefined}>
+        <Card title={t('Nächste Wiedervorlagen')} actions={overdueCount > 0 ? <Badge className="bg-red-100 text-red-700">{t('{n} überfällig', { n: overdueCount })}</Badge> : undefined}>
           {upcoming.length === 0 ? (
-            <EmptyState>Keine offenen Termine.</EmptyState>
+            <EmptyState>{t('Keine offenen Termine.')}</EmptyState>
           ) : (
             <ul className="space-y-2">
               {upcoming.map((r) => (
@@ -160,7 +162,7 @@ export default function Dashboard() {
             </ul>
           )}
           <Link to="/reminders" className="mt-3 inline-block text-xs text-brand-700 dark:text-brand-300 hover:underline">
-            → Alle Wiedervorlagen
+            → {t('Alle Wiedervorlagen')}
           </Link>
         </Card>
       </div>

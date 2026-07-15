@@ -7,6 +7,7 @@ import { fmtDate, toInputDate } from '../lib/format';
 import AttachmentList from '../components/AttachmentList';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 const STATUS: DefectStatus[] = ['open', 'in_progress', 'fixed', 'rejected'];
 const STATUS_LABEL: Record<DefectStatus, string> = { open: 'Offen', in_progress: 'In Arbeit', fixed: 'Behoben', rejected: 'Abgelehnt' };
@@ -26,6 +27,7 @@ const SEV_BADGE: Record<DefectSeverity, string> = {
 };
 
 function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const toast = useToast();
@@ -41,10 +43,10 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
     }
   }
   async function del() {
-    if (!(await confirm({ message: 'Mangel löschen (inkl. Fotos)?', danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Mangel löschen (inkl. Fotos)?'), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/defects/${d.id}`);
-      toast.success('Mangel gelöscht');
+      toast.success(t('Mangel gelöscht'));
       reload();
     } catch (e) {
       setErr(apiError(e));
@@ -57,10 +59,10 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <div className={`font-medium ${d.status === 'fixed' ? 'text-slate-500 dark:text-slate-400 line-through' : 'text-slate-800 dark:text-slate-100'}`}>{d.title}</div>
           <div className="mt-1 flex flex-wrap items-center gap-1.5">
-            <Badge className={SEV_BADGE[d.severity]}>{SEV_LABEL[d.severity]}</Badge>
-            <Badge className={STATUS_BADGE[d.status]}>{STATUS_LABEL[d.status]}</Badge>
+            <Badge className={SEV_BADGE[d.severity]}>{t(SEV_LABEL[d.severity])}</Badge>
+            <Badge className={STATUS_BADGE[d.status]}>{t(STATUS_LABEL[d.status])}</Badge>
             {d.location && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">📍 {d.location}</Badge>}
-            {d.dueDate && <Badge className="bg-sky-100 text-sky-700">Frist {fmtDate(d.dueDate)}</Badge>}
+            {d.dueDate && <Badge className="bg-sky-100 text-sky-700">{t('Frist')} {fmtDate(d.dueDate)}</Badge>}
             {d.attachments && d.attachments.length > 0 && <Badge className="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">📎 {d.attachments.length}</Badge>}
           </div>
         </button>
@@ -70,31 +72,31 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
         <div className="space-y-3 border-t border-slate-100 dark:border-slate-700 p-3">
           {d.description && <p className="rounded-lg bg-slate-50 dark:bg-slate-900 p-2 text-sm text-slate-600 dark:text-slate-300">{d.description}</p>}
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Status">
+            <Field label={t('Status')}>
               <Select value={d.status} onChange={(e) => patch({ status: e.target.value })}>
                 {STATUS.map((s) => (
                   <option key={s} value={s}>
-                    {STATUS_LABEL[s]}
+                    {t(STATUS_LABEL[s])}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Schwere">
+            <Field label={t('Schwere')}>
               <Select value={d.severity} onChange={(e) => patch({ severity: e.target.value })}>
                 {SEV.map((s) => (
                   <option key={s} value={s}>
-                    {SEV_LABEL[s]}
+                    {t(SEV_LABEL[s])}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Ort/Raum">
+            <Field label={t('Ort/Raum')}>
               <Input
                 defaultValue={d.location ?? ''}
                 onBlur={(e) => e.target.value !== (d.location ?? '') && patch({ location: e.target.value || null })}
               />
             </Field>
-            <Field label="Frist">
+            <Field label={t('Frist')}>
               <Input type="date" defaultValue={toInputDate(d.dueDate)} onChange={(e) => patch({ dueDate: e.target.value || null })} />
             </Field>
           </div>
@@ -104,7 +106,7 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
           {err && <ErrorBox>{err}</ErrorBox>}
           <div className="flex justify-end">
             <Button variant="danger" onClick={del}>
-              Löschen
+              {t('Löschen')}
             </Button>
           </div>
         </div>
@@ -114,6 +116,7 @@ function DefectCard({ d, reload }: { d: Defect; reload: () => void }) {
 }
 
 export default function Defects() {
+  const t = useT();
   const { data, loading, error, reload } = useFetch<Defect[]>('/defects');
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ title: '', location: '', severity: 'normal' as DefectSeverity, dueDate: '', description: '' });
@@ -123,7 +126,7 @@ export default function Defects() {
 
   async function add() {
     if (!form.title.trim()) {
-      setErr('Bitte einen Titel angeben.');
+      setErr(t('Bitte einen Titel angeben.'));
       return;
     }
     setBusy(true);
@@ -136,7 +139,7 @@ export default function Defects() {
         dueDate: form.dueDate || null,
         description: form.description || null,
       });
-      toast.success('Mangel angelegt');
+      toast.success(t('Mangel angelegt'));
       setForm({ title: '', location: '', severity: 'normal', dueDate: '', description: '' });
       setShowAdd(false);
       reload();
@@ -154,13 +157,13 @@ export default function Defects() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Mängelliste"
-        subtitle={`${openCount} offen · ${list.length} gesamt`}
-        actions={<Button onClick={() => setShowAdd(true)}>+ Mangel</Button>}
+        title={t('Mängelliste')}
+        subtitle={t('{open} offen · {total} gesamt', { open: openCount, total: list.length })}
+        actions={<Button onClick={() => setShowAdd(true)}>{t('+ Mangel')}</Button>}
       />
       {error && <ErrorBox>{error}</ErrorBox>}
       {list.length === 0 ? (
-        <EmptyState>Noch keine Mängel erfasst. Halte bei der Abnahme jeden Mangel mit Foto, Ort und Frist fest — wichtig für die Gewährleistung.</EmptyState>
+        <EmptyState>{t('Noch keine Mängel erfasst. Halte bei der Abnahme jeden Mangel mit Foto, Ort und Frist fest — wichtig für die Gewährleistung.')}</EmptyState>
       ) : (
         <div className="space-y-2">
           {list.map((d) => (
@@ -169,41 +172,41 @@ export default function Defects() {
         </div>
       )}
 
-      <Modal open={showAdd} onClose={() => setShowAdd(false)} title="Mangel erfassen" busy={busy}>
+      <Modal open={showAdd} onClose={() => setShowAdd(false)} title={t('Mangel erfassen')} busy={busy}>
         <div className="space-y-3">
-          <Field label="Titel">
-            <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="z. B. Kratzer Fliese Bad" />
+          <Field label={t('Titel')}>
+            <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder={t('z. B. Kratzer Fliese Bad')} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Ort/Raum">
-              <Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder="Hauptbadezimmer" />
+            <Field label={t('Ort/Raum')}>
+              <Input value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} placeholder={t('Hauptbadezimmer')} />
             </Field>
-            <Field label="Schwere">
+            <Field label={t('Schwere')}>
               <Select value={form.severity} onChange={(e) => setForm((f) => ({ ...f, severity: e.target.value as DefectSeverity }))}>
                 {SEV.map((s) => (
                   <option key={s} value={s}>
-                    {SEV_LABEL[s]}
+                    {t(SEV_LABEL[s])}
                   </option>
                 ))}
               </Select>
             </Field>
           </div>
-          <Field label="Frist (optional)">
+          <Field label={t('Frist (optional)')}>
             <Input type="date" value={form.dueDate} onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))} />
           </Field>
-          <Field label="Beschreibung">
+          <Field label={t('Beschreibung')}>
             <Textarea rows={3} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
           </Field>
           {err && <ErrorBox>{err}</ErrorBox>}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setShowAdd(false)}>
-              Abbrechen
+              {t('Abbrechen')}
             </Button>
             <Button onClick={add} disabled={busy}>
-              {busy ? 'Anlegen…' : 'Anlegen'}
+              {busy ? t('Anlegen…') : t('Anlegen')}
             </Button>
           </div>
-          <p className="text-xs text-slate-400 dark:text-slate-500">Fotos kannst du nach dem Anlegen direkt am Mangel-Eintrag hinzufügen.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">{t('Fotos kannst du nach dem Anlegen direkt am Mangel-Eintrag hinzufügen.')}</p>
         </div>
       </Modal>
     </div>

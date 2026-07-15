@@ -1,12 +1,14 @@
 import { useEffect, useId, useRef } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
+import { useT } from '../i18n/LanguageContext';
 
 export function Spinner({ className = '' }: { className?: string }) {
+  const t = useT();
   return (
     <div
       className={`inline-block h-6 w-6 animate-spin rounded-full border-2 border-slate-300 dark:border-slate-600 border-t-brand ${className}`}
       role="status"
-      aria-label="Lädt"
+      aria-label={t('Lädt')}
     />
   );
 }
@@ -126,6 +128,7 @@ export function Modal({
   busy?: boolean;
   children: ReactNode;
 }) {
+  const t = useT();
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   // onClose/busy in Refs spiegeln, damit der Effekt NUR bei open-Wechsel läuft.
@@ -163,7 +166,7 @@ export function Modal({
     document.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const t = window.setTimeout(() => {
+    const focusTimer = window.setTimeout(() => {
       const panel = panelRef.current;
       if (!panel) return;
       // bevorzugt das erste Eingabefeld fokussieren, sonst das erste fokussierbare Element
@@ -175,7 +178,7 @@ export function Modal({
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
-      window.clearTimeout(t);
+      window.clearTimeout(focusTimer);
       prevFocus?.focus?.();
     };
   }, [open]);
@@ -198,7 +201,7 @@ export function Modal({
           <h2 id={titleId} className="font-semibold text-slate-800 dark:text-slate-100">
             {title}
           </h2>
-          <button onClick={close} className="rounded-lg p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Schließen">
+          <button onClick={close} className="rounded-lg p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label={t('Schließen')}>
             ✕
           </button>
         </div>

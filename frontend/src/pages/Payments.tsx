@@ -6,8 +6,10 @@ import { Spinner, Card, Badge, Button, Input, Textarea, Field, PageHeader, Empty
 import { euro, fmtDate, toInputDate } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const toast = useToast();
@@ -45,7 +47,7 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
         paidDate: f.paidDate || null,
         note: f.note || null,
       });
-      toast.success('Rate gespeichert');
+      toast.success(t('Rate gespeichert'));
       setOpen(false);
       reload();
     } catch (e) {
@@ -53,10 +55,10 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
     }
   }
   async function del() {
-    if (!(await confirm({ message: 'Rate löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Rate löschen?'), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/payments/${it.id}`);
-      toast.success('Rate gelöscht');
+      toast.success(t('Rate gelöscht'));
       reload();
     } catch (e) {
       setErr(apiError(e));
@@ -71,7 +73,7 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
           checked={it.isPaid}
           onChange={togglePaid}
           className="h-5 w-5 shrink-0 rounded border-slate-300 dark:border-slate-600 text-brand-700 dark:text-brand-300 focus:ring-brand"
-          aria-label={`Bezahlt: ${it.label}`}
+          aria-label={t('Bezahlt: {label}', { label: it.label })}
         />
         <button className="min-w-0 flex-1 text-left" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
           <div className={`font-medium ${it.isPaid ? 'text-slate-500 dark:text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>{it.label}</div>
@@ -81,43 +83,43 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
           <div className="font-semibold text-slate-800 dark:text-slate-100">
             {it.plannedAmount != null ? euro(it.plannedAmount) : it.percent != null ? `${it.percent} %` : '–'}
           </div>
-          {it.isPaid && <Badge className="bg-emerald-100 text-emerald-700">bezahlt{it.paidDate ? ` ${fmtDate(it.paidDate)}` : ''}</Badge>}
+          {it.isPaid && <Badge className="bg-emerald-100 text-emerald-700">{t('bezahlt')}{it.paidDate ? ` ${fmtDate(it.paidDate)}` : ''}</Badge>}
         </div>
       </div>
       {open && (
         <div className="space-y-3 border-t border-slate-100 dark:border-slate-700 p-3">
-          <Field label="Bezeichnung">
+          <Field label={t('Bezeichnung')}>
             <Input value={f.label} onChange={(e) => setF((s) => ({ ...s, label: e.target.value }))} />
           </Field>
-          <Field label="Bedingung / Baufortschritt">
+          <Field label={t('Bedingung / Baufortschritt')}>
             <Input value={f.dueCondition} onChange={(e) => setF((s) => ({ ...s, dueCondition: e.target.value }))} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Prozent (%)">
+            <Field label={t('Prozent (%)')}>
               <Input type="number" inputMode="decimal" value={f.percent} onChange={(e) => setF((s) => ({ ...s, percent: e.target.value }))} />
             </Field>
-            <Field label="Soll-Betrag (€)">
+            <Field label={t('Soll-Betrag (€)')}>
               <Input type="number" inputMode="decimal" value={f.plannedAmount} onChange={(e) => setF((s) => ({ ...s, plannedAmount: e.target.value }))} />
             </Field>
-            <Field label="Fällig am">
+            <Field label={t('Fällig am')}>
               <Input type="date" value={f.dueDate} onChange={(e) => setF((s) => ({ ...s, dueDate: e.target.value }))} />
             </Field>
-            <Field label="Bezahlt am">
+            <Field label={t('Bezahlt am')}>
               <Input type="date" value={f.paidDate} onChange={(e) => setF((s) => ({ ...s, paidDate: e.target.value }))} />
             </Field>
-            <Field label="Bezahlter Betrag (€)">
+            <Field label={t('Bezahlter Betrag (€)')}>
               <Input type="number" inputMode="decimal" value={f.paidAmount} onChange={(e) => setF((s) => ({ ...s, paidAmount: e.target.value }))} />
             </Field>
           </div>
-          <Field label="Notiz">
+          <Field label={t('Notiz')}>
             <Textarea rows={2} value={f.note} onChange={(e) => setF((s) => ({ ...s, note: e.target.value }))} />
           </Field>
           {err && <ErrorBox>{err}</ErrorBox>}
           <div className="flex justify-between">
             <Button variant="danger" onClick={del}>
-              Löschen
+              {t('Löschen')}
             </Button>
-            <Button onClick={save}>Speichern</Button>
+            <Button onClick={save}>{t('Speichern')}</Button>
           </div>
         </div>
       )}
@@ -126,6 +128,7 @@ function Row({ it, reload }: { it: PaymentInstallment; reload: () => void }) {
 }
 
 export default function Payments() {
+  const t = useT();
   const { data, loading, error, reload } = useFetch<PaymentData>('/payments');
   const [busy, setBusy] = useState(false);
   const toast = useToast();
@@ -150,33 +153,33 @@ export default function Payments() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Zahlungsplan"
-        subtitle="Abschläge nach Baufortschritt (MaBV / § 650m BGB)"
+        title={t('Zahlungsplan')}
+        subtitle={t('Abschläge nach Baufortschritt (MaBV / § 650m BGB)')}
         actions={
           <Button onClick={addRow} disabled={busy}>
-            + Rate
+            {t('+ Rate')}
           </Button>
         }
       />
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
-          <div className="text-xs text-slate-500 dark:text-slate-400">Soll gesamt</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">{t('Soll gesamt')}</div>
           <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(s.plannedTotal)}</div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-500 dark:text-slate-400">Bezahlt</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">{t('Bezahlt')}</div>
           <div className="text-2xl font-bold text-emerald-600">{euro(s.paidTotal)}</div>
           <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            {s.paidCount}/{s.total} Raten
+            {t('{paidCount}/{total} Raten', { paidCount: s.paidCount, total: s.total })}
           </div>
         </Card>
         <Card>
-          <div className="text-xs text-slate-500 dark:text-slate-400">Offen</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">{t('Offen')}</div>
           <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{euro(s.openTotal)}</div>
         </Card>
       </div>
       {data.installments.length === 0 ? (
-        <EmptyState>Noch keine Raten. Lege deinen vertraglichen Abschlagsplan an.</EmptyState>
+        <EmptyState>{t('Noch keine Raten. Lege deinen vertraglichen Abschlagsplan an.')}</EmptyState>
       ) : (
         <div className="space-y-2">
           {data.installments.map((it) => (
@@ -185,8 +188,7 @@ export default function Payments() {
         </div>
       )}
       <p className="text-xs text-slate-500 dark:text-slate-400">
-        Die Beträge/Prozente stammen aus deinem konkreten Vertrag — bitte eintragen. Hinweis: Abschlagszahlungen sind bis zur
-        Fertigstellung auf max. 90 % begrenzt; 5 % Fertigstellungssicherheit (§ 650m BGB) sind zulässig.
+        {t('Die Beträge/Prozente stammen aus deinem konkreten Vertrag — bitte eintragen. Hinweis: Abschlagszahlungen sind bis zur Fertigstellung auf max. 90 % begrenzt; 5 % Fertigstellungssicherheit (§ 650m BGB) sind zulässig.')}
       </p>
     </div>
   );

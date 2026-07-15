@@ -5,6 +5,7 @@ import type { HouseArea } from '../types';
 import { Spinner, Button, Input, Textarea, Field, Modal, PageHeader, EmptyState, ErrorBox } from '../components/ui';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 function AreaModal({
   area,
@@ -25,10 +26,11 @@ function AreaModal({
   const [err, setErr] = useState<string | null>(null);
   const toast = useToast();
   const confirm = useConfirm();
+  const t = useT();
 
   async function save() {
     if (!name.trim()) {
-      setErr('Name erforderlich');
+      setErr(t('Name erforderlich'));
       return;
     }
     setBusy(true);
@@ -42,7 +44,7 @@ function AreaModal({
     try {
       if (area) await api.patch(`/house-areas/${area.id}`, body);
       else await api.post('/house-areas', body);
-      toast.success('Gespeichert');
+      toast.success(t('Gespeichert'));
       onDone();
     } catch (e) {
       setErr(apiError(e));
@@ -53,12 +55,12 @@ function AreaModal({
 
   async function del() {
     if (!area || !onDeleted) return;
-    if (!(await confirm({ message: 'Bereich löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Bereich löschen?'), danger: true, confirmLabel: t('Löschen') }))) return;
     setBusy(true);
     setErr(null);
     try {
       await api.delete(`/house-areas/${area.id}`);
-      toast.success('Bereich gelöscht');
+      toast.success(t('Bereich gelöscht'));
       onDeleted();
     } catch (e) {
       setErr(apiError(e));
@@ -67,37 +69,37 @@ function AreaModal({
   }
 
   return (
-    <Modal open onClose={onClose} title={area ? 'Bereich bearbeiten' : 'Bereich hinzufügen'} busy={busy}>
+    <Modal open onClose={onClose} title={area ? t('Bereich bearbeiten') : t('Bereich hinzufügen')} busy={busy}>
       <div className="space-y-3">
         <div className="grid grid-cols-[4rem_1fr] gap-3">
-          <Field label="Icon">
+          <Field label={t('Icon')}>
             <Input value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="🛁" />
           </Field>
-          <Field label="Name">
+          <Field label={t('Name')}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </Field>
         </div>
-        <Field label="Kurzbeschreibung">
+        <Field label={t('Kurzbeschreibung')}>
           <Input value={description} onChange={(e) => setDescription(e.target.value)} />
         </Field>
-        <Field label="Planungsnotizen / Ideen">
-          <Textarea rows={6} value={planningNotes} onChange={(e) => setPlanningNotes(e.target.value)} placeholder="Ideen, Maße, Produkt-Links…" />
+        <Field label={t('Planungsnotizen / Ideen')}>
+          <Textarea rows={6} value={planningNotes} onChange={(e) => setPlanningNotes(e.target.value)} placeholder={t('Ideen, Maße, Produkt-Links…')} />
         </Field>
         {err && <ErrorBox>{err}</ErrorBox>}
         <div className="flex items-center justify-between">
           {area && onDeleted ? (
             <Button variant="danger" onClick={del} disabled={busy}>
-              Löschen
+              {t('Löschen')}
             </Button>
           ) : (
             <span />
           )}
           <div className="flex gap-2">
             <Button variant="ghost" onClick={onClose}>
-              Abbrechen
+              {t('Abbrechen')}
             </Button>
             <Button onClick={save} disabled={busy}>
-              Speichern
+              {t('Speichern')}
             </Button>
           </div>
         </div>
@@ -110,17 +112,18 @@ export default function HouseAreas() {
   const { data, loading, error, reload } = useFetch<HouseArea[]>('/house-areas');
   const [active, setActive] = useState<HouseArea | null>(null);
   const [adding, setAdding] = useState(false);
+  const t = useT();
 
   if (loading) return <Spinner />;
 
   return (
     <div>
       <PageHeader
-        title="Haus-Planung"
-        subtitle="Experimentell — Bereiche, Ideen & Notizen"
+        title={t('Haus-Planung')}
+        subtitle={t('Experimentell — Bereiche, Ideen & Notizen')}
         actions={
           <Button variant="secondary" onClick={() => setAdding(true)}>
-            + Bereich
+            + {t('Bereich')}
           </Button>
         }
       />
@@ -134,11 +137,11 @@ export default function HouseAreas() {
           >
             <span className="text-3xl">{a.icon || '🏠'}</span>
             <span className="w-full break-words text-sm font-medium text-slate-700 dark:text-slate-200">{a.name}</span>
-            {a.planningNotes && <span className="text-[10px] text-slate-500 dark:text-slate-400">notiert</span>}
+            {a.planningNotes && <span className="text-[10px] text-slate-500 dark:text-slate-400">{t('notiert')}</span>}
           </button>
         ))}
       </div>
-      {data && !error && data.length === 0 && <EmptyState>Noch keine Bereiche.</EmptyState>}
+      {data && !error && data.length === 0 && <EmptyState>{t('Noch keine Bereiche.')}</EmptyState>}
 
       {active && (
         <AreaModal

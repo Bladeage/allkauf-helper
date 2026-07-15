@@ -6,8 +6,10 @@ import { Button, Textarea, ErrorBox } from './ui';
 import { fmtDateTime } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; taskId?: number }) {
+  const t = useT();
   const q = phaseId ? `/notes?phaseId=${phaseId}` : `/notes?taskId=${taskId}`;
   const { data, reload } = useFetch<Note[]>(q, [q]);
   const [text, setText] = useState('');
@@ -22,7 +24,7 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
     setErr(null);
     try {
       await api.post('/notes', { phaseId: phaseId ?? null, taskId: taskId ?? null, content: text.trim() });
-      toast.success('Notiz gespeichert');
+      toast.success(t('Notiz gespeichert'));
       setText('');
       reload();
     } catch (e) {
@@ -33,10 +35,10 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
   }
 
   async function del(id: number) {
-    if (!(await confirm({ message: 'Notiz löschen?', danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Notiz löschen?'), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/notes/${id}`);
-      toast.success('Notiz gelöscht');
+      toast.success(t('Notiz gelöscht'));
       reload();
     } catch (e) {
       setErr(apiError(e));
@@ -54,14 +56,14 @@ export default function NoteEditor({ phaseId, taskId }: { phaseId?: number; task
               onClick={() => del(n.id)}
               className="rounded px-1 py-0.5 hover:text-red-600 focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
             >
-              löschen
+              {t('löschen')}
             </button>
           </div>
         </div>
       ))}
       <div className="flex items-end gap-2">
-        <Textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder="Notiz hinzufügen…" />
-        <Button variant="secondary" onClick={add} disabled={busy} aria-label="Notiz hinzufügen">
+        <Textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('Notiz hinzufügen…')} />
+        <Button variant="secondary" onClick={add} disabled={busy} aria-label={t('Notiz hinzufügen')}>
           +
         </Button>
       </div>

@@ -5,6 +5,7 @@ import { useFetch } from '../hooks/useFetch';
 import { Spinner, Button, ErrorBox } from './ui';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 type ParentKey = 'taskId' | 'phaseId' | 'defectId' | 'diaryEntryId';
 
@@ -16,6 +17,7 @@ export default function AttachmentList(props: {
   diaryEntryId?: number;
 }) {
   const entry = (Object.entries(props).filter(([, v]) => v != null) as [ParentKey, number][])[0];
+  const t = useT();
   const [key, id] = entry;
   const { data, loading, reload } = useFetch<Attachment[]>(`/attachments?${key}=${id}`);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -39,7 +41,7 @@ export default function AttachmentList(props: {
       fd.append('file', file);
       fd.append(key, String(id));
       await api.post('/attachments', fd);
-      toast.success('Anhang hochgeladen');
+      toast.success(t('Anhang hochgeladen'));
       reload();
     } catch (e2) {
       setErr(apiError(e2));
@@ -49,10 +51,10 @@ export default function AttachmentList(props: {
   }
 
   async function del(a: Attachment) {
-    if (!(await confirm({ message: `Anhang „${a.originalName}“ löschen?`, danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Anhang „{name}“ löschen?', { name: a.originalName }), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/attachments/${a.id}`);
-      toast.success('Anhang gelöscht');
+      toast.success(t('Anhang gelöscht'));
       reload();
     } catch (e2) {
       setErr(apiError(e2));
@@ -63,9 +65,9 @@ export default function AttachmentList(props: {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Anhänge{list.length > 0 ? ` (${list.length})` : ''}</span>
+        <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{t('Anhänge')}{list.length > 0 ? ` (${list.length})` : ''}</span>
         <Button variant="secondary" type="button" onClick={() => fileRef.current?.click()} disabled={busy}>
-          {busy ? 'Lädt…' : '+ Datei/Foto'}
+          {busy ? t('Lädt…') : t('+ Datei/Foto')}
         </Button>
         <input
           ref={fileRef}
@@ -78,7 +80,7 @@ export default function AttachmentList(props: {
       {loading ? (
         <Spinner />
       ) : list.length === 0 ? (
-        <p className="text-xs text-slate-400 dark:text-slate-500">Noch keine Anhänge.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">{t('Noch keine Anhänge.')}</p>
       ) : (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {list.map((a) => (
@@ -99,7 +101,7 @@ export default function AttachmentList(props: {
                   type="button"
                   onClick={() => del(a)}
                   className="text-slate-400 dark:text-slate-500 hover:text-red-600"
-                  aria-label={`Anhang ${a.originalName} löschen`}
+                  aria-label={t('Anhang {name} löschen', { name: a.originalName })}
                 >
                   ✕
                 </button>

@@ -7,7 +7,7 @@ import { Spinner, Card, Button, Input, Select, Field, ErrorBox, PageHeader, Badg
 import { toInputDate } from '../lib/format';
 import { useToast } from '../context/ToastContext';
 import { useTheme, FONTS, SIZES, type ThemeMode, type FontKey, type SizeKey } from '../context/ThemeContext';
-import { useLang, type Lang } from '../i18n/LanguageContext';
+import { useLang, useT, type Lang } from '../i18n/LanguageContext';
 import TwoFactorCard from '../components/TwoFactorCard';
 import PasswordChangeCard from '../components/PasswordChangeCard';
 
@@ -28,6 +28,7 @@ export default function Settings() {
   const [err, setErr] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const toast = useToast();
+  const t = useT();
   const { mode, font, size, setMode, setFont, setSize } = useTheme();
   const { lang, setLang } = useLang();
 
@@ -65,7 +66,7 @@ export default function Settings() {
         contingencyPercent: num(form.contingencyPercent),
       });
       setSaved(true);
-      toast.success('Einstellungen gespeichert');
+      toast.success(t('Einstellungen gespeichert'));
     } catch (e) {
       setErr(apiError(e));
     } finally {
@@ -80,13 +81,13 @@ export default function Settings() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Einstellungen" subtitle="Projektdaten, Budget und Eigenleistungs-Stundensatz" />
+      <PageHeader title={t('Einstellungen')} subtitle={t('Projektdaten, Budget und Eigenleistungs-Stundensatz')} />
       {error && <ErrorBox>{error}</ErrorBox>}
 
-      <Card title="Darstellung">
+      <Card title={t('Darstellung')}>
         <div className="space-y-4">
           <div>
-            <div className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Modus</div>
+            <div className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">{t('Modus')}</div>
             <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
               {(['light', 'dark', 'system'] as ThemeMode[]).map((m) => (
                 <button
@@ -98,13 +99,13 @@ export default function Settings() {
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
                 >
-                  {m === 'light' ? '☀️ Hell' : m === 'dark' ? '🌙 Dunkel' : '🖥️ System'}
+                  {m === 'light' ? t('☀️ Hell') : m === 'dark' ? t('🌙 Dunkel') : t('🖥️ System')}
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <div className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Sprache / Language</div>
+            <div className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">{t('Sprache / Language')}</div>
             <div className="inline-flex rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
               {(['de', 'en'] as Lang[]).map((l) => (
                 <button
@@ -116,32 +117,32 @@ export default function Settings() {
                       : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                   }`}
                 >
-                  {l === 'de' ? '🇩🇪 Deutsch' : '🇬🇧 English'}
+                  {l === 'de' ? t('🇩🇪 Deutsch') : t('🇬🇧 English')}
                 </button>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Schriftart">
+            <Field label={t('Schriftart')}>
               <Select value={font} onChange={(e) => setFont(e.target.value as FontKey)}>
                 {(Object.keys(FONTS) as FontKey[]).map((k) => (
                   <option key={k} value={k}>
-                    {FONTS[k].label}
+                    {t(FONTS[k].label)}
                   </option>
                 ))}
               </Select>
             </Field>
-            <Field label="Schriftgröße">
+            <Field label={t('Schriftgröße')}>
               <Select value={size} onChange={(e) => setSize(e.target.value as SizeKey)}>
                 {(Object.keys(SIZES) as SizeKey[]).map((k) => (
                   <option key={k} value={k}>
-                    {SIZES[k].label}
+                    {t(SIZES[k].label)}
                   </option>
                 ))}
               </Select>
             </Field>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Design wird lokal auf diesem Gerät gespeichert.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('Design wird lokal auf diesem Gerät gespeichert.')}</p>
         </div>
       </Card>
 
@@ -149,54 +150,54 @@ export default function Settings() {
 
       <PasswordChangeCard />
 
-      <Card title="Projekt">
+      <Card title={t('Projekt')}>
         <div className="space-y-3">
-          <Field label="Projektname">
+          <Field label={t('Projektname')}>
             <Input value={form.projectName} onChange={(e) => up('projectName', e.target.value)} />
           </Field>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Wohnfläche (m²)">
+            <Field label={t('Wohnfläche (m²)')}>
               <Input type="number" min="0" inputMode="decimal" value={form.livingAreaSqm} onChange={(e) => up('livingAreaSqm', e.target.value)} />
             </Field>
-            <Field label="Gesamtbudget (€)">
+            <Field label={t('Gesamtbudget (€)')}>
               <Input type="number" min="0" inputMode="decimal" value={form.totalBudget} onChange={(e) => up('totalBudget', e.target.value)} />
             </Field>
-            <Field label="Projektstart (Gantt)">
+            <Field label={t('Projektstart (Gantt)')}>
               <Input type="date" value={form.projectStart} onChange={(e) => up('projectStart', e.target.value)} />
             </Field>
-            <Field label="Projektende (Gantt)">
+            <Field label={t('Projektende (Gantt)')}>
               <Input type="date" value={form.projectEnd} onChange={(e) => up('projectEnd', e.target.value)} />
             </Field>
-            <Field label="Übergabe/Abnahme (Start Gewährleistung)">
+            <Field label={t('Übergabe/Abnahme (Start Gewährleistung)')}>
               <Input type="date" value={form.handoverDate} onChange={(e) => up('handoverDate', e.target.value)} />
             </Field>
-            <Field label="Stundensatz Eigenleistung (€/h)">
+            <Field label={t('Stundensatz Eigenleistung (€/h)')}>
               <Input type="number" min="0" inputMode="decimal" value={form.hourlyRateEigenleistung} onChange={(e) => up('hourlyRateEigenleistung', e.target.value)} />
             </Field>
-            <Field label="Puffer / Reserve (%)">
-              <Input type="number" min="0" inputMode="decimal" value={form.contingencyPercent} onChange={(e) => up('contingencyPercent', e.target.value)} placeholder="z. B. 10" />
+            <Field label={t('Puffer / Reserve (%)')}>
+              <Input type="number" min="0" inputMode="decimal" value={form.contingencyPercent} onChange={(e) => up('contingencyPercent', e.target.value)} placeholder={t('z. B. 10')} />
             </Field>
           </div>
           {err && <ErrorBox>{err}</ErrorBox>}
           <div className="flex items-center gap-3">
             <Button onClick={save} disabled={busy}>
-              {busy ? 'Speichern…' : 'Speichern'}
+              {busy ? t('Speichern…') : t('Speichern')}
             </Button>
-            {saved && <span className="text-sm text-emerald-600">✓ Gespeichert</span>}
+            {saved && <span className="text-sm text-emerald-600">{t('✓ Gespeichert')}</span>}
           </div>
         </div>
       </Card>
 
-      <Card title="Module">
+      <Card title={t('Module')}>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-600 dark:text-slate-300">Haus-Planungsmodul (experimentell)</span>
+          <span className="text-slate-600 dark:text-slate-300">{t('Haus-Planungsmodul (experimentell)')}</span>
           <Badge className={config?.enableHouseModule ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}>
-            {config?.enableHouseModule ? 'aktiv' : 'deaktiviert'}
+            {config?.enableHouseModule ? t('aktiv') : t('deaktiviert')}
           </Badge>
         </div>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          Umschaltbar über die Umgebungsvariable <code className="rounded bg-slate-100 dark:bg-slate-700 px-1">ENABLE_HOUSE_MODULE</code> (true/false) in der
-          <code className="rounded bg-slate-100 dark:bg-slate-700 px-1">.env</code> und Neustart des Backends.
+          {t('Umschaltbar über die Umgebungsvariable')} <code className="rounded bg-slate-100 dark:bg-slate-700 px-1">ENABLE_HOUSE_MODULE</code> {t('(true/false) in der')}
+          <code className="rounded bg-slate-100 dark:bg-slate-700 px-1">.env</code> {t('und Neustart des Backends.')}
         </p>
       </Card>
     </div>

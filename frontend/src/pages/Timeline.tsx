@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import type { Phase, Milestone, ProjectSettings } from '../types';
 import { Spinner, PageHeader, EmptyState, ErrorBox } from '../components/ui';
+import { useT } from '../i18n/LanguageContext';
 
 const DAY = 86400000;
 const PX_PER_DAY = 6;
@@ -22,6 +23,7 @@ function shortTitle(t: string): string {
 }
 
 export default function Timeline() {
+  const t = useT();
   const navigate = useNavigate();
   const { data: phases, loading, error } = useFetch<Phase[]>('/phases');
   const { data: milestones } = useFetch<Milestone[]>('/milestones');
@@ -42,8 +44,8 @@ export default function Timeline() {
   if (bars.length === 0) {
     return (
       <div>
-        <PageHeader title="Zeitleiste" />
-        <EmptyState>Noch keine Phasen-Termine hinterlegt. Trage Start/Ende je Phase ein (Phase → bearbeiten).</EmptyState>
+        <PageHeader title={t('Zeitleiste')} />
+        <EmptyState>{t('Noch keine Phasen-Termine hinterlegt. Trage Start/Ende je Phase ein (Phase → bearbeiten).')}</EmptyState>
       </div>
     );
   }
@@ -76,26 +78,26 @@ export default function Timeline() {
 
   return (
     <div>
-      <PageHeader title="Zeitleiste" subtitle="Bauphasen als Balken — dürfen sich überlappen, horizontal scrollbar" />
+      <PageHeader title={t('Zeitleiste')} subtitle={t('Bauphasen als Balken — dürfen sich überlappen, horizontal scrollbar')} />
       <div className="mb-3 flex flex-wrap gap-3 text-xs text-slate-500 dark:text-slate-400">
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_FILL.done }} />
-          Fertig
+          {t('Fertig')}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_FILL.in_progress }} />
-          In Arbeit
+          {t('In Arbeit')}
         </span>
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded" style={{ background: STATUS_FILL.not_started }} />
-          Offen
+          {t('Offen')}
         </span>
-        <span className="flex items-center gap-1 text-indigo-500">◆ Meilenstein</span>
-        {showToday && <span className="flex items-center gap-1 text-red-500">▏heute</span>}
+        <span className="flex items-center gap-1 text-indigo-500">◆ {t('Meilenstein')}</span>
+        {showToday && <span className="flex items-center gap-1 text-red-500">▏{t('heute')}</span>}
       </div>
 
       <div className="overflow-x-auto rounded-2xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
-        <svg width={width} height={height} className="block" role="img" aria-label="Bauphasen-Zeitleiste (Gantt)">
+        <svg width={width} height={height} className="block" role="img" aria-label={t('Bauphasen-Zeitleiste (Gantt)')}>
           {/* Monats-Gridlines (hinten) */}
           {ticks.map((t, i) => (
             <g key={`t${i}`}>
@@ -118,7 +120,7 @@ export default function Timeline() {
                 key={b.p.id}
                 role="button"
                 tabIndex={0}
-                aria-label={`Phase öffnen: ${b.p.title}`}
+                aria-label={t('Phase öffnen: {title}', { title: b.p.title })}
                 className="cursor-pointer"
                 onClick={() => openPhase(b.p.id)}
                 onKeyDown={(ev) => {
@@ -173,9 +175,8 @@ export default function Timeline() {
         </svg>
       </div>
       <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-        Tipp: Auf einen Balken tippen (oder mit Tab + Enter) öffnet die Phase. Termine je Phase (bearbeiten) bzw.
-        Projektstart/-ende unter „Einstellungen" pflegen.
-        {partialCount > 0 && ` ${partialCount} Phase(n) mit nur einem Datum werden hier noch nicht angezeigt.`}
+        {t('Tipp: Auf einen Balken tippen (oder mit Tab + Enter) öffnet die Phase. Termine je Phase (bearbeiten) bzw. Projektstart/-ende unter „Einstellungen" pflegen.')}
+        {partialCount > 0 && ` ${t('{count} Phase(n) mit nur einem Datum werden hier noch nicht angezeigt.', { count: partialCount })}`}
       </p>
     </div>
   );

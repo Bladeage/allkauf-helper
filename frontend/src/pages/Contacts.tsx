@@ -5,10 +5,12 @@ import type { Contact } from '../types';
 import { Spinner, Card, Button, Input, Textarea, Field, Modal, PageHeader, EmptyState, ErrorBox } from '../components/ui';
 import { useToast } from '../context/ToastContext';
 import { useConfirm } from '../context/ConfirmContext';
+import { useT } from '../i18n/LanguageContext';
 
 const EMPTY = { name: '', role: '', company: '', phone: '', email: '', address: '', note: '' };
 
 export default function Contacts() {
+  const t = useT();
   const { data, loading, error, reload } = useFetch<Contact[]>('/contacts');
   const [edit, setEdit] = useState<Contact | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -40,7 +42,7 @@ export default function Contacts() {
   }
   async function save() {
     if (!form.name.trim()) {
-      setErr('Name ist erforderlich.');
+      setErr(t('Name ist erforderlich.'));
       return;
     }
     setBusy(true);
@@ -57,7 +59,7 @@ export default function Contacts() {
     try {
       if (edit) await api.patch(`/contacts/${edit.id}`, payload);
       else await api.post('/contacts', payload);
-      toast.success('Kontakt gespeichert');
+      toast.success(t('Kontakt gespeichert'));
       setShowForm(false);
       reload();
     } catch (e) {
@@ -67,10 +69,10 @@ export default function Contacts() {
     }
   }
   async function del(c: Contact) {
-    if (!(await confirm({ message: `Kontakt „${c.name}“ löschen?`, danger: true, confirmLabel: 'Löschen' }))) return;
+    if (!(await confirm({ message: t('Kontakt „{name}“ löschen?', { name: c.name }), danger: true, confirmLabel: t('Löschen') }))) return;
     try {
       await api.delete(`/contacts/${c.id}`);
-      toast.success('Kontakt gelöscht');
+      toast.success(t('Kontakt gelöscht'));
       reload();
     } catch (e) {
       toast.error(apiError(e));
@@ -82,10 +84,10 @@ export default function Contacts() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="Kontakte" subtitle="Bauleiter, Gewerke, Ämter, Versorger" actions={<Button onClick={openNew}>+ Kontakt</Button>} />
+      <PageHeader title={t('Kontakte')} subtitle={t('Bauleiter, Gewerke, Ämter, Versorger')} actions={<Button onClick={openNew}>{t('+ Kontakt')}</Button>} />
       {error && <ErrorBox>{error}</ErrorBox>}
       {list.length === 0 ? (
-        <EmptyState>Noch keine Kontakte.</EmptyState>
+        <EmptyState>{t('Noch keine Kontakte.')}</EmptyState>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {list.map((c) => (
@@ -96,10 +98,10 @@ export default function Contacts() {
                   {(c.role || c.company) && <div className="text-xs text-slate-500 dark:text-slate-400">{[c.role, c.company].filter(Boolean).join(' · ')}</div>}
                 </div>
                 <div className="flex shrink-0 gap-1">
-                  <button onClick={() => openEdit(c)} className="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label={`${c.name} bearbeiten`}>
+                  <button onClick={() => openEdit(c)} className="rounded-lg p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label={t('{name} bearbeiten', { name: c.name })}>
                     ✏️
                   </button>
-                  <button onClick={() => del(c)} className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label={`${c.name} löschen`}>
+                  <button onClick={() => del(c)} className="rounded-lg p-1.5 text-slate-400 dark:text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label={t('{name} löschen', { name: c.name })}>
                     🗑️
                   </button>
                 </div>
@@ -127,38 +129,38 @@ export default function Contacts() {
         </div>
       )}
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title={edit ? 'Kontakt bearbeiten' : 'Kontakt anlegen'} busy={busy}>
+      <Modal open={showForm} onClose={() => setShowForm(false)} title={edit ? t('Kontakt bearbeiten') : t('Kontakt anlegen')} busy={busy}>
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Name">
+            <Field label={t('Name')}>
               <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
             </Field>
-            <Field label="Rolle/Gewerk">
+            <Field label={t('Rolle/Gewerk')}>
               <Input value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))} />
             </Field>
-            <Field label="Firma">
+            <Field label={t('Firma')}>
               <Input value={form.company} onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))} />
             </Field>
-            <Field label="Telefon">
+            <Field label={t('Telefon')}>
               <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
             </Field>
-            <Field label="E-Mail">
+            <Field label={t('E-Mail')}>
               <Input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
             </Field>
-            <Field label="Adresse">
+            <Field label={t('Adresse')}>
               <Input value={form.address} onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))} />
             </Field>
           </div>
-          <Field label="Notiz">
+          <Field label={t('Notiz')}>
             <Textarea rows={2} value={form.note} onChange={(e) => setForm((f) => ({ ...f, note: e.target.value }))} />
           </Field>
           {err && <ErrorBox>{err}</ErrorBox>}
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setShowForm(false)}>
-              Abbrechen
+              {t('Abbrechen')}
             </Button>
             <Button onClick={save} disabled={busy}>
-              {busy ? 'Speichern…' : 'Speichern'}
+              {busy ? t('Speichern…') : t('Speichern')}
             </Button>
           </div>
         </div>

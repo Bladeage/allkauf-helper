@@ -4,6 +4,7 @@ import type { ProjectSettings, Phase, PhaseDetail, Milestone, PaymentInstallment
 import { Spinner, Button, Field, Input, Select, Badge, ErrorBox } from './ui';
 import { toInputDate, euro } from '../lib/format';
 import { useToast } from '../context/ToastContext';
+import { useT } from '../i18n/LanguageContext';
 
 type Props = { open: boolean; onClose: () => void; onDone?: () => void };
 
@@ -32,6 +33,7 @@ const STEP_DEFS = [
 ] as const;
 
 export default function SetupWizard({ open, onClose, onDone }: Props) {
+  const t = useT();
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -203,7 +205,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
     try {
       await saveStep();
       if (cur.key === 'done') {
-        toast.success('Einrichtung gespeichert');
+        toast.success(t('Einrichtung gespeichert'));
         onDone?.();
         onClose();
       } else {
@@ -231,7 +233,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
     setRetroPhases((prev) => prev.map((x) => (x.id === p.id ? { ...x, tasks: x.tasks.map((t) => ({ ...t, isDone: true })) } : x)));
     try {
       await Promise.all(open.map((t) => api.patch(`/tasks/${t.id}`, { isDone: true })));
-      toast.success(`„${p.title}" abgehakt`);
+      toast.success(t('„{title}" abgehakt', { title: p.title }));
     } catch (e) {
       setErr(apiError(e));
     }
@@ -259,15 +261,15 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Einrichtungs-Assistent"
+        aria-label={t('Einrichtungs-Assistent')}
         className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl dark:bg-slate-800 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Kopf */}
         <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-semibold text-slate-800 dark:text-slate-100">🧭 Einrichtungs-Assistent</h2>
-            <button onClick={() => !busy && onClose()} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700" aria-label="Schließen">
+            <h2 className="font-semibold text-slate-800 dark:text-slate-100">🧭 {t('Einrichtungs-Assistent')}</h2>
+            <button onClick={() => !busy && onClose()} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700" aria-label={t('Schließen')}>
               ✕
             </button>
           </div>
@@ -276,7 +278,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
               <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
             </div>
             <span className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
-              {step + 1}/{activeSteps.length} · {cur.title}
+              {step + 1}/{activeSteps.length} · {t(cur.title)}
             </span>
           </div>
         </div>
@@ -292,10 +294,9 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
               {cur.key === 'where' && (
                 <div className="space-y-4">
                   <p className="text-sm text-slate-600 dark:text-slate-300">
-                    Damit jede Phase ihre nötigen Daten bekommt: Sag uns, wo ihr gerade steht. Anschließend füllen wir von allgemein nach
-                    speziell — und holen Verpasstes nach.
+                    {t('Damit jede Phase ihre nötigen Daten bekommt: Sag uns, wo ihr gerade steht. Anschließend füllen wir von allgemein nach speziell — und holen Verpasstes nach.')}
                   </p>
-                  <Field label="Aktuelle Phase">
+                  <Field label={t('Aktuelle Phase')}>
                     <Select value={String(currentPhase)} onChange={(e) => setCurrentPhase(Number(e.target.value))}>
                       {phases.map((p) => (
                         <option key={p.id} value={p.orderNumber}>
@@ -312,8 +313,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                       className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-700 focus:ring-brand dark:border-slate-600"
                     />
                     <span>
-                      Verpasstes nachholen — am Ende zeige ich die Checklisten der früheren Phasen, damit ihr Erledigtes abhaken könnt (pro
-                      Phase ein „alles erledigt"-Knopf).
+                      {t('Verpasstes nachholen — am Ende zeige ich die Checklisten der früheren Phasen, damit ihr Erledigtes abhaken könnt (pro Phase ein „alles erledigt"-Knopf).')}
                     </span>
                   </label>
                 </div>
@@ -321,22 +321,22 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
               {cur.key === 'project' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Grunddaten fürs Dashboard, Budget-Warnungen und die Eigenleistungs-Hochrechnung.</p>
-                  <Field label="Projektname">
-                    <Input value={proj.projectName} onChange={(e) => setProj((f) => ({ ...f, projectName: e.target.value }))} placeholder="z. B. Unser Haus in …" />
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Grunddaten fürs Dashboard, Budget-Warnungen und die Eigenleistungs-Hochrechnung.')}</p>
+                  <Field label={t('Projektname')}>
+                    <Input value={proj.projectName} onChange={(e) => setProj((f) => ({ ...f, projectName: e.target.value }))} placeholder={t('z. B. Unser Haus in …')} />
                   </Field>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Wohnfläche (m²)">
+                    <Field label={t('Wohnfläche (m²)')}>
                       <Input type="number" inputMode="decimal" value={proj.livingAreaSqm} onChange={(e) => setProj((f) => ({ ...f, livingAreaSqm: e.target.value }))} />
                     </Field>
-                    <Field label="Gesamtbudget (€)">
+                    <Field label={t('Gesamtbudget (€)')}>
                       <Input type="number" inputMode="decimal" value={proj.totalBudget} onChange={(e) => setProj((f) => ({ ...f, totalBudget: e.target.value }))} />
                     </Field>
-                    <Field label="Stundensatz Eigenleistung (€/h)">
+                    <Field label={t('Stundensatz Eigenleistung (€/h)')}>
                       <Input type="number" inputMode="decimal" value={proj.hourlyRate} onChange={(e) => setProj((f) => ({ ...f, hourlyRate: e.target.value }))} />
                     </Field>
-                    <Field label="Puffer / Reserve (%)">
-                      <Input type="number" inputMode="decimal" value={proj.contingency} onChange={(e) => setProj((f) => ({ ...f, contingency: e.target.value }))} placeholder="z. B. 10" />
+                    <Field label={t('Puffer / Reserve (%)')}>
+                      <Input type="number" inputMode="decimal" value={proj.contingency} onChange={(e) => setProj((f) => ({ ...f, contingency: e.target.value }))} placeholder={t('z. B. 10')} />
                     </Field>
                   </div>
                 </div>
@@ -346,29 +346,29 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900">
                     <Badge className="bg-brand-50 text-brand-700 dark:bg-brand-700/20 dark:text-brand-300">Free Time</Badge>
-                    <span className="text-slate-600 dark:text-slate-300">Der Anbieter bzw. seine Partnerfirmen übernehmen je nach Vertrag Trockenbau, Estrich, Sanitär, Heizung & Elektro — eure Eigenleistung ist der Endausbau.</span>
+                    <span className="text-slate-600 dark:text-slate-300">{t('Der Anbieter bzw. seine Partnerfirmen übernehmen je nach Vertrag Trockenbau, Estrich, Sanitär, Heizung & Elektro — eure Eigenleistung ist der Endausbau.')}</span>
                   </div>
-                  <Field label="Grundpreis-Pauschale Haus (€)" hint="Hauslieferung + Montage + Ausbaupakete + Architekt/Statik. Aus eurem Vertrag.">
-                    <Input type="number" inputMode="decimal" value={grundpreis} onChange={(e) => setGrundpreis(e.target.value)} placeholder="z. B. 230000" />
+                  <Field label={t('Grundpreis-Pauschale Haus (€)')} hint={t('Hauslieferung + Montage + Ausbaupakete + Architekt/Statik. Aus eurem Vertrag.')}>
+                    <Input type="number" inputMode="decimal" value={grundpreis} onChange={(e) => setGrundpreis(e.target.value)} placeholder={t('z. B. 230000')} />
                   </Field>
-                  <Field label="Bemusterungs-Aufpreise gesamt (€)" hint="Grobe Summe der Upgrades (Fliesen/Bäder/Böden …) aus dem Bemusterungsprotokoll.">
-                    <Input type="number" inputMode="decimal" value={bemusterung} onChange={(e) => setBemusterung(e.target.value)} placeholder="z. B. 15000" />
+                  <Field label={t('Bemusterungs-Aufpreise gesamt (€)')} hint={t('Grobe Summe der Upgrades (Fliesen/Bäder/Böden …) aus dem Bemusterungsprotokoll.')}>
+                    <Input type="number" inputMode="decimal" value={bemusterung} onChange={(e) => setBemusterung(e.target.value)} placeholder={t('z. B. 15000')} />
                   </Field>
                 </div>
               )}
 
               {cur.key === 'dates' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Termine treiben die Wiedervorlagen (auch relative wie „X Tage vor Estrich") und die Zeitleiste.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Termine treiben die Wiedervorlagen (auch relative wie „X Tage vor Estrich") und die Zeitleiste.')}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Projektstart (Gantt)">
+                    <Field label={t('Projektstart (Gantt)')}>
                       <Input type="date" value={dates.projectStart} onChange={(e) => setDates((d) => ({ ...d, projectStart: e.target.value }))} />
                     </Field>
-                    <Field label="Projektende (Gantt)">
+                    <Field label={t('Projektende (Gantt)')}>
                       <Input type="date" value={dates.projectEnd} onChange={(e) => setDates((d) => ({ ...d, projectEnd: e.target.value }))} />
                     </Field>
                   </div>
-                  <div className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">Meilenstein-Termine</div>
+                  <div className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{t('Meilenstein-Termine')}</div>
                   <div className="space-y-2">
                     {sortedMs.map((m) => (
                       <div key={m.id} className="flex items-center justify-between gap-2">
@@ -382,12 +382,12 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
               {cur.key === 'payments' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Soll-Beträge je Abschlag aus eurem Zahlungsplan (MaBV/§ 650m). Später unter „Zahlungen" als bezahlt markierbar.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Soll-Beträge je Abschlag aus eurem Zahlungsplan (MaBV/§ 650m). Später unter „Zahlungen" als bezahlt markierbar.')}</p>
                   <div className="space-y-2">
                     {payments.map((p) => (
                       <div key={p.id} className="flex items-center justify-between gap-2">
                         <span className="min-w-0 flex-1 truncate text-sm text-slate-700 dark:text-slate-200">{p.label}</span>
-                        <Input type="number" inputMode="decimal" className="w-32 shrink-0" placeholder="€" value={payAmt[p.id] ?? ''} onChange={(e) => setPayAmt((d) => ({ ...d, [p.id]: e.target.value }))} aria-label={`Betrag ${p.label}`} />
+                        <Input type="number" inputMode="decimal" className="w-32 shrink-0" placeholder="€" value={payAmt[p.id] ?? ''} onChange={(e) => setPayAmt((d) => ({ ...d, [p.id]: e.target.value }))} aria-label={t('Betrag {label}', { label: p.label })} />
                       </div>
                     ))}
                   </div>
@@ -396,14 +396,14 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
               {cur.key === 'contacts' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Nur ausfüllen, was relevant ist — Telefon/E-Mail genügen. Weitere Felder später unter „Kontakte".</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Nur ausfüllen, was relevant ist — Telefon/E-Mail genügen. Weitere Felder später unter „Kontakte".')}</p>
                   <div className="space-y-2">
                     {contacts.map((c) => (
                       <div key={c.id} className="rounded-lg bg-slate-50 p-2 dark:bg-slate-900">
                         <div className="mb-1 truncate text-sm font-medium text-slate-700 dark:text-slate-200">{c.name}</div>
                         <div className="grid grid-cols-2 gap-2">
-                          <Input placeholder="Telefon" value={contactEdits[c.id]?.phone ?? ''} onChange={(e) => setContactEdits((d) => ({ ...d, [c.id]: { ...d[c.id], phone: e.target.value } }))} aria-label={`Telefon ${c.name}`} />
-                          <Input placeholder="E-Mail" value={contactEdits[c.id]?.email ?? ''} onChange={(e) => setContactEdits((d) => ({ ...d, [c.id]: { ...d[c.id], email: e.target.value } }))} aria-label={`E-Mail ${c.name}`} />
+                          <Input placeholder={t('Telefon')} value={contactEdits[c.id]?.phone ?? ''} onChange={(e) => setContactEdits((d) => ({ ...d, [c.id]: { ...d[c.id], phone: e.target.value } }))} aria-label={t('Telefon {name}', { name: c.name })} />
+                          <Input placeholder={t('E-Mail')} value={contactEdits[c.id]?.email ?? ''} onChange={(e) => setContactEdits((d) => ({ ...d, [c.id]: { ...d[c.id], email: e.target.value } }))} aria-label={t('E-Mail {name}', { name: c.name })} />
                         </div>
                       </div>
                     ))}
@@ -413,13 +413,13 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
               {cur.key === 'retro' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Hakt in den früheren Phasen ab, was schon erledigt ist — so stimmen Fortschritt und Checklisten.</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Hakt in den früheren Phasen ab, was schon erledigt ist — so stimmen Fortschritt und Checklisten.')}</p>
                   {retroLoading ? (
                     <div className="grid place-items-center py-6">
                       <Spinner />
                     </div>
                   ) : retroPhases.length === 0 ? (
-                    <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">Keine früheren Phasen — ihr steht ganz am Anfang. 🎉</p>
+                    <p className="rounded-lg bg-slate-50 p-3 text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">{t('Keine früheren Phasen — ihr steht ganz am Anfang.')} 🎉</p>
                   ) : (
                     retroPhases.map((p) => {
                       const done = p.tasks.filter((t) => t.isDone).length;
@@ -430,7 +430,7 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                               {p.title} <span className="text-xs text-slate-400">({done}/{p.tasks.length})</span>
                             </span>
                             <Button variant="secondary" onClick={() => markPhaseDone(p)} disabled={done === p.tasks.length}>
-                              alle erledigt
+                              {t('alle erledigt')}
                             </Button>
                           </div>
                           <div className="max-h-44 space-y-1 overflow-y-auto p-2">
@@ -455,14 +455,14 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
 
               {cur.key === 'done' && (
                 <div className="space-y-3">
-                  <p className="text-sm text-slate-600 dark:text-slate-300">Geschafft! Hier der Stand der wichtigsten Angaben:</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">{t('Geschafft! Hier der Stand der wichtigsten Angaben:')}</p>
                   <ul className="space-y-1.5 text-sm">
                     {[
-                      ['Gesamtbudget', check.budget],
-                      ['Projektstart', check.start],
-                      ['Mind. ein Meilenstein-Termin', check.milestones],
-                      ['Grundpreis (Haus)', check.grundpreis],
-                      ['Zahlungsplan-Beträge', check.payments],
+                      [t('Gesamtbudget'), check.budget],
+                      [t('Projektstart'), check.start],
+                      [t('Mind. ein Meilenstein-Termin'), check.milestones],
+                      [t('Grundpreis (Haus)'), check.grundpreis],
+                      [t('Zahlungsplan-Beträge'), check.payments],
                     ].map(([label, ok]) => (
                       <li key={label as string} className="flex items-center gap-2">
                         <span className={ok ? 'text-emerald-600' : 'text-slate-400'}>{ok ? '✓' : '○'}</span>
@@ -471,11 +471,10 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
                     ))}
                   </ul>
                   {settings?.totalBudget != null && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Aktuelles Budget: {euro(num(proj.totalBudget) ?? settings.totalBudget)}.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('Aktuelles Budget: {amount}.', { amount: euro(num(proj.totalBudget) ?? settings.totalBudget) })}</p>
                   )}
                   <p className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500 dark:bg-slate-900 dark:text-slate-400">
-                    Offene Punkte könnt ihr jederzeit ergänzen — der Assistent ist über das Dashboard erneut aufrufbar. Details je Aufgabe in den
-                    Phasen, Beträge unter „Kosten"/„Zahlungen".
+                    {t('Offene Punkte könnt ihr jederzeit ergänzen — der Assistent ist über das Dashboard erneut aufrufbar. Details je Aufgabe in den Phasen, Beträge unter „Kosten"/„Zahlungen".')}
                   </p>
                 </div>
               )}
@@ -492,16 +491,16 @@ export default function SetupWizard({ open, onClose, onDone }: Props) {
           )}
           <div className="flex items-center justify-between gap-2">
             <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={busy || step === 0}>
-              ← Zurück
+              ← {t('Zurück')}
             </Button>
             <div className="flex items-center gap-2">
               {cur.key !== 'done' && (
                 <Button variant="ghost" onClick={() => !busy && onClose()} disabled={busy}>
-                  Später
+                  {t('Später')}
                 </Button>
               )}
               <Button onClick={next} disabled={busy || loading}>
-                {busy ? 'Speichern…' : cur.key === 'done' ? 'Fertig' : 'Weiter →'}
+                {busy ? t('Speichern…') : cur.key === 'done' ? t('Fertig') : t('Weiter →')}
               </Button>
             </div>
           </div>

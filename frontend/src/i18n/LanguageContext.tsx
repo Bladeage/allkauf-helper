@@ -61,3 +61,13 @@ export function useLang(): LangApi {
 export function useT(): TFunc {
   return useLang().t;
 }
+
+// Statische Übersetzung ohne Hook/Context (z. B. für Class-Components wie ErrorBoundary).
+// Liest die Sprache direkt aus localStorage; reagiert nicht live auf Umschalten.
+export function tStatic(de: string): string {
+  try {
+    return localStorage.getItem(LANG_LS_KEY) === 'en' ? EN[de] ?? de : de;
+  } catch {
+    return de;
+  }
+}
