@@ -1,5 +1,7 @@
 # 🏠 Fertighaus-Helfer
 
+**Deutsch** · [English](README.en.md)
+
 **Selbst gehosteter Bau-Begleiter (PWA) für den Bau eines Fertig- bzw. Ausbauhauses.**
 Bildet das Bauvorhaben **Phase für Phase** ab — von Grundstück & Vertrag bis Abnahme und Gewährleistung:
 Checklisten, Kostentracking mit Prognose, Wiedervorlagen mit E-Mail-Erinnerung, Gantt-Zeitleiste,
@@ -10,10 +12,10 @@ keine externen Dienste**, alle Daten bleiben bei dir.
 > weitere Mitnutzer (z. B. Partner:in) lädt der Admin ein.
 
 > **🇬🇧 English:** *Fertighaus-Helfer* is a self-hosted PWA companion for building a prefab / owner-finished
-> house **in Germany**. The interface and the built-in checklists are **German only** and reference German
-> building law (MaBV, § 650m BGB, KfW/BEG); a partial English UI would be misleading, so it is intentionally
-> not provided. Installation, configuration and Docker usage are documented below (in German). One instance
-> per household; the first visitor creates the admin account via the onboarding page.
+> house **in Germany**. The interface is **available in English** — switch via the sidebar (🇩🇪 DE / 🇬🇧 EN) or
+> under **Settings**. An English checklist dataset can be seeded with `SEED_DATASET=generic-en`. Full English
+> documentation: **[README.en.md](README.en.md)**. Note that the domain content references German building law
+> (MaBV, § 650m BGB, KfW/BEG). One instance per household; the first visitor creates the admin account via onboarding.
 
 ---
 
@@ -34,6 +36,7 @@ keine externen Dienste**, alle Daten bleiben bei dir.
 - **Exporte** — Kosten als CSV/PDF, Bautagebuch als PDF, Termine als ICS (Kalender-Abo).
 - **Haus-Planung** — optionales Raumprogramm-Modul (Feature-Flag).
 - **PWA** — installierbar, App-Shell-Caching (Offline-Grundnavigation), Hell/Dunkel/System-Theme.
+- **Zweisprachig** — Oberfläche auf **Deutsch/Englisch** umschaltbar (Sidebar & Einstellungen); optional englischer Seed.
 - **Sicherheit** — geführtes Onboarding, JWT-Login (httpOnly-Cookie), optionale **Zwei-Faktor-Authentisierung
   (TOTP + Recovery-Codes)**, Rate-Limiting, Security-Header.
 
@@ -135,7 +138,9 @@ Der Datensatz ist austauschbar (`backend/src/prisma/data/`):
 
 | Datei | Inhalt | Enthalten |
 |---|---|---|
-| `data/generic.js` | herstellerneutraler Standard | ✅ Default |
+| `data/generic.js` | herstellerneutraler Standard (deutsch) | ✅ Default |
+| `data/generic-en.js` | englische Übersetzung des Standards | ✅ (`SEED_DATASET=generic-en`) |
+| `data/demo.js` | Standard + Beispielbeträge/-daten | ✅ (`SEED_DATASET=demo`) |
 | `data/custom.js` | eigener/anbieterspezifischer Datensatz | lokal (per `.gitignore`) |
 
 Ohne `SEED_DATASET` wird `custom` bevorzugt (falls vorhanden), sonst `generic`. `SEED_DATASET=generic|custom`

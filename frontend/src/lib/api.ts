@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { tStatic } from '../i18n/LanguageContext';
 
 // withCredentials: sendet das httpOnly-Auth-Cookie automatisch mit (same-origin)
 export const api = axios.create({ baseURL: '/api', withCredentials: true });
@@ -29,9 +30,14 @@ api.interceptors.response.use(
 );
 
 export function apiError(err: unknown, fallback = 'Es ist ein Fehler aufgetreten'): string {
+  let msg: string;
   if (axios.isAxiosError(err)) {
-    return (err.response?.data as { error?: string } | undefined)?.error || err.message || fallback;
+    msg = (err.response?.data as { error?: string } | undefined)?.error || err.message || fallback;
+  } else if (err instanceof Error) {
+    msg = err.message;
+  } else {
+    msg = fallback;
   }
-  if (err instanceof Error) return err.message;
-  return fallback;
+  // Backend-Meldungen sind deutsch — im EN-Modus über das Wörterbuch übersetzen (sonst unverändert).
+  return tStatic(msg);
 }
