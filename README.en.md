@@ -42,6 +42,20 @@ no external services**, all data stays with you.
 
 ---
 
+## Screenshots
+
+<p align="center"><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="820"></p>
+
+| Costs & forecast | Timeline (Gantt) |
+|:---:|:---:|
+| [![Costs](docs/screenshots/costs.png)](docs/screenshots/costs.png) | [![Timeline](docs/screenshots/timeline.png)](docs/screenshots/timeline.png) |
+| **Phases & checklists** | **Settings — 2FA & language (DE/EN)** |
+| [![Phases](docs/screenshots/phases.png)](docs/screenshots/phases.png) | [![Settings](docs/screenshots/settings.png)](docs/screenshots/settings.png) |
+
+<sub>Screenshots use the demo dataset (`SEED_DATASET=demo`); UI shown in German, switchable to English.</sub>
+
+---
+
 ## Quick start (prebuilt image)
 
 Prerequisite: **Docker** + **Docker Compose v2**. No source checkout required.

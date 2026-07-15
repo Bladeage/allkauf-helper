@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY . .
-RUN npm run build
+RUN npm run build  # i18n: CI-Layer-Cache gezielt neu erzeugen
 
 # ---- Serve-Stage (Nginx) ----
 FROM nginx:alpine

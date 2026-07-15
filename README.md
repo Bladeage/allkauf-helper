@@ -42,6 +42,20 @@ keine externen Dienste**, alle Daten bleiben bei dir.
 
 ---
 
+## Screenshots
+
+<p align="center"><img src="docs/screenshots/dashboard.png" alt="Dashboard" width="820"></p>
+
+| Kosten & Prognose | Zeitleiste (Gantt) |
+|:---:|:---:|
+| [![Kosten](docs/screenshots/costs.png)](docs/screenshots/costs.png) | [![Zeitleiste](docs/screenshots/timeline.png)](docs/screenshots/timeline.png) |
+| **Phasen & Checklisten** | **Einstellungen — 2FA & Sprache (DE/EN)** |
+| [![Phasen](docs/screenshots/phases.png)](docs/screenshots/phases.png) | [![Einstellungen](docs/screenshots/settings.png)](docs/screenshots/settings.png) |
+
+<sub>Screenshots mit dem Demo-Datensatz (`SEED_DATASET=demo`). Oberfläche auf Deutsch/Englisch umschaltbar.</sub>
+
+---
+
 ## Schnellstart (fertiges Image)
 
 Voraussetzung: **Docker** + **Docker Compose v2**. Kein Quellcode-Checkout nötig.
