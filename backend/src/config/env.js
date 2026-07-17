@@ -63,6 +63,9 @@ export const config = {
     showPasswordLogin: bool(process.env.OIDC_SHOW_PASSWORD_LOGIN, true),
     // Nur verknüpfen/anlegen, wenn Authentik die E-Mail als verifiziert meldet (Impersonations-Schutz).
     requireVerifiedEmail: bool(process.env.OIDC_REQUIRE_VERIFIED_EMAIL, false),
+    // prompt-Parameter: leer = nahtloses SSO (Standard; richtig, wenn ein Forward-Auth-Tor davorsteht).
+    // 'login' erzwingt bei Authentik eine erneute Anmeldung (Betrieb OHNE Tor -> Konto-Wechsel nach Logout).
+    prompt: process.env.OIDC_PROMPT || '',
   },
 };
 

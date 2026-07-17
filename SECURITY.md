@@ -18,5 +18,9 @@ Unterstützt wird jeweils die neueste Version (`latest` bzw. der jüngste `v*`-T
 - **HTTPS-Reverse-Proxy** davorschalten und **`TRUST_PROXY`** passend setzen (`1` ohne, `2` mit
   eigenem Proxy) — sonst greifen die Rate-Limits nicht zuverlässig.
 - **Zwei-Faktor-Authentisierung** in den Einstellungen aktivieren; Recovery-Codes sicher ablegen.
+- **Single Sign-On (OIDC)**: Bei `OIDC_ENABLED=true` den Provider absichern (verifizierte E-Mails,
+  Gruppen-/App-Zugriff) und `OIDC_REQUIRE_VERIFIED_EMAIL=true` setzen. Für minimale Angriffsfläche ein
+  **Forward-Auth-Tor** (Authentik) im Reverse Proxy vor die App stellen. Die OIDC-Verknüpfung ist
+  rückgängig machbar (Einstellungen bzw. `unlinkOidc.js`).
 - **Regelmäßige Backups** ziehen (siehe README → Backup & Restore), insbesondere vor Updates.
 - Zugang zusätzlich hinter eine **Access-List (Basic Auth)** und **fail2ban** legen, wenn öffentlich erreichbar.

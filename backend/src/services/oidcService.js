@@ -42,10 +42,9 @@ export async function buildLoginUrl({ state, nonce, codeChallenge }) {
   u.searchParams.set('nonce', nonce);
   u.searchParams.set('code_challenge', codeChallenge);
   u.searchParams.set('code_challenge_method', 'S256');
-  // prompt=login erzwingt bei Authentik eine echte Anmeldung statt stillem SSO-Durchreichen.
-  // Folge: Nach dem Logout landet man NICHT automatisch wieder eingeloggt und kann sich mit
-  // anderen Zugangsdaten anmelden.
-  u.searchParams.set('prompt', 'login');
+  // Optionaler prompt-Parameter (OIDC_PROMPT). Leer = nahtloses SSO (Standard hinter einem
+  // Forward-Auth-Tor); 'login' erzwingt eine erneute Anmeldung (Betrieb ohne Tor).
+  if (config.oidc.prompt) u.searchParams.set('prompt', config.oidc.prompt);
   return u.toString();
 }
 

@@ -39,6 +39,7 @@ keine externen Dienste**, alle Daten bleiben bei dir.
 - **Zweisprachig** — Oberfläche auf **Deutsch/Englisch** umschaltbar (Sidebar & Einstellungen); optional englischer Seed.
 - **Sicherheit** — geführtes Onboarding, JWT-Login (httpOnly-Cookie), optionale **Zwei-Faktor-Authentisierung
   (TOTP + Recovery-Codes)**, Rate-Limiting, Security-Header.
+- **Single Sign-On (OpenID Connect)** — optionale Anmeldung über einen OIDC-Provider (z. B. Authentik); Passwort-Login bleibt als Fallback.
 
 ---
 
@@ -109,6 +110,12 @@ Für den echten Einsatz `generic` (Default) verwenden. Screenshots liegen unter 
 | `MAX_UPLOAD_MB` | max. Größe je Datei-/Foto-Anhang (Default 15) |
 | `SEED_DATASET` | Startdatensatz (siehe [Datensätze](#datensätze)); `generic` (Default), `demo` (Beispieldaten) oder eigener `custom` |
 | `TRUST_PROXY` | Anzahl vertrauenswürdiger Reverse-Proxy-Hops. **`1`** (Default) bei Direktzugriff auf `:8081`; **`2`**, wenn ein eigener HTTPS-Reverse-Proxy davor steht. Falscher Wert macht die Rate-Limits wirkungslos. |
+| `OIDC_ENABLED` | `true`/`false` — **Single Sign-On** über OpenID Connect aktivieren (Details: [SSO](#single-sign-on-mit-openid-authentik)). |
+| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET`, `OIDC_REDIRECT_URI` | Zugangsdaten des OIDC-Providers (nur bei `OIDC_ENABLED=true`). |
+| `OIDC_ALLOW_SIGNUP` | `true` (Default) — unbekannte OIDC-Nutzer automatisch anlegen (per E-Mail gemappt). |
+| `OIDC_SHOW_PASSWORD_LOGIN` | `true` (Default) — bei aktivem OIDC auch das Passwort-Login zeigen; `false` = nur OpenID (Passwort per `?local=1` erreichbar). |
+| `OIDC_REQUIRE_VERIFIED_EMAIL` | `false` (Default) — auf `true` nur verknüpfen/anlegen, wenn der Provider die E-Mail als verifiziert meldet. |
+| `OIDC_PROMPT` | Leer (Default) = nahtloses SSO (richtig hinter einem Forward-Auth-Tor); `login` = erzwingt Neuanmeldung beim Provider (Betrieb ohne Tor). |
 
 > **Nutzer werden nicht über `.env` angelegt.** Der erste Admin entsteht ausschließlich über die Onboarding-Seite.
 
@@ -129,6 +136,8 @@ Für den echten Einsatz `generic` (Default) verwenden. Screenshots liegen unter 
 - **Reverse Proxy empfohlen**: Das Frontend liefert die PWA auf Port 8081 und proxyt `/api` → Backend. Stelle einen
   Reverse Proxy (Nginx Proxy Manager, Traefik, Caddy …) davor, der **HTTPS terminiert** und
   `X-Forwarded-Proto: https` setzt (nötig fürs Secure-Cookie).
+- **Single Sign-On (OpenID Connect)** — optional; siehe [Single Sign-On mit OpenID](#single-sign-on-mit-openid-authentik).
+  Das lokale Passwort-Login bleibt als Fallback; die OIDC-Verknüpfung ist rückgängig machbar (Impersonations-Schutz).
 
 Admin-Werkzeuge (auf dem Host):
 
@@ -138,7 +147,57 @@ docker compose exec backend node src/scripts/resetPassword.js <email> <neues-pas
 
 # 2FA zurücksetzen (falls Authenticator UND Recovery-Codes verloren gingen)
 docker compose exec backend node src/scripts/disable2fa.js <email>
+
+# OIDC-Verknüpfung eines Nutzers aufheben (Schutz vor Impersonation)
+docker compose exec backend node src/scripts/unlinkOidc.js <email>
 ```
+
+---
+
+## Single Sign-On mit OpenID (Authentik)
+
+Optional lässt sich die Anmeldung an einen **OpenID-Connect-Provider** delegieren (z. B.
+[Authentik](https://goauthentik.io), Keycloak …). Nutzer melden sich dann per **Single Sign-On** an;
+das lokale Passwort-Login bleibt als Fallback erhalten.
+
+**Aktivieren** — in der `.env`, danach `docker compose up -d` (Neustart lädt die Variablen):
+
+```dotenv
+OIDC_ENABLED=true
+OIDC_ISSUER=https://auth.example.com/application/o/<slug>/
+OIDC_CLIENT_ID=…
+OIDC_CLIENT_SECRET=…
+OIDC_REDIRECT_URI=https://<app-domain>/api/auth/oidc/callback
+```
+
+**Provider einrichten (Beispiel Authentik):** OAuth2/OpenID-Provider, Client-Typ **Confidential**,
+Redirect-URI wie oben (Strict), **Signing Key setzen** (RS256) und **Encryption Key leer lassen**
+(sonst kommt das ID-Token verschlüsselt und die Anmeldung schlägt fehl). Scopes `openid email profile`.
+Danach eine Application anlegen und den Provider zuweisen.
+
+**Verknüpfung (Pairing):** Bei der ersten OpenID-Anmeldung wird die Identität **per E-Mail** mit einem
+vorhandenen Konto verknüpft — oder, bei `OIDC_ALLOW_SIGNUP=true`, ein neues angelegt. Danach greift die
+feste Verknüpfung.
+
+**Optionen:**
+
+| Variable | Wirkung |
+|---|---|
+| `OIDC_SHOW_PASSWORD_LOGIN=false` | Login-Seite zeigt **nur** den OpenID-Button. Das Passwort-Login bleibt als Break-Glass über `…/?local=1` erreichbar. |
+| `OIDC_REQUIRE_VERIFIED_EMAIL=true` | Neue Verknüpfung/Anlage **nur** bei vom Provider verifizierter E-Mail (Schutz vor Impersonation über fremde Adressen). |
+
+**Verknüpfung aufheben (Schutz vor Impersonation):**
+
+- **Selbst:** Einstellungen → *OpenID-Verknüpfung* → **Verknüpfung aufheben**.
+- **Admin (Break-Glass):** `docker compose exec backend node src/scripts/unlinkOidc.js <email>`
+
+**Empfohlen — Forward-Auth-Tor davor:** Für minimale Angriffsfläche ein Authentik-**Forward-Auth-Tor** im
+Reverse Proxy *vor* die App stellen; unauthentifizierter Traffic erreicht die App dann gar nicht, und die
+App-OIDC-Anmeldung läuft dahinter per SSO nahtlos durch. In diesem Fall `OIDC_PROMPT` leer lassen (Default);
+An-/Abmeldung und Konto-Wechsel passieren am Tor (Authentik).
+
+> Betrieb **ohne** Tor: `OIDC_PROMPT=login` setzen — dann verlangt Authentik bei jeder Anmeldung eine
+> Neuanmeldung, sodass man nach dem Logout nicht automatisch wieder eingeloggt wird und das Konto wechseln kann.
 
 ---
 
