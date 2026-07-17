@@ -50,6 +50,13 @@ services:
       # --- Block 4: Datei-/Foto-Ablage ---
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+      # --- SSO / OIDC (Authentik) ---
+      OIDC_ENABLED: ${OIDC_ENABLED:-false}
+      OIDC_ISSUER: ${OIDC_ISSUER:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
+      OIDC_ALLOW_SIGNUP: ${OIDC_ALLOW_SIGNUP:-true}
     depends_on:
       db: { condition: service_healthy }
     volumes:

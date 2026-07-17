@@ -17,7 +17,8 @@ model User {
   id           Int      @id @default(autoincrement())
   name         String
   email        String   @unique
-  passwordHash String   @map("password_hash")
+  passwordHash String?  @map("password_hash")
+  oidcSub      String?  @unique @map("oidc_sub") // Verknüpfung zur Authentik-Identität (OIDC sub)
   role         String   @default("user")
   createdAt    DateTime @default(now()) @map("created_at")
 

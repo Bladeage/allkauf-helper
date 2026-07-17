@@ -54,7 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         api.get<{ needsSetup: boolean }>('/auth/status'),
       ]);
       if (!active) return;
-      if (meRes.status === 'fulfilled') setUser(meRes.value.data);
+      if (meRes.status === 'fulfilled') {
+        setUser(meRes.value.data);
+        markLoggedIn(); // Flag aktualisieren (auch nach OIDC-Full-Page-Login) für Multi-Tab-Sync
+      }
       if (statusRes.status === 'fulfilled') setNeedsSetup(Boolean(statusRes.value.data.needsSetup));
       setReady(true);
     })();

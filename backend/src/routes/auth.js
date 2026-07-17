@@ -17,7 +17,8 @@ import { loginLimiter, sensitiveActionLimiter } from '../middleware/rateLimit.js
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { parse } from '../utils/validation.js';
 import { send } from '../utils/serialize.js';
-import { config } from '../config/env.js';
+import { setSessionCookie, cookieOptions } from '../utils/sessionCookie.js';
+import oidc from './oidc.js';
 
 const router = Router();
 
@@ -41,25 +42,6 @@ const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Aktuelles Passwort erforderlich'),
   newPassword: z.string().min(8, 'Neues Passwort muss mindestens 8 Zeichen haben').max(200),
 });
-
-function cookieOptions(req, extra = {}) {
-  return {
-    httpOnly: true,
-    // Secure nur bei echter HTTPS-Verbindung (req.secure via trust proxy / X-Forwarded-Proto).
-    secure: Boolean(req.secure),
-    sameSite: 'lax',
-    path: '/',
-    ...extra,
-  };
-}
-
-function setSessionCookie(req, res, result) {
-  res.cookie(
-    config.cookieName,
-    result.token,
-    cookieOptions(req, result.remember ? { maxAge: config.rememberMaxAgeMs } : {}),
-  );
-}
 
 // ---------- Ersteinrichtung / Onboarding ----------
 router.get(
@@ -173,5 +155,8 @@ router.post(
     res.json({ ok: true });
   }),
 );
+
+// OIDC-/SSO-Endpunkte (Authentik) unter /api/auth/oidc.
+router.use('/oidc', oidc);
 
 export default router;

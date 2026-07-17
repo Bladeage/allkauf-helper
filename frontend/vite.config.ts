@@ -28,6 +28,9 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: '/index.html',
+        // /api/* sind Backend-Endpunkte (u. a. der OIDC-Redirect /api/auth/oidc/login):
+        // NICHT die App-Shell ausliefern, sondern die Navigation zum Backend durchlassen.
+        navigateFallbackDenylist: [/^\/api\//],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {

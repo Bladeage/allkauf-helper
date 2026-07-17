@@ -46,6 +46,20 @@ export const config = {
   // Block 4: Datei-/Foto-Ablage
   uploadDir: process.env.UPLOAD_DIR || '/app/uploads',
   maxUploadBytes: (Number(process.env.MAX_UPLOAD_MB) || 15) * 1024 * 1024,
+
+  // --- SSO / OIDC (Authentik) ---
+  oidc: {
+    enabled: bool(process.env.OIDC_ENABLED, false),
+    // Issuer immer mit genau einem Trailing-Slash (für die .well-known-Auflösung).
+    issuer: process.env.OIDC_ISSUER ? process.env.OIDC_ISSUER.replace(/\/?$/, '/') : '',
+    clientId: process.env.OIDC_CLIENT_ID || '',
+    clientSecret: process.env.OIDC_CLIENT_SECRET || '',
+    redirectUri: process.env.OIDC_REDIRECT_URI || '',
+    scope: process.env.OIDC_SCOPE || 'openid email profile',
+    // Neue Authentik-Nutzer automatisch lokal anlegen (per E-Mail gemappt).
+    allowSignup: bool(process.env.OIDC_ALLOW_SIGNUP, true),
+    buttonLabel: process.env.OIDC_BUTTON_LABEL || 'Einloggen mit OpenID',
+  },
 };
 
 export function assertSecrets() {
@@ -59,6 +73,12 @@ export function assertSecrets() {
     }
     if (!config.databaseUrl) {
       throw new Error('DATABASE_URL ist nicht gesetzt (Pflicht in production).');
+    }
+    if (config.oidc.enabled) {
+      const missing = ['issuer', 'clientId', 'clientSecret', 'redirectUri'].filter((k) => !config.oidc[k]);
+      if (missing.length) {
+        throw new Error(`OIDC_ENABLED=true, aber es fehlen: ${missing.join(', ')} (OIDC_ISSUER/CLIENT_ID/CLIENT_SECRET/REDIRECT_URI).`);
+      }
     }
   }
 }

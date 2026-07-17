@@ -1,6 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { apiError } from '../lib/api';
+import { api, apiError } from '../lib/api';
 import { Button, Input, Field, ErrorBox } from '../components/ui';
 import { useT } from '../i18n/LanguageContext';
 
@@ -14,6 +14,23 @@ export default function Login() {
   const [code, setCode] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [oidc, setOidc] = useState<{ enabled: boolean; label: string }>({
+    enabled: false,
+    label: 'Mit Authentik anmelden',
+  });
+
+  useEffect(() => {
+    api
+      .get<{ enabled: boolean; label: string }>('/auth/oidc/config')
+      .then((r) => setOidc(r.data))
+      .catch(() => {});
+    // Fehlerrückmeldung vom OIDC-Callback (?login_error=...) anzeigen und aus der URL putzen.
+    if (new URLSearchParams(window.location.search).has('login_error')) {
+      setErr(t('Anmeldung über Authentik fehlgeschlagen. Bitte erneut versuchen oder mit Passwort anmelden.'));
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function submitPassword(e: FormEvent) {
     e.preventDefault();
@@ -57,6 +74,25 @@ export default function Login() {
             {step === 'password' ? t('Bitte anmelden') : t('Zwei-Faktor-Bestätigung')}
           </p>
         </div>
+
+        {step === 'password' && oidc.enabled && (
+          <div className="mb-5 space-y-3">
+            <Button
+              type="button"
+              className="w-full"
+              onClick={() => {
+                window.location.href = '/api/auth/oidc/login';
+              }}
+            >
+              🔐 {oidc.label}
+            </Button>
+            <div className="flex items-center gap-3 text-xs text-slate-400">
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+              {t('oder mit Passwort')}
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            </div>
+          </div>
+        )}
 
         {step === 'password' ? (
           <form onSubmit={submitPassword} className="space-y-4">

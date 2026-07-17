@@ -20,7 +20,7 @@ const DUMMY_HASH = bcrypt.hashSync('timing-mitigation-dummy', 10);
 
 const publicUser = (u) => ({ id: u.id, name: u.name, email: u.email, role: u.role });
 
-function issueSession(user, remember) {
+export function issueSession(user, remember) {
   const token = jwt.sign(
     { sub: String(user.id), email: user.email, name: user.name, role: user.role, tv: user.tokenVersion ?? 0 },
     config.jwtSecret,
@@ -33,7 +33,8 @@ function issueSession(user, remember) {
 export async function login(email, password, remember = false) {
   const normEmail = String(email || '').toLowerCase().trim();
   const user = await prisma.user.findUnique({ where: { email: normEmail } });
-  const hash = user ? user.passwordHash : DUMMY_HASH;
+  // Reine OIDC-Nutzer haben kein lokales Passwort -> DUMMY_HASH (schlägt konstant-zeitig fehl).
+  const hash = user && user.passwordHash ? user.passwordHash : DUMMY_HASH;
   const ok = await bcrypt.compare(String(password || ''), hash);
   if (!user || !ok) {
     throw new HttpError(401, 'E-Mail oder Passwort falsch');
