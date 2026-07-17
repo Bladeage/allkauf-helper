@@ -59,6 +59,10 @@ export const config = {
     // Neue Authentik-Nutzer automatisch lokal anlegen (per E-Mail gemappt).
     allowSignup: bool(process.env.OIDC_ALLOW_SIGNUP, true),
     buttonLabel: process.env.OIDC_BUTTON_LABEL || 'Einloggen mit OpenID',
+    // Bei aktivem OIDC: auch das Passwort-Login anzeigen? (false = nur OpenID-Screen)
+    showPasswordLogin: bool(process.env.OIDC_SHOW_PASSWORD_LOGIN, true),
+    // Nur verknüpfen/anlegen, wenn Authentik die E-Mail als verifiziert meldet (Impersonations-Schutz).
+    requireVerifiedEmail: bool(process.env.OIDC_REQUIRE_VERIFIED_EMAIL, false),
   },
 };
 

@@ -10,6 +10,7 @@ import { useTheme, FONTS, SIZES, type ThemeMode, type FontKey, type SizeKey } fr
 import { useLang, useT, type Lang } from '../i18n/LanguageContext';
 import TwoFactorCard from '../components/TwoFactorCard';
 import PasswordChangeCard from '../components/PasswordChangeCard';
+import OpenIdLinkCard from '../components/OpenIdLinkCard';
 
 export default function Settings() {
   const { data, loading, error } = useFetch<ProjectSettings>('/settings');
@@ -149,6 +150,8 @@ export default function Settings() {
       <TwoFactorCard />
 
       <PasswordChangeCard />
+
+      <OpenIdLinkCard />
 
       <Card title={t('Projekt')}>
         <div className="space-y-3">

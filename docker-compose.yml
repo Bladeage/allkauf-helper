@@ -57,6 +57,8 @@ services:
       OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
       OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI:-}
       OIDC_ALLOW_SIGNUP: ${OIDC_ALLOW_SIGNUP:-true}
+      OIDC_SHOW_PASSWORD_LOGIN: ${OIDC_SHOW_PASSWORD_LOGIN:-true}
+      OIDC_REQUIRE_VERIFIED_EMAIL: ${OIDC_REQUIRE_VERIFIED_EMAIL:-false}
     depends_on:
       db: { condition: service_healthy }
     volumes:

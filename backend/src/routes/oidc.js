@@ -6,9 +6,18 @@ import jwt from 'jsonwebtoken';
 import { config } from '../config/env.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { loginLimiter } from '../middleware/rateLimit.js';
+import { requireAuth } from '../middleware/auth.js';
 import { issueSession } from '../services/authService.js';
 import { setSessionCookie, cookieOptions } from '../utils/sessionCookie.js';
-import { pkcePair, randomToken, buildLoginUrl, exchangeCode, findOrCreateUser } from '../services/oidcService.js';
+import {
+  pkcePair,
+  randomToken,
+  buildLoginUrl,
+  exchangeCode,
+  findOrCreateUser,
+  pairingStatus,
+  unpairUser,
+} from '../services/oidcService.js';
 
 const router = Router();
 const TX_COOKIE = 'alkauf_oidc_tx';
@@ -21,8 +30,26 @@ const txCookieOptions = (req, extra = {}) => ({ ...cookieOptions(req), path: '/a
 router.get('/config', (req, res) => {
   const o = config.oidc;
   const configured = Boolean(o.issuer && o.clientId && o.clientSecret && o.redirectUri);
-  res.json({ enabled: o.enabled && configured, label: o.buttonLabel });
+  res.json({ enabled: o.enabled && configured, label: o.buttonLabel, showPasswordLogin: o.showPasswordLogin });
 });
+
+// Verknüpfungs-Status des eingeloggten Nutzers (für die Einstellungen).
+router.get(
+  '/status',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    res.json(await pairingStatus(req.user.id));
+  }),
+);
+
+// OIDC-Verknüpfung des eingeloggten Nutzers aufheben (Schutz vor Impersonation).
+router.post(
+  '/unlink',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    res.json(await unpairUser(req.user.id));
+  }),
+);
 
 // Schritt 1: Redirect zum Authentik-Login.
 router.get(

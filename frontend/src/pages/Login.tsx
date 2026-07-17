@@ -14,14 +14,18 @@ export default function Login() {
   const [code, setCode] = useState('');
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [oidc, setOidc] = useState<{ enabled: boolean; label: string }>({
+  const [oidc, setOidc] = useState<{ enabled: boolean; label: string; showPasswordLogin: boolean }>({
     enabled: false,
-    label: 'Mit Authentik anmelden',
+    label: 'Einloggen mit OpenID',
+    showPasswordLogin: true,
   });
+  // Break-Glass: ?local=1 erzwingt das Passwort-Login auch im OpenID-only-Modus.
+  const forceLocal = new URLSearchParams(window.location.search).has('local');
+  const showPasswordForm = !oidc.enabled || oidc.showPasswordLogin || forceLocal;
 
   useEffect(() => {
     api
-      .get<{ enabled: boolean; label: string }>('/auth/oidc/config')
+      .get<{ enabled: boolean; label: string; showPasswordLogin: boolean }>('/auth/oidc/config')
       .then((r) => setOidc(r.data))
       .catch(() => {});
     // Fehlerrückmeldung vom OIDC-Callback (?login_error=...) anzeigen und aus der URL putzen.
@@ -75,8 +79,19 @@ export default function Login() {
           </p>
         </div>
 
+        {step === 'password' && sessionExpired && !err && (
+          <div className="mb-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800" role="status">
+            {t('Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.')}
+          </div>
+        )}
+        {err && (
+          <div className="mb-4">
+            <ErrorBox>{err}</ErrorBox>
+          </div>
+        )}
+
         {step === 'password' && oidc.enabled && (
-          <div className="mb-5 space-y-3">
+          <div className={showPasswordForm ? 'mb-5 space-y-3' : 'space-y-3'}>
             <Button
               type="button"
               className="w-full"
@@ -86,15 +101,51 @@ export default function Login() {
             >
               🔐 {oidc.label}
             </Button>
-            <div className="flex items-center gap-3 text-xs text-slate-400">
-              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-              {t('oder mit Passwort')}
-              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
-            </div>
+            {showPasswordForm && (
+              <div className="flex items-center gap-3 text-xs text-slate-400">
+                <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+                {t('oder mit Passwort')}
+                <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+              </div>
+            )}
           </div>
         )}
 
-        {step === 'password' ? (
+        {step === 'mfa' ? (
+          <form onSubmit={submitMfa} className="space-y-4">
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {t('Gib den 6-stelligen Code aus deiner Authenticator-App ein — oder einen Recovery-Code.')}
+            </p>
+            <Field label={t('Code')}>
+              <Input
+                type="text"
+                inputMode="text"
+                autoComplete="one-time-code"
+                autoCapitalize="none"
+                autoCorrect="off"
+                autoFocus
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder={t('123456 oder Recovery-Code')}
+                required
+              />
+            </Field>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? t('Prüfen…') : t('Bestätigen')}
+            </Button>
+            <button
+              type="button"
+              className="w-full text-center text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+              onClick={() => {
+                setStep('password');
+                setErr(null);
+                setPassword('');
+              }}
+            >
+              {t('Zurück')}
+            </button>
+          </form>
+        ) : showPasswordForm ? (
           <form onSubmit={submitPassword} className="space-y-4">
             <Field label={t('E-Mail')}>
               <Input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -117,51 +168,17 @@ export default function Login() {
               />
               {t('Eingeloggt bleiben')}
             </label>
-            {sessionExpired && !err && (
-              <div className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800" role="status">
-                {t('Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.')}
-              </div>
-            )}
-            {err && <ErrorBox>{err}</ErrorBox>}
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? t('Anmelden…') : t('Anmelden')}
             </Button>
           </form>
         ) : (
-          <form onSubmit={submitMfa} className="space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              {t('Gib den 6-stelligen Code aus deiner Authenticator-App ein — oder einen Recovery-Code.')}
-            </p>
-            <Field label={t('Code')}>
-              <Input
-                type="text"
-                inputMode="text"
-                autoComplete="one-time-code"
-                autoCapitalize="none"
-                autoCorrect="off"
-                autoFocus
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder={t('123456 oder Recovery-Code')}
-                required
-              />
-            </Field>
-            {err && <ErrorBox>{err}</ErrorBox>}
-            <Button type="submit" className="w-full" disabled={busy}>
-              {busy ? t('Prüfen…') : t('Bestätigen')}
-            </Button>
-            <button
-              type="button"
-              className="w-full text-center text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-              onClick={() => {
-                setStep('password');
-                setErr(null);
-                setPassword('');
-              }}
-            >
-              {t('Zurück')}
-            </button>
-          </form>
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            {t('Anmeldung nur über OpenID.')}{' '}
+            <a href="?local=1" className="underline underline-offset-2 hover:text-slate-700 dark:hover:text-slate-200">
+              {t('Stattdessen mit Passwort anmelden')}
+            </a>
+          </p>
         )}
       </div>
     </div>

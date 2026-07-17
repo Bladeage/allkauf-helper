@@ -42,6 +42,10 @@ export async function buildLoginUrl({ state, nonce, codeChallenge }) {
   u.searchParams.set('nonce', nonce);
   u.searchParams.set('code_challenge', codeChallenge);
   u.searchParams.set('code_challenge_method', 'S256');
+  // prompt=login erzwingt bei Authentik eine echte Anmeldung statt stillem SSO-Durchreichen.
+  // Folge: Nach dem Logout landet man NICHT automatisch wieder eingeloggt und kann sich mit
+  // anderen Zugangsdaten anmelden.
+  u.searchParams.set('prompt', 'login');
   return u.toString();
 }
 
@@ -69,6 +73,12 @@ export async function exchangeCode({ code, codeVerifier, expectedNonce }) {
   });
   if (!tokenRes.ok) {
     const txt = await tokenRes.text().catch(() => '');
+    if (txt.includes('invalid_client')) {
+      // Maskierte Diagnose: welche Credentials nutzt das Backend wirklich? -> mit Authentik abgleichen.
+      const s = config.oidc.clientSecret || '';
+      const fp = s.length >= 8 ? `${s.slice(0, 4)}…${s.slice(-4)}` : '(zu kurz/leer)';
+      console.error(`[oidc] invalid_client — client_id=${config.oidc.clientId} secret_len=${s.length} secret_fp=${fp}`);
+    }
     throw new HttpError(502, `OIDC-Token-Austausch fehlgeschlagen (${tokenRes.status}) ${txt.slice(0, 200)}`);
   }
   const tokens = await tokenRes.json();
@@ -93,21 +103,31 @@ export async function exchangeCode({ code, codeVerifier, expectedNonce }) {
   const sub = info.sub || claims.sub;
   const email = String(info.email || claims.email || '').toLowerCase().trim();
   const name = info.name || info.preferred_username || email;
+  // email_verified aus userinfo bzw. ID-Token (Standard-OIDC-Claim).
+  const emailVerified = (info.email_verified ?? claims.email_verified) === true;
   if (!sub) throw new HttpError(502, 'OIDC: kein sub im Profil');
   if (!email) throw new HttpError(400, 'OIDC: keine E-Mail im Profil (ist der email-Scope aktiv?)');
-  return { sub, email, name };
+  return { sub, email, name, emailVerified };
 }
 
 // Verknüpft die OIDC-Identität mit einem lokalen Nutzer:
 //   1) bereits per oidcSub verknüpft -> nehmen
 //   2) gleiche E-Mail vorhanden      -> verknüpfen (bestehende Projektdaten bleiben erhalten)
 //   3) sonst neu anlegen             -> nur wenn OIDC_ALLOW_SIGNUP; erster Nutzer wird Admin
-export async function findOrCreateUser({ sub, email, name }) {
+export async function findOrCreateUser({ sub, email, name, emailVerified }) {
+  // Bereits verknüpft -> direkt nehmen (kein E-Mail-Check nötig).
   const bySub = await prisma.user.findUnique({ where: { oidcSub: sub } });
   if (bySub) return bySub;
 
+  // Für NEUE Verknüpfungen/Anlagen optional eine verifizierte E-Mail verlangen
+  // (Schutz vor Impersonation über eine fremde, unbestätigte E-Mail-Adresse).
+  if (config.oidc.requireVerifiedEmail && !emailVerified) {
+    throw new HttpError(403, 'OIDC: E-Mail ist bei Authentik nicht verifiziert — Verknüpfung/Anlage abgelehnt.');
+  }
+
   const byEmail = await prisma.user.findUnique({ where: { email } });
   if (byEmail) {
+    // Vorhandenes Konto mit dieser OIDC-Identität verknüpfen (Pairing).
     return prisma.user.update({ where: { id: byEmail.id }, data: { oidcSub: sub } });
   }
 
@@ -118,4 +138,25 @@ export async function findOrCreateUser({ sub, email, name }) {
   return prisma.user.create({
     data: { name, email, oidcSub: sub, role: count === 0 ? 'admin' : 'user', passwordHash: null },
   });
+}
+
+// Verknüpfungs-Status (für die Self-Service-Anzeige in den Einstellungen).
+export async function pairingStatus(userId) {
+  const u = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { oidcSub: true, passwordHash: true },
+  });
+  if (!u) throw new HttpError(404, 'Nutzer nicht gefunden');
+  return { linked: Boolean(u.oidcSub), hasPassword: Boolean(u.passwordHash) };
+}
+
+// OIDC-Verknüpfung aufheben (rückgängig machbare Paarung -> Schutz vor Impersonation).
+export async function unpairUser(userId) {
+  const u = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { oidcSub: true, passwordHash: true },
+  });
+  if (!u) throw new HttpError(404, 'Nutzer nicht gefunden');
+  if (u.oidcSub) await prisma.user.update({ where: { id: userId }, data: { oidcSub: null } });
+  return { linked: false, hasPassword: Boolean(u.passwordHash) };
 }

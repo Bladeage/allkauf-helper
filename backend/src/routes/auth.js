@@ -17,6 +17,7 @@ import { loginLimiter, sensitiveActionLimiter } from '../middleware/rateLimit.js
 import { asyncHandler } from '../middleware/errorHandler.js';
 import { parse } from '../utils/validation.js';
 import { send } from '../utils/serialize.js';
+import { config } from '../config/env.js';
 import { setSessionCookie, cookieOptions } from '../utils/sessionCookie.js';
 import oidc from './oidc.js';
 
