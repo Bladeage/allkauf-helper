@@ -40,6 +40,16 @@ export const PHASES = [
       S('Risikolebens-/BU-Versicherung für Kreditnehmer geprüft'),
       S('Erwerbsnebenkosten: Grunderwerbsteuer', { costCategory: CAT.sonst }),
       S('Erwerbsnebenkosten: Notar & Grundbucheintrag', { costCategory: CAT.sonst }),
+      S('Erwerbsnebenkosten: Gerichtskosten Grundbuchamt (separate Rechnung)', {
+        costCategory: CAT.sonst,
+        description:
+          'Das Amtsgericht rechnet Vormerkung, Grundschuld- und Eigentumseintragung getrennt von der Notarrechnung ab — die Rechnung kommt oft erst Wochen später.',
+      }),
+      S('Grundsteuer nach Grundstückskauf: Nachveranlagung erwartet', {
+        costCategory: CAT.sonst,
+        description:
+          'Nach dem Kauf stellt das Finanzamt Grundsteuerwert und Messbetrag (unbebaut) auf den nächsten 1. Januar fest; der Grundsteuerbescheid der Gemeinde folgt. Nach Fertigstellung erneute Nachfeststellung (siehe Phase 6).',
+      }),
       S('Maklerprovision (falls angefallen)', { costCategory: CAT.sonst }),
       S('Bereitstellungszinsen verhandelt & im Budget eingeplant', {
         costCategory: CAT.sonst,
@@ -96,6 +106,23 @@ export const PHASES = [
         description:
           'Die Elektro-Rohinstallation erfolgt VOR der Dämmung — Leerrohre jetzt festlegen. Nachträgliche Verlegung kostet ein Vielfaches; ein Glasfaser-Leerrohr altert nicht.',
       }),
+      S('Nachträge (Anlagen zum Werkvertrag) fortlaufend dokumentiert & Vertragssumme aktualisiert', {
+        description:
+          'Jede Zusatzvereinbarung erhöht die Vertragssumme — die Bank kennt meist nur die ursprüngliche Werkvertragssumme, Nachträge belasten das Eigenkapital-Polster. Summe im Budget fortschreiben.',
+      }),
+      S('Bauseitige Anforderungen externer Anbieter an die Gewerkeplanung übergeben (PV, Küche, Kamin …)', {
+        priority: 'high',
+        description:
+          'Externe Angebote nennen oft konkrete bauseitige Voraussetzungen (Leerrohr-Dimension mit Zugdraht, Zählerschrank-Spezifikation, Traglasten, Anschlusspositionen) — vor der Elektro-Rohinstallation einsammeln und an die Gewerke geben.',
+      }),
+      S('Angebots- und Aktionsfristen (Küche, PV …) gegen den Bauzeitenplan terminiert', {
+        description:
+          'Preisbindung, Aktions-/Lieferfenster und Bestellvorlauf (oft ~10 Wochen) prüfen; ein Küchen-Aufmaß setzt begehbaren Estrich und fertige Anschlüsse voraus — Fristen rückwärts vom Baufortschritt planen.',
+      }),
+      S('Plansatz auf Widersprüche geprüft (Höhenbezüge, Flurstücks-/Titelblöcke, Maßketten)', {
+        description:
+          'Vor Unterschrift/Einreichung: Höhenangaben (m ü. NHN) zwischen Grundriss, Schnitt und Ansichten vergleichen, Titelblöcke und Flurstücksangaben prüfen; Abweichungen schriftlich klären lassen.',
+      }),
     ],
   },
   {
@@ -131,6 +158,11 @@ export const PHASES = [
       }),
       S('Niederschlagswasser: Versickerungsnachweis & gesplittete Abwassergebühr beim Versorger angezeigt', {
         description: 'Befestigte/angeschlossene Flächen angeben; ggf. Genehmigung/Nachweis für eine Versickerungsanlage (Mulde/Rigole) erforderlich.',
+      }),
+      S('GEG-/Energienachweis-Annahmen mit der tatsächlichen Planung abgeglichen (PV-Leistung, Speicher, Wärmeerzeuger)', {
+        priority: 'high',
+        description:
+          'Der Nachweis gilt nur bei plangerechter Ausführung — weicht z. B. die PV-/Speichergröße ab, werden Nachweis und darauf basierende Bestätigungen ungültig. Änderungen dem Aussteller melden und neu rechnen lassen.',
       }),
     ],
   },
@@ -171,6 +203,10 @@ export const PHASES = [
         priority: 'high',
         description: 'Kommunale Entwässerungssatzung schreibt eine Rückstauklappe/-hebeanlage für Abläufe unterhalb der Straßenoberkante vor. Fehlt sie, entfällt der Versicherungsschutz bei Kanalrückstau.',
       }),
+      S('Zahlungsplan erst nach finalem Gesamtpreis & Finanzierungsplan erfasst', {
+        description:
+          'Reihenfolge: 1. finaler Gesamtpreis (inkl. Nachträgen, Baugrund-/Tiefbaukosten, Bemusterung) → 2. Finanzierung mit Plan zur Lückenfüllung → 3. Abschlags-/Zahlungsplan mit Beträgen und Fälligkeiten füllen. Vorher bleiben die Abschlags-Positionen bewusst leer.',
+      }),
     ],
   },
   {
@@ -209,6 +245,10 @@ export const PHASES = [
       }),
       S('Luftdichtheitsmessung (Blower-Door) koordiniert', {
         description: 'Für Förderung/GEG oft erforderlich; von einem Energieberater durchführen lassen.',
+      }),
+      S('Bauseitige energierelevante Leistungen fotodokumentiert (für Energienachweis/-ausweis)', {
+        description:
+          'Bei bauseitigen Leistungen (z. B. PV, Dämmung in Eigenleistung) eine Fotodokumentation erstellen — Aussteller von GEG-Nachweis und Energieausweis verlangen sie als Beleg.',
       }),
       S('Eigenleistungshelfer bei der BG BAU angemeldet'),
       S('Material: Bodenbeläge (Platzhalter)', { costCategory: CAT.eigen }),
@@ -258,7 +298,10 @@ export const PHASES = [
         description: 'In der Regel nicht im Hauspreis.',
       }),
       S('Unabhängigen Sachverständigen zur Bauabnahme hinzugezogen', { priority: 'high', description: 'Nach der Abnahme kehrt die Beweislast um.' }),
-      S('Energieausweis (GEG) bzw. KfW „Bestätigung nach Durchführung" (BnD) durch EEE eingereicht', { priority: 'high' }),
+      S('Energieausweis (GEG) bzw. KfW „Bestätigung nach Durchführung" (BnD) durch EEE eingereicht', {
+        priority: 'high',
+        description: 'Banken machen oft eine Effizienzklasse mit Frist (z. B. 3 Monate nach Fertigstellung) zur Darlehensauflage — Frist im Blick behalten.',
+      }),
       S('Hausnummer beantragt'),
       S('Ummeldung beim Einwohnermeldeamt (innerhalb 2 Wochen)'),
       S('Außenanlagen: Einfahrt/Zufahrt (Platzhalter)', { costCategory: CAT.eigen }),
