@@ -50,6 +50,11 @@ services:
       # --- Block 4: Datei-/Foto-Ablage ---
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+      # --- Eingebaute Datensicherung (standardmäßig AN) ---
+      BACKUP_ENABLED: ${BACKUP_ENABLED:-true}
+      BACKUP_DIR: /app/backups
+      BACKUP_CRON: ${BACKUP_CRON:-30 3 * * *}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
       # --- SSO / OIDC (Authentik) ---
       OIDC_ENABLED: ${OIDC_ENABLED:-false}
       OIDC_ISSUER: ${OIDC_ISSUER:-}
@@ -64,6 +69,14 @@ services:
       db: { condition: service_healthy }
     volumes:
       - uploads_data:/app/uploads
+      # Eigenes Volume, damit die Sicherungen unabhängig von den Nutzdaten
+      # gespiegelt/ausgelagert werden können.
+      # ACHTUNG: `docker compose down -v` löscht AUCH dieses Volume. Wer die
+      # Sicherungen direkt auf der Platte haben will (empfohlen für Auslagerung
+      # auf NAS/externe Platte), ersetzt die Zeile durch einen Bind-Mount:
+      #   - ./backups:/app/backups
+      # Dann muss dem Ordner der Container-User gehören: chown 1000:1000 ./backups
+      - backups_data:/app/backups
     networks: [alkauf_net]
 
   frontend:
@@ -104,3 +117,4 @@ networks:
 volumes:
   db_data: { driver: local }
   uploads_data: { driver: local }
+  backups_data: { driver: local }

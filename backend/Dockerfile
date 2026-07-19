@@ -1,8 +1,12 @@
 # ---- Backend: Node 20 / Express / Prisma ----
 FROM node:20-alpine
 
-# Prisma benötigt OpenSSL auf Alpine (sonst Query-Engine-Fehler zur Laufzeit)
-RUN apk add --no-cache openssl libc6-compat
+# Prisma benötigt OpenSSL auf Alpine (sonst Query-Engine-Fehler zur Laufzeit).
+# postgresql-client liefert pg_dump für die eingebaute Datensicherung.
+# Hinweis zur Version: Alpine 3.23 führt kein postgresql15-client mehr; pg_dump 16
+# gegen einen Server 15 ist der unterstützte Weg (nur alter Client gegen neuen
+# Server verweigert PostgreSQL). Wer die DB auf 17/18 hebt, muss hier mitziehen.
+RUN apk add --no-cache openssl libc6-compat postgresql16-client
 
 WORKDIR /app
 
@@ -19,7 +23,7 @@ RUN npx prisma generate
 
 # Upload-Verzeichnis anlegen und alles dem non-root 'node'-User geben.
 # Das Named Volume erbt beim ersten Mount die Ownership dieses Pfads.
-RUN mkdir -p /app/uploads && chown -R node:node /app
+RUN mkdir -p /app/uploads /app/backups && chown -R node:node /app
 
 ENV NODE_ENV=production
 ENV PORT=5000

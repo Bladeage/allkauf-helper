@@ -47,6 +47,17 @@ export const config = {
   uploadDir: process.env.UPLOAD_DIR || '/app/uploads',
   maxUploadBytes: (Number(process.env.MAX_UPLOAD_MB) || 15) * 1024 * 1024,
 
+  // --- Eingebaute Datensicherung ---
+  // Absichtlich standardmäßig AN: eine Bau-Dokumentation ist unwiederbringlich,
+  // und ein Backup, das man erst einschalten muss, existiert im Ernstfall nicht.
+  backup: {
+    enabled: bool(process.env.BACKUP_ENABLED, true),
+    dir: process.env.BACKUP_DIR || '/app/backups',
+    // Nachts, wenn niemand arbeitet. Vollständige node-cron-Syntax erlaubt.
+    schedule: process.env.BACKUP_CRON || '30 3 * * *',
+    retentionDays: Number(process.env.BACKUP_RETENTION_DAYS) || 14,
+  },
+
   // --- SSO / OIDC (Authentik) ---
   oidc: {
     enabled: bool(process.env.OIDC_ENABLED, false),
