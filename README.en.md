@@ -263,9 +263,34 @@ docker compose down                                  # stop
 docker compose down -v                               # stop + delete DB volume (data loss!)
 ```
 
-### Backup & restore
+### Backup
 
-The **database** and the **attachments** (`uploads_data`) must be backed up. Ready-made script (creates timestamped archives under `./backups/`):
+**Backups are built in and enabled out of the box** — there is nothing to set up.
+The backend backs up the **database** and the **attachments** daily at 03:30 by default
+and keeps the last 14 backups.
+
+Configurable under **Settings → Backup** (admins only):
+
+| Setting | Default | Meaning |
+|---|---|---|
+| Automatic backup | on | Scheduled backup enabled |
+| Frequency | daily | daily or weekly |
+| Time | 03:30 | Timezone `Europe/Berlin` |
+| Keep (count) | 14 | older ones are deleted; `0` = unlimited |
+
+The same page holds the **Back up now** button and a **download link** per backup
+(database and files separately).
+
+> **Important:** Backups live in the `backups_data` volume — on the **same disk** as your
+> data. That protects against accidental deletion, not against disk failure. Download them
+> regularly, or mount `/app/backups` as a bind mount and mirror the folder elsewhere.
+
+Initial values for a fresh installation can be set via env vars (`BACKUP_ENABLED`,
+`BACKUP_FREQUENCY`, `BACKUP_TIME`, `BACKUP_WEEKDAY`, `BACKUP_KEEP`). After the first
+start the UI settings take over — with one exception: `BACKUP_ENABLED=false` disables
+backups entirely, regardless of the UI.
+
+Alternatively (or additionally) the host script, which produces the same filenames:
 
 ```bash
 ./scripts/backup.sh
@@ -274,13 +299,24 @@ The **database** and the **attachments** (`uploads_data`) must be backed up. Rea
 
 **Take a backup before every update** — the backend startup migrates the database automatically.
 
-Restore (caution: overwrites data):
+#### Restore
+
+Fetch the backups from the volume (or download them in the UI):
+
+```bash
+docker compose cp backend:/app/backups ./backups
+```
+
+Restore — **overwrites existing data**:
 
 ```bash
 gunzip -c backups/db-<stamp>.sql.gz | docker compose exec -T db psql -U alkauf_user -d alkauf_haus
 docker compose exec -T backend tar xzf - -C /app < backups/uploads-<stamp>.tar.gz
 docker compose restart backend
 ```
+
+The dump is created with `--no-owner --no-privileges`, so it can also be restored into an
+instance that uses a different database user.
 
 ---
 

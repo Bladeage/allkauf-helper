@@ -481,5 +481,51 @@ export const EN: Record<string, string> = {
   "🇩🇪 Deutsch": "🇩🇪 German",
   "🇬🇧 English": "🇬🇧 English",
   "🌙 Dunkel": "🌙 Dark",
-  "🖥️ System": "🖥️ System"
+  "🖥️ System": "🖥️ System",
+
+  // --- Datensicherung ---
+  "Datensicherung": "Backup",
+  "Sichert Datenbank und alle hochgeladenen Dateien automatisch. Die Sicherungen liegen im Container-Volume — lade sie regelmäßig herunter oder spiegle sie auf ein anderes Gerät, damit sie einen Plattenausfall überleben.":
+    "Automatically backs up the database and all uploaded files. Backups are stored in the container volume — download them regularly or mirror them to another device so they survive a disk failure.",
+  "Die Datensicherung ist per Umgebungsvariable BACKUP_ENABLED=false abgeschaltet.":
+    "Backups are disabled via the BACKUP_ENABLED=false environment variable.",
+  "Automatische Sicherung aktiv": "Automatic backup enabled",
+  "an": "on",
+  "aus": "off",
+  "Häufigkeit": "Frequency",
+  "täglich": "daily",
+  "wöchentlich": "weekly",
+  "Wochentag": "Day of week",
+  "Uhrzeit": "Time",
+  "Aufbewahren (Anzahl)": "Keep (count)",
+  "0 = unbegrenzt aufbewahren": "0 = keep indefinitely",
+  "Einstellungen speichern": "Save settings",
+  "Speichert…": "Saving…",
+  "Jetzt sichern": "Back up now",
+  "Sichert…": "Backing up…",
+  "Vorhandene Sicherungen": "Existing backups",
+  "Noch keine Sicherung vorhanden. Die erste läuft zum eingestellten Zeitpunkt — oder jetzt per Knopfdruck.":
+    "No backups yet. The first one runs at the scheduled time — or right now at the push of a button.",
+  "Datenbank": "Database",
+  "Dateien": "Files",
+  "Sicherung löschen": "Delete backup",
+  "Diese Sicherung endgültig löschen?": "Permanently delete this backup?",
+  "Sicherung gelöscht.": "Backup deleted.",
+  "Sicherung erstellt.": "Backup created.",
+  "Einstellungen gespeichert.": "Settings saved.",
+  "Ältere Sicherungen wurden entfernt.": "Older backups were removed.",
+  "Sicherungen konnten nicht geladen werden": "Backups could not be loaded",
+  "Sicherung fehlgeschlagen": "Backup failed",
+  "Speichern fehlgeschlagen": "Saving failed",
+  "Löschen fehlgeschlagen": "Deleting failed",
+  "Ablage im Container": "Location in container",
+  "Wiederherstellung: siehe README, Abschnitt „Datensicherung\".":
+    "Restore: see README, section \"Backup\".",
+  "Sonntag": "Sunday",
+  "Montag": "Monday",
+  "Dienstag": "Tuesday",
+  "Mittwoch": "Wednesday",
+  "Donnerstag": "Thursday",
+  "Freitag": "Friday",
+  "Samstag": "Saturday"
 };

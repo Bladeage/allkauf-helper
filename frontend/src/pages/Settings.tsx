@@ -11,10 +11,13 @@ import { useLang, useT, type Lang } from '../i18n/LanguageContext';
 import TwoFactorCard from '../components/TwoFactorCard';
 import PasswordChangeCard from '../components/PasswordChangeCard';
 import OpenIdLinkCard from '../components/OpenIdLinkCard';
+import BackupCard from '../components/BackupCard';
+import { useAuth } from '../context/AuthContext';
 
 export default function Settings() {
   const { data, loading, error } = useFetch<ProjectSettings>('/settings');
   const { config } = useData();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     projectName: '',
     livingAreaSqm: '',
@@ -152,6 +155,9 @@ export default function Settings() {
       <PasswordChangeCard />
 
       <OpenIdLinkCard />
+
+      {/* Sicherungen enthalten alle Projektdaten inkl. Nutzerkonten — nur für Admins. */}
+      {user?.role === 'admin' && <BackupCard />}
 
       <Card title={t('Projekt')}>
         <div className="space-y-3">

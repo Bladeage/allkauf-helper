@@ -198,6 +198,14 @@ model ProjectSettings {
   handoverDate            DateTime? @map("handover_date") @db.Date // Start der Gewährleistungsfrist
   hourlyRateEigenleistung Decimal?  @map("hourly_rate_eigenleistung") @db.Decimal(8, 2)
   contingencyPercent      Decimal?  @map("contingency_percent") @db.Decimal(5, 2) // Puffer/Reserve in % (Unvorhergesehenes/Nachträge)
+
+  // --- Datensicherung (in der UI einstellbar; ENV liefert nur die Startwerte) ---
+  backupEnabled   Boolean @default(true) @map("backup_enabled")
+  backupFrequency String  @default("daily") @map("backup_frequency") // daily | weekly
+  backupTime      String  @default("03:30") @map("backup_time") // HH:MM, Europe/Berlin
+  backupWeekday   Int     @default(0) @map("backup_weekday") // 0=So .. 6=Sa, nur bei weekly
+  backupKeep      Int     @default(14) @map("backup_keep") // max. Anzahl aufbewahrter Sicherungen
+
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 

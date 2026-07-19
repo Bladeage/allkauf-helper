@@ -83,25 +83,37 @@ export function listBackups() {
     .sort((a, b) => b.stamp.localeCompare(a.stamp) || a.kind.localeCompare(b.kind));
 }
 
-// Löscht Sicherungen, die älter als retentionDays sind. 0 = nie aufräumen.
-export function pruneBackups(retentionDays = config.backup.retentionDays) {
-  if (!retentionDays || retentionDays <= 0) return [];
-  const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+// Fasst die Einzeldateien eines Laufs (db + uploads) zu einem Eintrag zusammen.
+export function listBackupRuns() {
+  const byStamp = new Map();
+  for (const f of listBackups()) {
+    const run = byStamp.get(f.stamp) || { stamp: f.stamp, files: [], size: 0 };
+    run.files.push(f);
+    run.size += f.size;
+    byStamp.set(f.stamp, run);
+  }
+  // listBackups() ist bereits absteigend sortiert — Map behält die Reihenfolge.
+  return [...byStamp.values()];
+}
+
+// Behält die neuesten `keep` Läufe und löscht ältere. 0 = nie aufräumen.
+export function pruneBackups(keep = config.backup.keep) {
+  if (!keep || keep <= 0) return [];
   const removed = [];
-  for (const b of listBackups()) {
-    const full = path.join(backupDir, b.filename);
-    if (fs.statSync(full).mtimeMs >= cutoff) continue;
-    try {
-      fs.unlinkSync(full);
-      removed.push(b.filename);
-    } catch (e) {
-      console.error(`[backup] Konnte ${b.filename} nicht löschen:`, e.message);
+  for (const run of listBackupRuns().slice(keep)) {
+    for (const f of run.files) {
+      try {
+        fs.unlinkSync(path.join(backupDir, f.filename));
+        removed.push(f.filename);
+      } catch (e) {
+        console.error(`[backup] Konnte ${f.filename} nicht löschen:`, e.message);
+      }
     }
   }
   return removed;
 }
 
-async function performBackup() {
+async function performBackup(keep) {
   ensureBackupDir();
   const s = stamp();
   const dbFile = path.join(backupDir, `db-${s}.sql.gz`);
@@ -125,7 +137,7 @@ async function performBackup() {
   fs.mkdirSync(config.uploadDir, { recursive: true });
   const uploadBytes = await spawnToFile('tar', ['czf', '-', '-C', parent, base], uploadsFile);
 
-  const pruned = pruneBackups();
+  const pruned = pruneBackups(keep);
   return {
     stamp: s,
     files: [
@@ -137,9 +149,9 @@ async function performBackup() {
 }
 
 // Ein Lauf zur Zeit: parallele Aufrufe bekommen dasselbe Ergebnis-Promise.
-export function runBackup() {
+export function runBackup(keep) {
   if (running) return running;
-  running = performBackup().finally(() => {
+  running = performBackup(keep).finally(() => {
     running = null;
   });
   return running;
