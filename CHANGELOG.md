@@ -3,7 +3,7 @@
 Wesentliche Änderungen am **Fertighaus-Helfer** — neueste zuerst.
 Details und Hintergründe stehen in den jeweiligen Git-Commits.
 
-## v1.2.0 (2026-07-17)
+## v1.2.0 (2026-07-19)
 
 - **Single Sign-On über OpenID Connect (z. B. Authentik)** — optionale Anmeldung per SSO
   („Einloggen mit OpenID"); lokales Passwort-Login bleibt als Fallback. Konto-Verknüpfung per E-Mail.
@@ -13,6 +13,14 @@ Details und Hintergründe stehen in den jeweiligen Git-Commits.
   OIDC läuft dahinter per SSO nahtlos durch (`OIDC_PROMPT` leer).
 - Neue `.env`-Optionen: `OIDC_ENABLED`, `OIDC_ISSUER/CLIENT_ID/CLIENT_SECRET/REDIRECT_URI`,
   `OIDC_ALLOW_SIGNUP`, `OIDC_SHOW_PASSWORD_LOGIN`, `OIDC_REQUIRE_VERIFIED_EMAIL`, `OIDC_PROMPT`.
+- **Checklisten-Ergänzungen aus der Praxis** (generischer Seed DE/EN, 10 neue optionale Punkte):
+  Gerichtskosten Grundbuchamt als separater Nebenkosten-Posten; Grundsteuer-Nachveranlagung nach
+  Grundstückskauf; Nachträge zum Werkvertrag dokumentieren; bauseitige Anforderungen externer
+  Anbieter an die Gewerkeplanung übergeben; Angebots-/Aktionsfristen gegen den Bauzeitenplan
+  terminieren; Plansatz auf Widersprüche prüfen; Energienachweis-Annahmen (PV/Speicher) mit der
+  Ausführung abgleichen; Zahlungsplan erst nach finalem Preis & Finanzierungsplan erfassen;
+  Fotodokumentation bauseitiger energierelevanter Leistungen; Hinweis auf Bank-Fristen beim
+  Energieausweis. Wirkt nur auf frische Installationen (Seed).
 
 ## v1.1.0 (2026-07-15)
 

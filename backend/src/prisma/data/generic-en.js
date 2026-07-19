@@ -41,6 +41,16 @@ export const PHASES = [
       S('Term-life / occupational-disability insurance for borrowers checked'),
       S('Ancillary purchase costs: real-estate transfer tax', { costCategory: CAT.sonst }),
       S('Ancillary purchase costs: notary & land-register entry', { costCategory: CAT.sonst }),
+      S('Ancillary purchase costs: land-registry court fees (separate invoice)', {
+        costCategory: CAT.sonst,
+        description:
+          'The local court bills the priority notice, land charge and ownership registration separately from the notary invoice — that bill often arrives weeks later.',
+      }),
+      S('Property tax after plot purchase: reassessment expected', {
+        costCategory: CAT.sonst,
+        description:
+          'After the purchase the tax office assesses the property-tax value and base amount (undeveloped) as of the next 1 January; the municipal property-tax bill follows. Another reassessment is due after completion (see phase 6).',
+      }),
       S('Estate-agent commission (if incurred)', { costCategory: CAT.sonst }),
       S('Commitment interest negotiated & budgeted', {
         costCategory: CAT.sonst,
@@ -97,6 +107,23 @@ export const PHASES = [
         description:
           'The electrical first-fix happens BEFORE the insulation — define conduits now. Retrofitting costs many times more; a fibre conduit never becomes obsolete.',
       }),
+      S('Contract addenda (annexes to the works contract) continuously documented & contract total updated', {
+        description:
+          'Every supplementary agreement increases the contract total — the bank usually only knows the original works-contract sum, so addenda eat into your equity buffer. Keep the total up to date in the budget.',
+      }),
+      S('On-site requirements of external suppliers handed to the trade planning (PV, kitchen, fireplace …)', {
+        priority: 'high',
+        description:
+          'External quotes often state concrete on-site preconditions (conduit size with pull wire, meter-cabinet specification, load capacities, connection positions) — collect them before the electrical first-fix and pass them to the trades.',
+      }),
+      S('Quote and promotion deadlines (kitchen, PV …) scheduled against the construction timeline', {
+        description:
+          'Check price-validity periods, promotion/delivery windows and order lead times (often ~10 weeks); a kitchen measurement requires a walkable screed and finished connections — plan deadlines backwards from construction progress.',
+      }),
+      S('Drawing set checked for contradictions (height datums, parcel/title blocks, dimension chains)', {
+        description:
+          'Before signing/submitting: compare height figures (m above datum) between floor plan, section and elevations, check title blocks and parcel numbers; have deviations clarified in writing.',
+      }),
     ],
   },
   {
@@ -132,6 +159,11 @@ export const PHASES = [
       }),
       S('Rainwater: infiltration proof & split wastewater charge reported to the utility', {
         description: 'Declare paved/connected surfaces; a permit/proof for an infiltration system (swale/soakaway trench) may be required.',
+      }),
+      S('Energy-certificate assumptions reconciled with the actual design (PV output, battery, heat generator)', {
+        priority: 'high',
+        description:
+          'The energy-performance proof is only valid if built as planned — if, say, the PV/battery size deviates, the proof and any confirmations based on it become invalid. Report changes to the issuer and have it recalculated.',
       }),
     ],
   },
@@ -172,6 +204,10 @@ export const PHASES = [
         priority: 'high',
         description: 'The municipal drainage by-law requires a backflow valve/lifting station for drains below street level. Without it, insurance cover lapses in the event of sewer backflow.',
       }),
+      S('Payment plan captured only after the final total price & financing plan', {
+        description:
+          'Sequence: 1. final total price (incl. addenda, soil/civil-works costs, sample selection) → 2. financing with a plan to close any gap → 3. fill in the instalment/payment plan with amounts and due dates. Until then the instalment items deliberately stay empty.',
+      }),
     ],
   },
   {
@@ -210,6 +246,10 @@ export const PHASES = [
       }),
       S('Airtightness test (blower door) coordinated', {
         description: 'Often required for funding/GEG; have it carried out by an energy consultant.',
+      }),
+      S('Self-performed energy-relevant work photo-documented (for the energy proof/certificate)', {
+        description:
+          'For self-performed work (e.g. PV, self-installed insulation) create photo documentation — the issuers of the energy-performance proof and certificate require it as evidence.',
       }),
       S('Self-help workers registered with BG BAU'),
       S('Material: floor coverings (placeholder)', { costCategory: CAT.eigen }),
@@ -259,7 +299,10 @@ export const PHASES = [
         description: 'Usually not included in the house price.',
       }),
       S('Independent expert brought in for construction acceptance', { priority: 'high', description: 'After acceptance, the burden of proof reverses.' }),
-      S('Energy certificate (GEG) or KfW "confirmation after completion" (BnD) submitted by the EEE', { priority: 'high' }),
+      S('Energy certificate (GEG) or KfW "confirmation after completion" (BnD) submitted by the EEE', {
+        priority: 'high',
+        description: 'Banks often make a certain efficiency class with a deadline (e.g. 3 months after completion) a loan condition — keep the deadline in view.',
+      }),
       S('House number applied for'),
       S('Re-registration at the residents registration office (within 2 weeks)'),
       S('Outdoor works: driveway/access (placeholder)', { costCategory: CAT.eigen }),
