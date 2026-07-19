@@ -4,7 +4,7 @@
 #   2) docker compose -f docker-compose.public.yml up -d
 #
 # Images werden von GitHub Actions nach ghcr.io gepusht (siehe .github/workflows).
-# TAG überschreibbar (Image-Tag ohne 'v'):  TAG=1.1.0 docker compose -f docker-compose.public.yml up -d
+# TAG überschreibbar (Image-Tag ohne 'v'):  TAG=1.2.0 docker compose -f docker-compose.public.yml up -d
 services:
   db:
     image: postgres:15-alpine

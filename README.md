@@ -81,7 +81,7 @@ Die Images liegen in der GitHub Container Registry (multi-arch amd64/arm64):
 - `ghcr.io/bladeage/fertighaus-helper-backend`
 - `ghcr.io/bladeage/fertighaus-helper-frontend`
 
-Feste Version statt `latest`: `TAG=1.1.0 docker compose -f docker-compose.public.yml up -d` (Image-Tag ohne `v`).
+Feste Version statt `latest`: `TAG=1.2.0 docker compose -f docker-compose.public.yml up -d` (Image-Tag ohne `v`).
 
 ### Mit Beispieldaten ausprobieren
 
