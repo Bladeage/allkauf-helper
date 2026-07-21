@@ -265,9 +265,35 @@ docker compose down                                  # stoppen
 docker compose down -v                               # stoppen + DB-Volume löschen (Datenverlust!)
 ```
 
-### Backup & Restore
+### Datensicherung
 
-Gesichert werden müssen **Datenbank** und **Anhänge** (`uploads_data`). Fertiges Skript (legt Zeitstempel-Archive unter `./backups/` an):
+**Die Sicherung läuft eingebaut und ist ab Werk aktiv** — es ist nichts einzurichten.
+Das Backend sichert **Datenbank** und **Anhänge** standardmäßig täglich um 03:30 Uhr und
+bewahrt die letzten 14 Sicherungen auf.
+
+Einstellbar unter **Einstellungen → Datensicherung** (nur für Admins):
+
+| Einstellung | Standard | Bedeutung |
+|---|---|---|
+| Automatische Sicherung | an | Zeitgesteuerte Sicherung aktiv |
+| Häufigkeit | täglich | täglich oder wöchentlich |
+| Uhrzeit | 03:30 | Zeitzone `Europe/Berlin` |
+| Aufbewahren (Anzahl) | 14 | ältere werden gelöscht; `0` = unbegrenzt |
+
+Dort liegen auch der Knopf **Jetzt sichern** und die **Download-Links** je Sicherung
+(Datenbank und Dateien getrennt).
+
+> **Wichtig:** Die Sicherungen liegen im Volume `backups_data` — also auf **derselben
+> Platte** wie die Daten. Gegen versehentliches Löschen hilft das, gegen einen
+> Plattenausfall nicht. Lade sie regelmäßig herunter oder mounte `/app/backups` als
+> Bind-Mount und spiegle den Ordner auf ein anderes Gerät.
+
+Startwerte für eine frische Installation lassen sich per ENV vorgeben
+(`BACKUP_ENABLED`, `BACKUP_FREQUENCY`, `BACKUP_TIME`, `BACKUP_WEEKDAY`, `BACKUP_KEEP`).
+Ab der ersten Installation gilt, was in der Oberfläche steht — mit einer Ausnahme:
+`BACKUP_ENABLED=false` schaltet die Sicherung hart ab, unabhängig von den Einstellungen.
+
+Alternativ (oder zusätzlich) das Host-Skript, das dieselben Dateinamen erzeugt:
 
 ```bash
 ./scripts/backup.sh
@@ -276,13 +302,24 @@ Gesichert werden müssen **Datenbank** und **Anhänge** (`uploads_data`). Fertig
 
 **Vor jedem Update ein Backup ziehen** — der Backend-Start migriert die Datenbank automatisch.
 
-Restore (Achtung: überschreibt Daten):
+#### Wiederherstellung
+
+Sicherungen aus dem Volume holen (oder in der Oberfläche herunterladen):
+
+```bash
+docker compose cp backend:/app/backups ./backups
+```
+
+Einspielen — **überschreibt vorhandene Daten**:
 
 ```bash
 gunzip -c backups/db-<stamp>.sql.gz | docker compose exec -T db psql -U alkauf_user -d alkauf_haus
 docker compose exec -T backend tar xzf - -C /app < backups/uploads-<stamp>.tar.gz
 docker compose restart backend
 ```
+
+Der Dump wird mit `--no-owner --no-privileges` erzeugt und lässt sich damit auch in eine
+Instanz mit anderem Datenbank-Benutzer einspielen.
 
 ---
 

@@ -3,6 +3,26 @@
 Wesentliche Änderungen am **Fertighaus-Helfer** — neueste zuerst.
 Details und Hintergründe stehen in den jeweiligen Git-Commits.
 
+## Unveröffentlicht
+
+- **Eingebaute Datensicherung — ab Werk aktiv.** Bisher lag die Sicherung außerhalb der
+  Auslieferung (`scripts/backup.sh` plus ein Cron-Eintrag auf dem Host); wer sich den
+  Fertighaus-Helfer installierte, hatte damit faktisch kein Backup. Das Backend sichert
+  Datenbank und Anhänge jetzt selbst — standardmäßig täglich um 03:30 Uhr, die letzten
+  14 Sicherungen werden aufbewahrt.
+- **Einstellungen → Datensicherung** (nur Admins): Häufigkeit (täglich/wöchentlich),
+  Wochentag, Uhrzeit und Anzahl aufbewahrter Sicherungen; Knopf „Jetzt sichern";
+  Download-Link je Sicherung; Löschen einzelner Sicherungen.
+- Zeitplanänderungen greifen sofort, ohne Neustart. Eine verkleinerte Aufbewahrung räumt
+  direkt beim Speichern auf statt erst beim nächsten Lauf.
+- Neue `.env`-Startwerte: `BACKUP_ENABLED`, `BACKUP_FREQUENCY`, `BACKUP_TIME`,
+  `BACKUP_WEEKDAY`, `BACKUP_KEEP`. `BACKUP_ENABLED=false` schaltet die Sicherung hart ab
+  und sticht die Oberfläche — der Betreiber der Instanz behält das letzte Wort.
+- Neues Volume `backups_data`; Backend-Image enthält `postgresql16-client` für `pg_dump`.
+  Hinweis: Alpine 3.23 führt kein `postgresql15-client` mehr — `pg_dump` 16 gegen einen
+  Server 15 ist der unterstützte Weg.
+- Dateinamen entsprechen `scripts/backup.sh`, damit für beide Wege derselbe Restore gilt.
+
 ## v1.2.0 (2026-07-19)
 
 - **Single Sign-On über OpenID Connect (z. B. Authentik)** — optionale Anmeldung per SSO

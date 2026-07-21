@@ -51,10 +51,19 @@ services:
       # Erster Admin wird beim ersten Start über die Onboarding-Seite angelegt.
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+      # --- Eingebaute Datensicherung (standardmäßig AN) ---
+      BACKUP_ENABLED: ${BACKUP_ENABLED:-true}
+      BACKUP_DIR: /app/backups
+      BACKUP_CRON: ${BACKUP_CRON:-30 3 * * *}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
     depends_on:
       db: { condition: service_healthy }
     volumes:
       - uploads_data:/app/uploads
+      # ACHTUNG: `docker compose down -v` löscht auch dieses Volume. Für
+      # Sicherungen direkt auf der Platte stattdessen einen Bind-Mount nutzen:
+      #   - ./backups:/app/backups        (vorher: chown 1000:1000 ./backups)
+      - backups_data:/app/backups
     networks: [alkauf_net]
 
   frontend:
@@ -74,3 +83,4 @@ networks:
 volumes:
   db_data: { driver: local }
   uploads_data: { driver: local }
+  backups_data: { driver: local }

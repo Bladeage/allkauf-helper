@@ -47,6 +47,20 @@ export const config = {
   uploadDir: process.env.UPLOAD_DIR || '/app/uploads',
   maxUploadBytes: (Number(process.env.MAX_UPLOAD_MB) || 15) * 1024 * 1024,
 
+  // --- Eingebaute Datensicherung ---
+  // Absichtlich standardmäßig AN: eine Bau-Dokumentation ist unwiederbringlich,
+  // und ein Backup, das man erst einschalten muss, existiert im Ernstfall nicht.
+  backup: {
+    enabled: bool(process.env.BACKUP_ENABLED, true),
+    dir: process.env.BACKUP_DIR || '/app/backups',
+    // Startwerte für eine frische Installation. Ab dann gilt, was in den
+    // Projekteinstellungen steht — die Oberfläche ist die führende Quelle.
+    frequency: process.env.BACKUP_FREQUENCY === 'weekly' ? 'weekly' : 'daily',
+    time: /^\d{1,2}:\d{2}$/.test(process.env.BACKUP_TIME || '') ? process.env.BACKUP_TIME : '03:30',
+    weekday: Number.isInteger(Number(process.env.BACKUP_WEEKDAY)) ? Number(process.env.BACKUP_WEEKDAY) : 0,
+    keep: Number(process.env.BACKUP_KEEP) || 14,
+  },
+
   // --- SSO / OIDC (Authentik) ---
   oidc: {
     enabled: bool(process.env.OIDC_ENABLED, false),
